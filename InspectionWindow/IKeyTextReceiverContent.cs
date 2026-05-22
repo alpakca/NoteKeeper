@@ -11,7 +11,7 @@ namespace NoteKeeper.InspectionWindow
         public void InsertText(string text);
         public void InsertChar(char ch);
         public void KeyPressed(Keys key);
-        public void MouseSelected(Point mousePosition);
+        public void MouseSelected(Point pagePosition);
         public void InputEnded();
     }
 }

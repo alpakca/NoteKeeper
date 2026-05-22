@@ -109,9 +109,9 @@ namespace NoteKeeper.InspectionWindow
             }
         }
 
-        public void MouseSelected(Point pageMousePosition)
+        public void MouseSelected(Point pagePosition)
         {
-            caretPosition = lastResult.Caret.MouseCaretPosition(pageMousePosition.ToVector2(), null);
+            caretPosition = lastResult.Caret.MouseCaretPosition(pagePosition.ToVector2(), null);
             ReceivingInput = true;
         }
 

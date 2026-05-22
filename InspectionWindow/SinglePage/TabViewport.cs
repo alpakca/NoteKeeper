@@ -8,41 +8,33 @@ namespace NoteKeeper.InspectionWindow.SinglePage
 {
     internal class TabViewport : ITabViewport
     {
+        private Point scrolledDistance;
+
         public int PageDefaultWidth { get; set; } = 1000;
         public int PageDefaultHeight { get; set; } = 1800;
         public int HorizontalMargin { get; set; } = 100;
         public int VerticalMargin { get; set; } = 50;
 
         public float Zoom { get; set; } = 1f;
-        public Point ScrolledDistance
-        {
-            get;
-            set
-            {
-                field = value;
-
-                if (PageDefaultWidth * Zoom + HorizontalMargin > VisualWidth)
-                    field.X = Math.Clamp(field.X, (int)(VisualWidth - PageDefaultWidth * Zoom - HorizontalMargin), HorizontalMargin);
-
-                if (PageDefaultHeight * Zoom + VerticalMargin > VisualHeight)
-                    field.Y = Math.Clamp(field.Y, (int)(VisualHeight - PageDefaultHeight * Zoom - VerticalMargin), VerticalMargin);
-            }
-        }
+        public Point ScrolledDistance => scrolledDistance;
 
         public int VisualWidth { get; set; }
         public int VisualHeight { get; set; }
+
+        private bool ExceedsVisualHeight => PageDefaultHeight * Zoom + 2 * VerticalMargin > VisualHeight;
+        private bool ExceedsVisualWidth => PageDefaultWidth * Zoom + 2 * HorizontalMargin > VisualWidth;
 
         public Point PageTopLeftPosition
         {
             get
             {
-                Point position = ScrolledDistance;
-                if (PageDefaultWidth * Zoom + HorizontalMargin <= VisualWidth)
+                Point position = new Point(HorizontalMargin, VerticalMargin) - scrolledDistance;
+                if (!ExceedsVisualWidth)
                 {
                     position.X = (int)((VisualWidth - PageDefaultWidth * Zoom) / 2);
                 }
 
-                if (PageDefaultHeight * Zoom + VerticalMargin <= VisualHeight)
+                if (!ExceedsVisualHeight)
                 {
                     position.Y = (int)((VisualHeight - PageDefaultHeight * Zoom) / 2);
                 }
@@ -51,20 +43,26 @@ namespace NoteKeeper.InspectionWindow.SinglePage
             }
         }
 
-        public TabViewport()
-        {
-            ScrolledDistance = new Point(HorizontalMargin, VerticalMargin);
-        }
-
-        public Point ZoomedPosition(Point position)
-        {
-            return new Point((int)(position.X * Zoom), (int)(position.Y * Zoom));
-        }
-
-        public Point RelativeToPage(Point mousePosition)
+        public Point ToPagePosition(Point mousePosition)
         {
             mousePosition -= PageTopLeftPosition;
-            return new Point((int)(mousePosition.X * Zoom), (int)(mousePosition.Y * Zoom));
+            return new Point((int)(mousePosition.X * (1 / Zoom)), (int)(mousePosition.Y * (1 / Zoom)));
+        }
+
+        public void ScrollHorizontal(int xOffset)
+        {
+            if (ExceedsVisualWidth)
+            {
+                scrolledDistance.X = Math.Clamp(scrolledDistance.X + xOffset, 0, (int)(PageDefaultWidth * Zoom + 2 * HorizontalMargin - VisualWidth));
+            }
+        }
+
+        public void ScrollVertical(int yOffset)
+        {
+            if (ExceedsVisualHeight)
+            {
+                scrolledDistance.Y = Math.Clamp(scrolledDistance.Y + yOffset, 0, (int)(PageDefaultHeight * Zoom + 2 * VerticalMargin - VisualHeight));
+            }
         }
     }
 }

@@ -23,16 +23,13 @@ namespace NoteKeeper.InspectionWindow.SinglePage
 
         public IPageContent? HitContent(Point mousePosition)
         {
-            Point pageTopLeftPosition = viewport.PageTopLeftPosition;
-            mousePosition -= pageTopLeftPosition;
-
-            mousePosition = viewport.ZoomedPosition(mousePosition);
+            Point pagePosition = viewport.ToPagePosition(mousePosition);
 
             for (int i = page.Contents.Count - 1; i >= 0; i--)
             {
                 IPageContent content = page.Contents[i];
-                if (content.Location.X <= mousePosition.X && mousePosition.X < content.Location.X + content.Size.X &&
-                    content.Location.Y <= mousePosition.Y && mousePosition.Y < content.Location.Y + content.Size.Y)
+                if (content.Location.X <= pagePosition.X && pagePosition.X < content.Location.X + content.Size.X &&
+                    content.Location.Y <= pagePosition.Y && pagePosition.Y < content.Location.Y + content.Size.Y)
                 {
                     return content;
                 }
@@ -52,7 +49,7 @@ namespace NoteKeeper.InspectionWindow.SinglePage
                     currentKeyTextReceiver = hit;
                 }
 
-                currentKeyTextReceiver?.MouseSelected(viewport.RelativeToPage(mousePosition));
+                currentKeyTextReceiver?.MouseSelected(viewport.ToPagePosition(mousePosition));
             }
         }
 
@@ -63,23 +60,20 @@ namespace NoteKeeper.InspectionWindow.SinglePage
 
         public void KeyInput(Keys key)
         {
-            if (currentKeyTextReceiver == null)
-            {
-                if (InputManager.IsDown(Keys.LeftControl))
-                {
-                    viewport.Zoom += 0.1f;
-                }
-                else if (InputManager.IsDown(Keys.Left))
-                {
-                    viewport.ScrolledDistance += new Point(10, 0);
-                }
-                else if (InputManager.IsDown(Keys.Right))
-                {
-                    viewport.ScrolledDistance += new Point(-10, 0);
-                }
-            }
-
             currentKeyTextReceiver?.KeyPressed(key);
+
+            if (key == Keys.LeftControl)
+            {
+                viewport.Zoom += 0.1f;
+            }
+            else if (key == Keys.Left)
+            {
+                viewport.ScrollHorizontal(-10);
+            }
+            else if (key == Keys.Right)
+            {
+                viewport.ScrollHorizontal(10);
+            }
         }
     }
 }

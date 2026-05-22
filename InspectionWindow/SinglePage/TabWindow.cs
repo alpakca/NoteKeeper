@@ -52,7 +52,7 @@ namespace NoteKeeper.InspectionWindow.SinglePage
             {
                 if (transformer.AnyNodeSelected)
                 {
-                    transformer.MouseMove(e.MousePoint - viewport.PageTopLeftPosition);
+                    transformer.MouseMove(viewport.ToPagePosition(e.MousePoint));
                 }
             }
         }
@@ -61,7 +61,7 @@ namespace NoteKeeper.InspectionWindow.SinglePage
         {
             if (currentMode == ShellModes.Transform)
             {
-                if (!transformer.HitAnyNode(e.MousePoint - viewport.PageTopLeftPosition))
+                if (!transformer.HitAnyNode(viewport.ToPagePosition(e.MousePoint)))
                 {
                     IPageContent hitContent = inputHandler.HitContent(e.MousePoint);
                     if (transformer.TransformedContent != hitContent && e.NewlyPressedButtons.HasFlag(MouseButtons.Left))
@@ -72,7 +72,7 @@ namespace NoteKeeper.InspectionWindow.SinglePage
 
                 if (!transformer.AnyNodeSelected && e.NewlyPressedButtons.HasFlag(MouseButtons.Left))
                 {
-                    transformer.MouseHoldStart(e.MousePoint - viewport.PageTopLeftPosition);
+                    transformer.MouseHoldStart(viewport.ToPagePosition(e.MousePoint));
                 }
                 else if (transformer.AnyNodeSelected && !e.PressedButtons.HasFlag(MouseButtons.Left))
                 {
@@ -97,7 +97,7 @@ namespace NoteKeeper.InspectionWindow.SinglePage
 
         protected override void OnMouseWheelChange(PopUpWindowEventArgs e)
         {
-            viewport.ScrolledDistance = new Point(viewport.ScrolledDistance.X, viewport.ScrolledDistance.Y + e.MouseWheelChange / 6);   
+            viewport.ScrollVertical(-e.MouseWheelChange / 6);
         }
     }
 }
