@@ -1,0 +1,32 @@
+﻿using PopUpUI.Surface;
+using Microsoft.Xna.Framework;
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace NoteKeeper.InspectionWindow.SinglePage
+{
+    // talks to shell - only class that have connection between shell and inspection items
+    internal class SinglePageTab : Tab
+    {
+        private readonly NotePage page;
+        private readonly TabViewport viewport;
+        private readonly TabWindow window;
+
+        public override ITabViewport TabViewport => viewport;
+        public override TabWindow Window => window;
+
+        public SinglePageTab(NotePage page, Point windowSize)
+        {
+            viewport = new TabViewport { VisualWidth = windowSize.X, VisualHeight = windowSize.Y };
+
+            this.page = page;
+            window = new TabWindow(page, viewport);
+        }
+
+        public override void ShellModeUpdated(ShellModes mode)
+        {
+            window.ModeUpdated(mode);
+        }
+    }
+}
