@@ -3,7 +3,6 @@ using Microsoft.Xna.Framework.Input;
 using PopUpUI.Input;
 using PopUpUI.Surface;
 using PopUpUI.Elements;
-using System.Diagnostics;
 
 namespace NoteKeeper.InspectionWindow.SinglePage
 {
@@ -46,58 +45,63 @@ namespace NoteKeeper.InspectionWindow.SinglePage
             inputHandler.CurrentMode = mode;
         }
 
-        protected override void OnMousePositionChange(PopUpWindowEventArgs e)
+        protected override void OnMousePositionChange(PopWindowMouseEventArgs e)
         {
             if (currentMode == ShellModes.Transform)
             {
                 if (transformer.AnyNodeSelected)
                 {
-                    transformer.MouseMove(viewport.ToPagePosition(e.MousePoint));
+                    transformer.MouseMove(viewport.ToPagePosition(e.MousePosition));
                 }
             }
         }
 
-        protected override void OnMouseButtonStateChange(PopUpWindowEventArgs e)
+        protected override void OnMouseButtonStateChange(PopWindowMouseEventArgs e)
         {
             if (currentMode == ShellModes.Transform)
             {
-                if (!transformer.HitAnyNode(viewport.ToPagePosition(e.MousePoint)))
+                if (!transformer.HitAnyNode(viewport.ToPagePosition(e.MousePosition)))
                 {
-                    IPageContent hitContent = inputHandler.HitContent(e.MousePoint);
-                    if (transformer.TransformedContent != hitContent && e.NewlyPressedButtons.HasFlag(MouseButtons.Left))
+                    IPageContent hitContent = inputHandler.HitContent(e.MousePosition);
+                    if (transformer.TransformedContent != hitContent && e.FirstTimeButtons.HasLeft)
                     {
                         transformer.TransformedContent = hitContent;
                     }
                 }
 
-                if (!transformer.AnyNodeSelected && e.NewlyPressedButtons.HasFlag(MouseButtons.Left))
+                if (!transformer.AnyNodeSelected && e.FirstTimeButtons.HasLeft)
                 {
-                    transformer.MouseHoldStart(viewport.ToPagePosition(e.MousePoint));
+                    transformer.MouseHoldStart(viewport.ToPagePosition(e.MousePosition));
                 }
-                else if (transformer.AnyNodeSelected && !e.PressedButtons.HasFlag(MouseButtons.Left))
+                else if (transformer.AnyNodeSelected && !e.CurrentButtons.HasLeft)
                 {
                     transformer.MouseHoldEnd();
                 }
             }
-            else if (e.NewlyPressedButtons.HasFlag(MouseButtons.Left))
+            else if (e.FirstTimeButtons.HasLeft)
             {
-                inputHandler.LeftMouseSelection(e.MousePoint);
+                inputHandler.LeftMouseSelection(e.MousePosition);
             }
         }
 
-        protected override void OnTextInput(PopUpWindowEventArgs e, char ch)
+        protected override void OnTextInput(PopWindowMouseEventArgs e, char ch)
         {
-            inputHandler.TextInput(ch);
+            inputHandler.TextInput(e, ch);
         }
 
-        protected override void OnKeyDown(PopUpWindowEventArgs e, Keys key)
+        protected override void OnKeyDown(PopWindowMouseEventArgs e, Keys key)
         {
-            inputHandler.KeyInput(key);
+            inputHandler.KeyInput(e, key);
         }
 
-        protected override void OnMouseWheelChange(PopUpWindowEventArgs e)
+        protected override void OnMouseVerticalScrollChange(PopWindowMouseEventArgs e, int change)
         {
-            viewport.ScrollVertical(-e.MouseWheelChange / 6);
+            viewport.ScrollVertical(-change / 6);
+        }
+
+        protected override void OnMouseHorizontalScrollChange(PopWindowMouseEventArgs e, int change)
+        {
+            viewport.ScrollHorizontal(-change / 6);
         }
     }
 }

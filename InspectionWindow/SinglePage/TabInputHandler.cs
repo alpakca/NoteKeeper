@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using PopUpUI.Input;
 using PopUpUI.Toolkit;
 
 #nullable enable
@@ -53,27 +54,14 @@ namespace NoteKeeper.InspectionWindow.SinglePage
             }
         }
 
-        public void TextInput(char ch)
+        public void TextInput(PopWindowMouseEventArgs e, char ch)
         {
             currentKeyTextReceiver?.InsertChar(ch);
         }
 
-        public void KeyInput(Keys key)
+        public void KeyInput(PopWindowMouseEventArgs e, Keys key)
         {
             currentKeyTextReceiver?.KeyPressed(key);
-
-            if (key == Keys.LeftControl)
-            {
-                viewport.Zoom += 0.1f;
-            }
-            else if (key == Keys.Left)
-            {
-                viewport.ScrollHorizontal(-10);
-            }
-            else if (key == Keys.Right)
-            {
-                viewport.ScrollHorizontal(10);
-            }
         }
     }
 }

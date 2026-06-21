@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace NoteKeeper.InspectionWindow.SinglePage
@@ -21,8 +22,11 @@ namespace NoteKeeper.InspectionWindow.SinglePage
         public int VisualWidth { get; set; }
         public int VisualHeight { get; set; }
 
-        private bool ExceedsVisualHeight => PageDefaultHeight * Zoom + 2 * VerticalMargin > VisualHeight;
-        private bool ExceedsVisualWidth => PageDefaultWidth * Zoom + 2 * HorizontalMargin > VisualWidth;
+        public int ActualHeight => (int)(PageDefaultHeight * Zoom + 2 * VerticalMargin);
+        public int ActualWidth => (int)(PageDefaultWidth * Zoom + 2 * HorizontalMargin);
+
+        private bool ExceedsVisualHeight => ActualHeight > VisualHeight;
+        private bool ExceedsVisualWidth => ActualWidth > VisualWidth;
 
         public Point PageTopLeftPosition
         {
@@ -49,19 +53,35 @@ namespace NoteKeeper.InspectionWindow.SinglePage
             return new Point((int)(mousePosition.X * (1 / Zoom)), (int)(mousePosition.Y * (1 / Zoom)));
         }
 
-        public void ScrollHorizontal(int xOffset)
+        public void ScrollHorizontal(int amount)
         {
             if (ExceedsVisualWidth)
             {
-                scrolledDistance.X = Math.Clamp(scrolledDistance.X + xOffset, 0, (int)(PageDefaultWidth * Zoom + 2 * HorizontalMargin - VisualWidth));
+                scrolledDistance.X = Math.Clamp(scrolledDistance.X + amount, 0, (int)(ActualWidth - VisualWidth));
             }
         }
 
-        public void ScrollVertical(int yOffset)
+        public void ScrollVertical(int amount)
         {
             if (ExceedsVisualHeight)
             {
-                scrolledDistance.Y = Math.Clamp(scrolledDistance.Y + yOffset, 0, (int)(PageDefaultHeight * Zoom + 2 * VerticalMargin - VisualHeight));
+                scrolledDistance.Y = Math.Clamp(scrolledDistance.Y + amount, 0, (int)(ActualHeight - VisualHeight));
+            }
+        }
+
+        public void SetHorizontalScroll(int xOffset)
+        {
+            if (ExceedsVisualWidth)
+            {
+                scrolledDistance.X = Math.Clamp(xOffset, 0, (int)(ActualWidth - VisualWidth));
+            }
+        }
+
+        public void SetVerticalScroll(int yOffset)
+        {
+            if (ExceedsVisualHeight)
+            {
+                scrolledDistance.Y = Math.Clamp(yOffset, 0, (int)(ActualHeight - VisualHeight));
             }
         }
     }

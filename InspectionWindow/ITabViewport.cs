@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
-using System.Collections.Generic;
 using System.Text;
 
 namespace NoteKeeper.InspectionWindow
@@ -13,7 +12,12 @@ namespace NoteKeeper.InspectionWindow
         public int VisualWidth { get; set; }
         public int VisualHeight { get; set; }
 
-        public void ScrollHorizontal(int xOffset);
-        public void ScrollVertical(int yOffset);
+        public int ActualHeight { get; }
+        public int ActualWidth { get; }
+
+        public void ScrollHorizontal(int amount);
+        public void ScrollVertical(int amount);
+        public void SetHorizontalScroll(int xOffset);
+        public void SetVerticalScroll(int yOffset);
     }
 }

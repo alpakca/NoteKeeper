@@ -7,6 +7,7 @@ using NoteKeeper.InspectionWindow.SinglePage;
 using System.Linq;
 using System.Diagnostics;
 using PopUpUI.Elements;
+using NoteKeeper.Shell;
 
 namespace NoteKeeper
 {
@@ -38,8 +39,8 @@ namespace NoteKeeper
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             SpriteFont font = Content.Load<SpriteFont>("ComicSans");
 
-            Texture2D red = GetTexture(200, 200, Color.DarkRed);
-            Texture2D green = GetTexture(200, 200, Color.DarkGreen);
+            Texture2D red = Util.GetTexture(200, 200, Color.DarkRed);
+            Texture2D green = Util.GetTexture(200, 200, Color.DarkGreen);
 
             NotePage page = new NotePage();
             page.Contents.AddRange([new PageImageContent(red) 
@@ -62,7 +63,12 @@ namespace NoteKeeper
 
             SinglePageTab tab = new SinglePageTab(page, viewerSize);
             tab.Window.Boundaries = new Rectangle(20, upMargin, viewerSize.X, viewerSize.Y);
-            PopWindowManager.ActiveWindows.Add(tab.Window);
+
+
+
+            ControlPanel panel = new ControlPanel();
+            panel.ActiveTabs.Add(tab);
+            panel.DisplayTab(tab);
         }
 
         protected override void Update(GameTime gameTime)
@@ -90,10 +96,13 @@ namespace NoteKeeper
 
             base.Draw(gameTime);
         }
+    }
 
-        private Texture2D GetTexture(int w, int h, Color color)
+    public class Util
+    {
+        public static Texture2D GetTexture(int w, int h, Color color)
         {
-            Texture2D tex = new Texture2D(GraphicsDevice, w, h);
+            Texture2D tex = new Texture2D(DrawHelper.Device, w, h);
             tex.SetData(Enumerable.Repeat(color, w * h).ToArray());
 
             return tex;
