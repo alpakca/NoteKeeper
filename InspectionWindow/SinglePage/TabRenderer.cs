@@ -39,7 +39,7 @@ namespace NoteKeeper.InspectionWindow.SinglePage
             foreach (Point position in nodeScreenPositions)
             {
                 // replace with actual image
-                DrawHelper.DrawBackground(new Rectangle(position, new Point(PageContentTransformer.NodeLength)), Color.White);
+                DrawHelper.DrawBackground(new Rectangle(position, new Point(PageContentTransformer.NodeLength)), Color.Black);
             }
 
             DrawHelper.EndBatch();

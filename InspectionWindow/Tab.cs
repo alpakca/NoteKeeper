@@ -1,4 +1,6 @@
-﻿using PopUpUI.Surface;
+﻿using Microsoft.Xna.Framework;
+using PopUpUI.Input;
+using PopUpUI.Surface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,5 +19,9 @@ namespace NoteKeeper.InspectionWindow
         public abstract PopWindow Window { get; }
 
         public abstract void ShellModeUpdated(ShellModes mode);
+        public abstract void AddContent(IPageContent content);
+        public abstract Point GetContentScreenLocation(IPageContent content);
+
+        public abstract void SimulateMouseButtonStateInput(PopWindowMouseEventArgs e);
     }
 }

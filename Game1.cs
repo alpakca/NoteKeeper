@@ -8,6 +8,7 @@ using System.Linq;
 using System.Diagnostics;
 using PopUpUI.Elements;
 using NoteKeeper.Shell;
+using PopUpUI.Text;
 
 namespace NoteKeeper
 {
@@ -37,21 +38,28 @@ namespace NoteKeeper
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+            ContentAssistant.LoadWithContentManager<SpriteFont>(("ComicSans", "Font_ComicSans"));
+
+
             SpriteFont font = Content.Load<SpriteFont>("ComicSans");
 
             Texture2D red = Util.GetTexture(200, 200, Color.DarkRed);
             Texture2D green = Util.GetTexture(200, 200, Color.DarkGreen);
 
             NotePage page = new NotePage();
-            page.Contents.AddRange([new PageImageContent(red) 
+            page.Contents.AddRange([
+               new PageImageContent(red)
             {
-                Size = new Point(200, 200), 
+                Size = new Point(200, 200),
                 Location = new Point(50, 500)
-            }, new PageImageContent(green) 
+            }, new PageImageContent(green)
             {
                 Size = new Point(50, 50),
                 Location = new Point(250, 250)
-            }, new PageTextContent(font) {
+            },new PageImageContent(green) {
+                Size = new Point(200, 30),
+                Location = new Point(50, 50)
+            }, new PageTextContent(new TextProcesser { Font = font }) {
                 Size = new Point(200, 200),
                 Location = new Point(50, 50)
             }]);

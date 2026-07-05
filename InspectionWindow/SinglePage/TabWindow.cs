@@ -84,6 +84,11 @@ namespace NoteKeeper.InspectionWindow.SinglePage
             }
         }
 
+        public void SimulateMouseButtonStateInput(PopWindowMouseEventArgs e)
+        {
+            OnMouseButtonStateChange(e);
+        }
+
         protected override void OnTextInput(PopWindowMouseEventArgs e, char ch)
         {
             inputHandler.TextInput(e, ch);

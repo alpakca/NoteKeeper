@@ -1,123 +1,178 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using PopUpUI.Text;
 using PopUpUI.Toolkit;
-using System.Linq;
 
 namespace NoteKeeper.InspectionWindow
 {
     internal class PageTextContent : IPageContent, IKeyTextReceiverContent
     {
+        private readonly BasicProcesser processer;
+
+        private bool receivingInput;
         private TextPosition caretPosition;
         private ITextProcesserResult lastResult;
-        private readonly TextProcesser processer;
 
-        public bool ReceivingInput { get; set; }
-
-        public Point Size 
+        public Point Size
         {
-            get => lastResult.TextSize.ToPoint(); 
+            get;
             set
             {
+                field = value;
+               
                 processer.HorizontalTextLength = value.X;
                 lastResult = processer.GetParseResult();
+
+                if (field.Y < lastResult.TextSize.Y)
+                {
+                    field.Y = (int)lastResult.TextSize.Y;
+                }
             }
         }
         public Point Location { get; set; }
 
-        public PageTextContent(SpriteFont font)
+        public PageTextContent(BasicProcesser processer)
         {
-            processer = new TextProcesser { Font = font, TextColor = Color.Black };
-            font.DefaultCharacter = '?';
+            this.processer = processer;
         }
 
         public void Render(Point pageLocation)
         {
             lastResult.Render(PopUpUI.Surface.BatchDrawOptions.Default, (Location + pageLocation).ToVector2(), null, 1f);
 
-            // draw the caret
-            if (ReceivingInput)
+            if (receivingInput)
             {
-                Vector2 screenPosition = lastResult.Caret.ScreenCaretPosition(caretPosition, null);
-                DrawHelper.DrawBackground(new Rectangle(pageLocation + Location + screenPosition.ToPoint(), new Point(2, processer.Font.LineSpacing)), Color.Black);
+                Point caretPageLocation = lastResult.Caret.ScreenCaretPosition(caretPosition, null).ToPoint();
+                DrawHelper.DrawBackground(new Rectangle(Location + pageLocation + caretPageLocation, new Point(2, processer.Font.LineSpacing)), Color.Black);
+
+                // draw outline indicating the boundary of content
+
+                const int OutlineThickness = 2;
+                const int OutlineMargin = 4;
+
+                DrawHelper.DrawBackground(new Rectangle(Location + pageLocation + new Point(-OutlineMargin), new Point(Size.X + 2 * OutlineMargin, OutlineThickness)), Color.Black);
+                DrawHelper.DrawBackground(new Rectangle(Location + pageLocation + new Point(-OutlineMargin, OutlineMargin) + new Point(0, Size.Y - OutlineThickness), new Point(Size.X + 2 * OutlineMargin, OutlineThickness)), Color.Black);
+
+                DrawHelper.DrawBackground(new Rectangle(Location + pageLocation + new Point(-OutlineMargin), new Point(OutlineThickness, Size.Y + 2 * OutlineMargin)), Color.Black);
+                DrawHelper.DrawBackground(new Rectangle(Location + pageLocation + new Point(OutlineMargin, -OutlineMargin) + new Point(Size.X - OutlineThickness, 0), new Point(OutlineThickness, Size.Y + 2 * OutlineMargin)), Color.Black);
             }
         }
 
-        public void InsertText(string str)
+        public void MouseSelected(Point pagePosition)
         {
-            foreach (var ch in str)
+            Vector2 inContentPosition = (pagePosition - Location).ToVector2();
+            if (lastResult.TextSize.Y <= inContentPosition.Y)
             {
-                InsertChar(ch);
+                caretPosition = lastResult.Caret.MaximumPosition;
             }
+            else if (inContentPosition.Y < 0)
+            {
+                caretPosition = lastResult.Caret.MinimumPosition;
+            }
+            else
+            {
+                caretPosition = lastResult.Caret.MouseCaretPosition(inContentPosition, null);
+            }
+
+            receivingInput = true;
+        }
+
+        public void InputEnded()
+        {
+            receivingInput = false;
         }
 
         public void InsertChar(char ch)
         {
-            if (char.IsControl(ch) && ch != '\n')
+            if (ch != '\n' && !processer.Font.Characters.Contains(ch))
             {
                 return;
             }
 
-            processer.Text = processer.Text.Insert(lastResult.Caret.GetLineFreePosition(caretPosition), ch.ToString());
+            int indexInText = lastResult.Caret.GetLineFreePosition(caretPosition);
+            processer.Text = processer.Text.Insert(indexInText, ch.ToString());
 
             lastResult = processer.GetParseResult();
             caretPosition = lastResult.Caret.Advance(caretPosition, 1);
+
+            if (lastResult.TextSize.Y > Size.Y)
+            {
+                Size = lastResult.TextSize.ToPoint();
+            }
+        }
+
+        public void InsertText(string text)
+        {
+            int indexInText = lastResult.Caret.GetLineFreePosition(caretPosition);
+            processer.Text = processer.Text.Insert(indexInText, text);
+
+            lastResult = processer.GetParseResult();
+            caretPosition = lastResult.Caret.Advance(caretPosition, text.Length);
+
+            if (lastResult.TextSize.Y > Size.Y)
+            {
+                Size = lastResult.TextSize.ToPoint();
+            }
         }
 
         public void Backspace()
         {
             if (processer.Text.Length == 0 || (caretPosition.IndexInsideLine == 0 && caretPosition.LineIndex == 0))
-            {
                 return;
-            }
 
-            int lineFreePosition = lastResult.Caret.GetLineFreePosition(caretPosition);
-            processer.Text = processer.Text[..(lineFreePosition - 1)] + processer.Text[lineFreePosition..];
+            int indexInText = lastResult.Caret.GetLineFreePosition(caretPosition);
+            processer.Text = processer.Text[..(indexInText - 1)] + processer.Text[indexInText..];
 
             lastResult = processer.GetParseResult();
-            caretPosition = lastResult.Caret.Advance(caretPosition, -1);
+            caretPosition = lastResult.Caret.GetCaretPosition(indexInText - 1);
         }
 
         public void KeyPressed(Keys key)
         {
             switch (key)
             {
-                case Keys.Back:
-                    Backspace();
+                case Keys.Up:
+                    
+                    if (caretPosition.LineIndex == 0)
+                    {
+                        caretPosition = lastResult.Caret.MinimumPosition;
+                    }
+                    else
+                    {
+                        caretPosition = lastResult.Caret.Clamp(new TextPosition(caretPosition.LineIndex - 1, caretPosition.IndexInsideLine));
+                    }
+
                     break;
-                case Keys.Enter:
-                    InsertChar('\n');
+                case Keys.Down:
+
+                    if (caretPosition.LineIndex == lastResult.Lines.LineCount - 1)
+                    {
+                        caretPosition = lastResult.Caret.MaximumPosition;
+                    }
+                    else
+                    {
+                        caretPosition = lastResult.Caret.Clamp(new TextPosition(caretPosition.LineIndex + 1, caretPosition.IndexInsideLine));
+                    }
+
                     break;
                 case Keys.Left:
+
                     caretPosition = lastResult.Caret.Advance(caretPosition, -1);
                     break;
                 case Keys.Right:
+
                     caretPosition = lastResult.Caret.Advance(caretPosition, +1);
                     break;
-                case Keys.Up:
+                case Keys.Enter:
 
-                    caretPosition = caretPosition.LineIndex == 0
-                                  ? lastResult.Caret.MinimumPosition 
-                                  : lastResult.Caret.Clamp(new TextPosition(caretPosition.LineIndex - 1, caretPosition.IndexInsideLine));
+                    InsertChar('\n');
                     break;
-                case Keys.Down:
-                    caretPosition = caretPosition.LineIndex ==  lastResult.Lines.LineCount - 1
-                                  ? lastResult.Caret.MaximumPosition
-                                  : lastResult.Caret.Clamp(new TextPosition(caretPosition.LineIndex + 1, caretPosition.IndexInsideLine));
+
+                case Keys.Back:
+
+                    Backspace();
                     break;
             }
-        }
-
-        public void MouseSelected(Point pagePosition)
-        {
-            caretPosition = lastResult.Caret.MouseCaretPosition(pagePosition.ToVector2(), null);
-            ReceivingInput = true;
-        }
-
-        public void InputEnded()
-        {
-            ReceivingInput = false;
         }
     }
 }

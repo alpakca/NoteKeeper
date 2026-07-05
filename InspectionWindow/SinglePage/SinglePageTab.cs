@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using PopUpUI.Input;
 
 namespace NoteKeeper.InspectionWindow.SinglePage
 {
@@ -27,6 +28,21 @@ namespace NoteKeeper.InspectionWindow.SinglePage
         public override void ShellModeUpdated(ShellModes mode)
         {
             window.ModeUpdated(mode);
+        }
+
+        public override void AddContent(IPageContent content)
+        {
+            page.Contents.Add(content);
+        }
+
+        public override Point GetContentScreenLocation(IPageContent content)
+        {
+            return viewport.ToScreenLocation(content.Location);
+        }
+
+        public override void SimulateMouseButtonStateInput(PopWindowMouseEventArgs e)
+        {
+            window.SimulateMouseButtonStateInput(e);
         }
     }
 }
