@@ -72,11 +72,23 @@ namespace NoteKeeper
             SinglePageTab tab = new SinglePageTab(page, viewerSize);
             tab.Window.Boundaries = new Rectangle(20, upMargin, viewerSize.X, viewerSize.Y);
 
+            SinglePageTab tabb = new SinglePageTab(page, viewerSize);
+            tabb.Window.Boundaries = new Rectangle(20, upMargin, viewerSize.X, viewerSize.Y);
+            tabb.Name = "Xort";
 
+            SinglePageTab zzz = new SinglePageTab(page, viewerSize);
+            zzz.Window.Boundaries = new Rectangle(20, upMargin, viewerSize.X, viewerSize.Y);
+            zzz.Name = "Game1.cs";
+
+            SinglePageTab vvv = new SinglePageTab(new NotePage(), viewerSize);
+            vvv.Window.Boundaries = new Rectangle(20, upMargin, viewerSize.X, viewerSize.Y);
+            vvv.Name = "TabGroupRenderer.cs*";
 
             ControlPanel panel = new ControlPanel();
             panel.ActiveTabs.Add(tab);
-            panel.DisplayTab(tab);
+            panel.ActiveTabs.Add(tabb);
+            panel.ActiveTabs.Add(zzz);
+            panel.ActiveTabs.Add(vvv);
         }
 
         protected override void Update(GameTime gameTime)

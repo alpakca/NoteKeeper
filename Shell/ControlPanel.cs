@@ -3,12 +3,16 @@ using PopUpUI.Surface;
 using PopUpUI.Toolkit;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using System.Collections.ObjectModel;
 
 namespace NoteKeeper.Shell
 {
     internal class ControlPanel
     {
         private Tab displayedTab;
+
+        private readonly ButtonPlate buttonPlate;
+        private readonly TabGroup tabGroup;
 
         private readonly PanelWindow window;
         private readonly List<ITabUpdateReceiver> tabUpdateReceivers;
@@ -23,12 +27,15 @@ namespace NoteKeeper.Shell
             }
         }
         public Tab DisplayedTab => displayedTab;
-        public List<Tab> ActiveTabs { get; }
+        public ObservableCollection<Tab> ActiveTabs { get; }
 
         public ControlPanel()
         {
-            ActiveTabs = new List<Tab>();
             tabUpdateReceivers = new List<ITabUpdateReceiver>();
+            ActiveTabs = new ObservableCollection<Tab>();
+
+            buttonPlate = new ButtonPlate(this);
+            tabGroup = new TabGroup(this) { Boundaries = new Rectangle(20, 170, 1720, 30) };
 
             window = new PanelWindow(WindowOptions.Size);
             InitializeWindow();
@@ -58,11 +65,10 @@ namespace NoteKeeper.Shell
                 SelectablePacket = new PopUpUI.Input.SelectablePacket()
             };
 
-            ButtonPlate buttonPlate = new ButtonPlate(this);
-
             window.Elements.Add(verticalScroller);
             window.Elements.Add(horizontalScroller);
             window.Elements.AddRange(buttonPlate.Buttons);
+            window.Elements.Add(tabGroup);
 
             tabUpdateReceivers.AddRange(verticalScroller, horizontalScroller, window);
         }
@@ -75,11 +81,6 @@ namespace NoteKeeper.Shell
 
         public void DisplayTab(Tab tab)
         {
-            if (!ActiveTabs.Contains(tab))
-            {
-                return;
-            }
-
             PopWindowManager.ActiveWindows.Remove(displayedTab?.Window);
 
             displayedTab = tab;
@@ -89,8 +90,11 @@ namespace NoteKeeper.Shell
                 receiver.DisplayedTabChanged(tab);
             }
 
-            PopWindowManager.ActiveWindows.Add(tab.Window);
-            PopWindowManager.ActiveWindows.MoveToBottom(tab.Window);
+            if (tab != null)
+            {
+                PopWindowManager.ActiveWindows.Add(tab.Window);
+                PopWindowManager.ActiveWindows.MoveToBottom(tab.Window);
+            }
         }
     }
 }

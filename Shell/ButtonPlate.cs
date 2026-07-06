@@ -34,7 +34,7 @@ namespace NoteKeeper.Shell
             {
                 Name = "Writing Mode Toggle",
 
-                Boundaries = new Rectangle(100, 100, 20, 20),
+                Boundaries = new Rectangle(100, 60, 20, 20),
                 UncheckedAnimation = new PopUpUI.Surface.Animation2D([Util.GetTexture(20, 20, Color.Green)]),
                 CheckedAnimation = new PopUpUI.Surface.Animation2D([Util.GetTexture(20, 20, Color.Gray)]),
 
@@ -48,7 +48,7 @@ namespace NoteKeeper.Shell
             {
                 Name = "Transform Mode Toggle",
 
-                Boundaries = new Rectangle(130, 100, 20, 20),
+                Boundaries = new Rectangle(130, 60, 20, 20),
                 UncheckedAnimation = new PopUpUI.Surface.Animation2D([Util.GetTexture(20, 20, Color.Red)]),
                 CheckedAnimation = new PopUpUI.Surface.Animation2D([Util.GetTexture(20, 20, Color.Blue)]),
 
@@ -62,7 +62,7 @@ namespace NoteKeeper.Shell
             {
                 Name = "Text Content Add Button",
 
-                Boundaries = new Rectangle(160, 100, 20, 20),
+                Boundaries = new Rectangle(160, 60, 20, 20),
                 DefaultAnimation = new PopUpUI.Surface.Animation2D([Util.GetTexture(20, 20, Color.Beige)]),
 
                 SelectablePacket = selectablePacket,
