@@ -15,7 +15,7 @@ namespace NoteKeeper.InspectionWindow.SinglePage
         private readonly PageContentTransformer transformer;
         private readonly TabInputHandler inputHandler;
 
-        public TabWindow(NotePage page, TabViewport viewport) : base(new Point(viewport.VisualWidth, viewport.VisualHeight))
+        public TabWindow(NotePage page, TabViewport viewport) : base(new Point(viewport.UIWidth, viewport.UIHeight))
         {
             this.viewport = viewport;
 

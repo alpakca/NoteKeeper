@@ -40,8 +40,17 @@ namespace NoteKeeper
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             ContentAssistant.LoadWithContentManager<SpriteFont>(("ComicSans", "Font_ComicSans"));
 
+            string absolutePathStart = @"C:\Users\user\Desktop\C#\NoteKeeper\NoteKeeper\";
+            ContentAssistant.LoadTexture2Ds((absolutePathStart + @"Assets\Shell\TransformMode.png", "Button_TransformMode"),
+                                            (absolutePathStart + @"Assets\Shell\TransformModeSelected.png", "Button_TransformMode_Selected"),
+                                            (absolutePathStart + @"Assets\Shell\WritingMode.png", "Button_WritingMode"),
+                                            (absolutePathStart + @"Assets\Shell\WritingModeSelected.png", "Button_WritingMode_Selected"),
+                                            (absolutePathStart + @"Assets\Shell\AddTextBlock.png", "Button_AddTextBlock"),
+                                            (absolutePathStart + @"Assets\Shell\AddTextBlockHovered.png", "Button_AddTextBlock_Hovered"),
+                                            (absolutePathStart + @"Assets\Shell\AddTextBlockHeld.png", "Button_AddTextBlock_Held"));
 
-            SpriteFont font = Content.Load<SpriteFont>("ComicSans");
+
+            SpriteFont font = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans");
 
             Texture2D red = Util.GetTexture(200, 200, Color.DarkRed);
             Texture2D green = Util.GetTexture(200, 200, Color.DarkGreen);

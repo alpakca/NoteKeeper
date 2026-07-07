@@ -26,14 +26,14 @@ namespace NoteKeeper.InspectionWindow.SinglePage
         } = 1f;
         public Point ScrolledDistance => scrolledDistance;
 
-        public int VisualWidth { get; set; }
-        public int VisualHeight { get; set; }
+        public int UIWidth { get; set; }
+        public int UIHeight { get; set; }
 
-        public int ActualHeight => (int)(PageDefaultHeight * Zoom + 2 * VerticalMargin);
-        public int ActualWidth => (int)(PageDefaultWidth * Zoom + 2 * HorizontalMargin);
+        public int DocumentHeight => (int)(PageDefaultHeight * Zoom + 2 * VerticalMargin);
+        public int DocumentWidth => (int)(PageDefaultWidth * Zoom + 2 * HorizontalMargin);
 
-        private bool ExceedsVisualHeight => ActualHeight > VisualHeight;
-        private bool ExceedsVisualWidth => ActualWidth > VisualWidth;
+        private bool ExceedsVisualHeight => DocumentHeight > UIHeight;
+        private bool ExceedsVisualWidth => DocumentWidth > UIWidth;
 
         public Point PageTopLeftPosition
         {
@@ -42,12 +42,12 @@ namespace NoteKeeper.InspectionWindow.SinglePage
                 Point position = new Point(HorizontalMargin, VerticalMargin) - scrolledDistance;
                 if (!ExceedsVisualWidth)
                 {
-                    position.X = (int)((VisualWidth - PageDefaultWidth * Zoom) / 2);
+                    position.X = (int)((UIWidth - PageDefaultWidth * Zoom) / 2);
                 }
 
                 if (!ExceedsVisualHeight)
                 {
-                    position.Y = (int)((VisualHeight - PageDefaultHeight * Zoom) / 2);
+                    position.Y = (int)((UIHeight - PageDefaultHeight * Zoom) / 2);
                 }
 
                 return position;
@@ -70,7 +70,7 @@ namespace NoteKeeper.InspectionWindow.SinglePage
         {
             if (ExceedsVisualWidth)
             {
-                scrolledDistance.X = Math.Clamp(scrolledDistance.X + amount, 0, (int)(ActualWidth - VisualWidth));
+                scrolledDistance.X = Math.Clamp(scrolledDistance.X + amount, 0, (int)(DocumentWidth - UIWidth));
             }
         }
 
@@ -78,7 +78,7 @@ namespace NoteKeeper.InspectionWindow.SinglePage
         {
             if (ExceedsVisualHeight)
             {
-                scrolledDistance.Y = Math.Clamp(scrolledDistance.Y + amount, 0, (int)(ActualHeight - VisualHeight));
+                scrolledDistance.Y = Math.Clamp(scrolledDistance.Y + amount, 0, (int)(DocumentHeight - UIHeight));
             }
         }
 
@@ -86,7 +86,7 @@ namespace NoteKeeper.InspectionWindow.SinglePage
         {
             if (ExceedsVisualWidth)
             {
-                scrolledDistance.X = Math.Clamp(xOffset, 0, (int)(ActualWidth - VisualWidth));
+                scrolledDistance.X = Math.Clamp(xOffset, 0, (int)(DocumentWidth - UIWidth));
             }
         }
 
@@ -94,7 +94,7 @@ namespace NoteKeeper.InspectionWindow.SinglePage
         {
             if (ExceedsVisualHeight)
             {
-                scrolledDistance.Y = Math.Clamp(yOffset, 0, (int)(ActualHeight - VisualHeight));
+                scrolledDistance.Y = Math.Clamp(yOffset, 0, (int)(DocumentHeight - UIHeight));
             }
         }
     }

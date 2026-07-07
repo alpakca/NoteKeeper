@@ -23,7 +23,7 @@ namespace NoteKeeper.Shell
             set
             {
                 field = value;
-                displayedTab.ShellModeUpdated(value);
+                displayedTab?.ShellModeUpdated(value);
             }
         }
         public Tab DisplayedTab => displayedTab;
@@ -84,6 +84,7 @@ namespace NoteKeeper.Shell
             PopWindowManager.ActiveWindows.Remove(displayedTab?.Window);
 
             displayedTab = tab;
+            tab.ShellModeUpdated(Mode);
 
             foreach (var receiver in tabUpdateReceivers)
             {
@@ -95,6 +96,8 @@ namespace NoteKeeper.Shell
                 PopWindowManager.ActiveWindows.Add(tab.Window);
                 PopWindowManager.ActiveWindows.MoveToBottom(tab.Window);
             }
+
+            RearrangeUISizes();
         }
     }
 }

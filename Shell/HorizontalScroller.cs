@@ -27,7 +27,7 @@ namespace NoteKeeper.Shell
 
         public override IEnumerable<UIDrawInfo> GetDrawInfos()
         {
-            if (displayedTabViewport == null || displayedTabViewport.ActualWidth - displayedTabViewport.VisualWidth <= 0)
+            if (displayedTabViewport == null || displayedTabViewport.DocumentWidth - displayedTabViewport.UIWidth <= 0)
             {
                 return [];
             }
@@ -47,7 +47,7 @@ namespace NoteKeeper.Shell
                 return;
             }
 
-            int remaining = displayedTabViewport.ActualWidth - displayedTabViewport.VisualWidth;
+            int remaining = displayedTabViewport.DocumentWidth - displayedTabViewport.UIWidth;
             if (remaining > 0)
             {
                 SlideTo(displayedTabViewport.ScrolledDistance.X / Speed);
