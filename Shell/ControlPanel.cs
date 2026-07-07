@@ -68,7 +68,7 @@ namespace NoteKeeper.Shell
             window.Elements.Add(verticalScroller);
             window.Elements.Add(horizontalScroller);
             window.Elements.AddRange(buttonPlate.Buttons);
-            window.Elements.Add(tabGroup);
+            window.Elements.Add(tabGroup.UIElement);
 
             tabUpdateReceivers.AddRange(verticalScroller, horizontalScroller, window);
         }

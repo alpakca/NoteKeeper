@@ -1,67 +1,54 @@
 ﻿using Microsoft.Xna.Framework;
 using NoteKeeper.InspectionWindow;
 using PopUpUI.Elements;
-using PopUpUI.Input;
-using PopUpUI.Surface;
-using System.Collections.Generic;
 
 namespace NoteKeeper.Shell
 {
     // handles the selection, groupping, visualization of tabs
-    internal class TabGroup : PopElement, ISelectable, IHoldable
+    internal class TabGroup
     {
-        private bool isHeld;
         private Rectangle recentSwitchedTabsBetweenArea;
 
-        private readonly TextureDrawInfo drawInfo;
-
         private readonly ControlPanel panel;
+        private readonly TabGroupUIElement uiElement;
         private readonly TabGroupRenderer renderer;
 
-        public bool IsHeld => isHeld;
-
-        public SelectablePacket SelectablePacket { get; } = new SelectablePacket();
-        public HoldablePacket HoldPacket { get; } = new HoldablePacket();
-
         public int MinimumVisualHeight { get; }
+        public PopElement UIElement => uiElement;
 
-        public override Rectangle Boundaries
-        { 
+        public Rectangle Boundaries
+        {
+            get;
             set
             {
-                if (base.Boundaries.Size != value.Size)
+                if (field.Size != value.Size)
                 {
                     renderer.SizeChanged(value.Size);
-                    drawInfo.Texture = renderer.Target;
+                    uiElement.Texture = renderer.Target;
                 }
 
-                drawInfo.DestinationArea = value;
-                base.Boundaries = value;
+                uiElement.Boundaries = value;
+                field = value;
             }
         }
 
         public TabGroup(ControlPanel panel)
         {
             this.panel = panel;
-            drawInfo = new TextureDrawInfo();
             renderer = new TabGroupRenderer();
+            uiElement = new TabGroupUIElement(this);
 
             panel.ActiveTabs.CollectionChanged += (_, _) => renderer.TabStatuesChanged(panel, this.Boundaries.Width);
         }
 
-        public override void RenderUpdate()
+        public void RenderTabs()
         {
             renderer.Render(panel.DisplayedTab);
         }
 
-        public override IEnumerable<UIDrawInfo> GetDrawInfos()
+        public void Holding(Point mousePosition)
         {
-            return [drawInfo];
-        }
-
-        public void OnHolding(PopWindowMouseEventArgs e)
-        {
-            Tab hit = renderer.HitTab(e.MousePosition - Boundaries.Location);
+            Tab hit = renderer.HitTab(mousePosition - Boundaries.Location);
 
             // if hit the displayed tab, clear the cache
             if (hit == panel.DisplayedTab)
@@ -70,7 +57,7 @@ namespace NoteKeeper.Shell
             }
 
             // if mouse is inside buffer zone, between recent switched tab and displayed tab, don't switch it again (so it won't flicker)
-            if (recentSwitchedTabsBetweenArea.Contains(e.MousePosition - Boundaries.Location))
+            if (recentSwitchedTabsBetweenArea.Contains(mousePosition - Boundaries.Location))
             {
                 return;
             }
@@ -101,43 +88,23 @@ namespace NoteKeeper.Shell
             }
         }
 
-        public void OnHoldStateChange(PopWindowMouseEventArgs e, bool startedHolding)
+        public void HoldRemoved()
         {
-            isHeld = startedHolding;
-
-            if (!startedHolding)
-            {
-                ResetRecentSwitchedData();
-            }
+            ResetRecentSwitchedData();
         }
 
-        public void OnSelect(PopWindowMouseEventArgs e)
+        public void Selected(Point mousePosition)
         {
-            Tab hit = renderer.HitTab(e.MousePosition - Boundaries.Location);
+            Tab hit = renderer.HitTab(mousePosition - Boundaries.Location);
             if (hit != null && hit != panel.DisplayedTab)
             {
                 panel.DisplayTab(hit);
             }
         }
 
-
         private void ResetRecentSwitchedData()
         {
             recentSwitchedTabsBetweenArea = new Rectangle(0, 0, -1, -1);
-        }
-
-        public void OnSelectingOutside(PopWindowMouseEventArgs e)
-        {
-        }
-
-        public bool CanBeHeld(Point point)
-        {
-            return base.InsideBoundaries(point);
-        }
-
-        public bool CanBeSelected(Point point)
-        {
-            return base.InsideBoundaries(point);
         }
     }
 }
