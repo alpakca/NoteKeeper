@@ -1,11 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using NoteKeeper.InspectionWindow;
+using NoteKeeper.Shell.PUIHelpers;
 using PopUpUI.Elements;
 using PopUpUI.Elements.Visual;
 using PopUpUI.Input;
-using PopUpUI.Surface;
-using PopUpUI.Toolkit;
+using PopUpUI.PUI;
 using System;
 using System.Collections.Generic;
 
@@ -28,70 +27,22 @@ namespace NoteKeeper.Shell
 
         private void InitializeButtons()
         {
-            SelectablePacket selectablePacket = new SelectablePacket();
-            HoldablePacket holdPacket = new HoldablePacket();
+            PUIInterpreter interpreter = PUIHelper.GetInterpreter(PUIHelper.ShellAssetsFolderPath + "ButtonPlate.pui");
+            interpreter.ProcessTokens();
 
-            Buttons.Add(new VisualToggleButton
-            {
-                Name = "Writing Mode Toggle",
+            VisualToggleButton writingModeToggle = interpreter.CreateFromProperties(PUIHelper.VisualToggleButtonInstantiator, "Writing_Mode_Toggle");
+            VisualToggleButton transformModeToggle = interpreter.CreateFromProperties(PUIHelper.VisualToggleButtonInstantiator, "Transform_Mode_Toggle");
 
-                Boundaries = new Rectangle(100, 60, 32, 32),
-                UncheckedAnimation = Animation2D.FromTexture(ContentAssistant.FromLoaded<Texture2D>("Button_WritingMode")),
-                CheckedAnimation = Animation2D.FromTexture(ContentAssistant.FromLoaded<Texture2D>("Button_WritingMode_Selected")),
+            writingModeToggle.ToggleCommand = new OppositeToggleButtonsCommand(transformModeToggle, () => panel.Mode = ShellModes.Writing);
+            transformModeToggle.ToggleCommand = new OppositeToggleButtonsCommand(writingModeToggle, () => panel.Mode = ShellModes.Transform);
 
-                SelectablePacket = selectablePacket,
-                HoldPacket = holdPacket
-            });
+            VisualClickable addTextBlock = interpreter.CreateFromProperties(PUIHelper.VisualClickableInstantiator, "Add_Text_Block");
+            addTextBlock.ClickCommand = new ActionCommander<Clickable>(AddTextBlockCommander);
 
-            Buttons.Add(new VisualToggleButton
-            {
-                Name = "Transform Mode Toggle",
-
-                Boundaries = new Rectangle(130, 60, 32, 32),
-                UncheckedAnimation = Animation2D.FromTexture(ContentAssistant.FromLoaded<Texture2D>("Button_TransformMode")),
-                CheckedAnimation = Animation2D.FromTexture(ContentAssistant.FromLoaded<Texture2D>("Button_TransformMode_Selected")),
-
-                SelectablePacket = selectablePacket,
-                HoldPacket = holdPacket
-            });
-
-            (Buttons[0] as ToggleButton).ToggleCommand = new OppositeToggleButtonsCommand(Buttons[1] as ToggleButton, () => panel.Mode = ShellModes.Writing);
-            (Buttons[1] as ToggleButton).ToggleCommand = new OppositeToggleButtonsCommand(Buttons[0] as ToggleButton, () => panel.Mode = ShellModes.Transform);
-
-            Buttons.Add(new VisualClickable
-            {
-                Name = "Text Content Add Button",
-
-                Boundaries = new Rectangle(160, 60, 32, 32),
-                DefaultAnimation = Animation2D.FromTexture(ContentAssistant.FromLoaded<Texture2D>("Button_AddTextBlock")),
-                HoverAnimation = Animation2D.FromTexture(ContentAssistant.FromLoaded<Texture2D>("Button_AddTextBlock_Hovered")),
-                HoldAnimation = Animation2D.FromTexture(ContentAssistant.FromLoaded<Texture2D>("Button_AddTextBlock_Held")),
-
-                SelectablePacket = selectablePacket,
-                HoldPacket = holdPacket,
-
-                ClickCommand = new ActionCommander<Clickable>(_ =>
-                {
-                    if (panel.DisplayedTab == null)
-                    {
-                        return;
-                    }
-
-                    PageTextContent content = ContentGetter.GetTextContent();
-                    content.Location = new Point(100, 100);
-                    content.Size = new Point(200, 50);
-
-                    panel.DisplayedTab.AddContent(content);
-                    ActivateWritingMode();
-
-                    panel.DisplayedTab.SimulateMouseButtonStateInput(new PopWindowMouseEventArgs(MouseButtons.Left,
-                                                                                                 MouseButtons.Left,
-                                                                                                 MouseButtons.None,
-                                                                                                 panel.DisplayedTab.GetContentScreenLocation(content)));
-                })
-            });
+            Buttons.AddRange(writingModeToggle, transformModeToggle, addTextBlock);
 
             ActivateWritingMode();
+            transformModeToggle.SetCheckStatus(false); // don't actually need this line; its here in case of broken UI.
         }
 
         public void ActivateWritingMode()
@@ -102,6 +53,26 @@ namespace NoteKeeper.Shell
         public void ActivateTransformMode()
         {
             (Buttons[1] as ToggleButton).Toggle();
+        }
+
+        private void AddTextBlockCommander(Clickable clickable)
+        {
+            if (panel.DisplayedTab == null)
+            {
+                return;
+            }
+
+            PageTextContent content = ContentGetter.GetTextContent();
+            content.Location = new Point(100, 100);
+            content.Size = new Point(200, 50);
+
+            panel.DisplayedTab.AddContent(content);
+            ActivateWritingMode();
+
+            panel.DisplayedTab.SimulateMouseButtonStateInput(new PopWindowMouseEventArgs(MouseButtons.Left,
+                                                                                         MouseButtons.Left,
+                                                                                         MouseButtons.None,
+                                                                                         panel.DisplayedTab.GetContentScreenLocation(content)));
         }
 
         private class OppositeToggleButtonsCommand : ICommander<ToggleButton>
@@ -120,7 +91,7 @@ namespace NoteKeeper.Shell
                 // This button was toggled even though it was checked
                 if (!oppositeButton.IsChecked && !thisButton.IsChecked)
                 {
-                    thisButton.Toggle();
+                    thisButton.Toggle(); // toggle back
                     return;
                 }
 

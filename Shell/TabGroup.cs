@@ -7,6 +7,7 @@ namespace NoteKeeper.Shell
     // handles the selection, groupping, visualization of tabs
     internal class TabGroup
     {
+        // buffer area that mouse can move without flickering (constantly changing) rendering.
         private Rectangle recentSwitchedTabsBetweenArea;
 
         private readonly ControlPanel panel;

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using NoteKeeper.InspectionWindow;
+using PopUpUI.Input;
 using PopUpUI.Surface;
 using PopUpUI.Toolkit;
 using System;
@@ -15,23 +16,25 @@ namespace NoteKeeper.Shell
     internal class PanelWindow : PopWindow, ITabUpdateReceiver
     {
         private Tab? displayedTab;
+        private readonly KeyboardShortcutManager shortcutManager;
 
         public PanelWindow(Point size) : base(size)
         {
+            shortcutManager = new KeyboardShortcutManager();
+            Elements.Add(shortcutManager);
+
+            InitializeShortcuts();
         }
 
-        protected override void Update()
+        private void InitializeShortcuts()
         {
-            if (InputManager.AllPressed(Keys.LeftControl, Keys.Add))
-            {
-                displayedTab?.TabViewport.Zoom += 0.1f;
-            }
-            else if (InputManager.AllPressed(Keys.LeftControl, Keys.Subtract))
-            {
-                displayedTab?.TabViewport.Zoom -= 0.1f;
-            }
+            KeyboardCombination zoomIn = KeyboardCombination.GetSingleUse([Keys.LeftControl, Keys.Add]);
+            zoomIn.FirstTriggerAction = () => displayedTab?.TabViewport.Zoom += 0.1f;
 
-            base.Update();
+            KeyboardCombination zoomOut = KeyboardCombination.GetSingleUse([Keys.LeftControl, Keys.Subtract]);
+            zoomOut.FirstTriggerAction = () => displayedTab?.TabViewport.Zoom -= 0.1f;
+
+            shortcutManager.AddCombinations(zoomIn, zoomOut);
         }
 
         public void DisplayedTabChanged(Tab setTab)
