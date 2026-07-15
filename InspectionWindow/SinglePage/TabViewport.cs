@@ -29,23 +29,23 @@ namespace NoteKeeper.InspectionWindow.SinglePage
         public int UIWidth { get; set; }
         public int UIHeight { get; set; }
 
-        public int DocumentHeight => (int)(PageDefaultHeight * Zoom + 2 * VerticalMargin);
-        public int DocumentWidth => (int)(PageDefaultWidth * Zoom + 2 * HorizontalMargin);
+        public int TotalContentHeight => (int)(PageDefaultHeight * Zoom + 2 * VerticalMargin);
+        public int TotalContentWidth => (int)(PageDefaultWidth * Zoom + 2 * HorizontalMargin);
 
-        private bool ExceedsVisualHeight => DocumentHeight > UIHeight;
-        private bool ExceedsVisualWidth => DocumentWidth > UIWidth;
+        private bool ExceedsUIHeight => TotalContentHeight > UIHeight;
+        private bool ExceedsUIWidth => TotalContentWidth > UIWidth;
 
         public Point PageTopLeftPosition
         {
             get
             {
                 Point position = new Point(HorizontalMargin, VerticalMargin) - scrolledDistance;
-                if (!ExceedsVisualWidth)
+                if (!ExceedsUIWidth)
                 {
                     position.X = (int)((UIWidth - PageDefaultWidth * Zoom) / 2);
                 }
 
-                if (!ExceedsVisualHeight)
+                if (!ExceedsUIHeight)
                 {
                     position.Y = (int)((UIHeight - PageDefaultHeight * Zoom) / 2);
                 }
@@ -68,33 +68,27 @@ namespace NoteKeeper.InspectionWindow.SinglePage
 
         public void ScrollHorizontal(int amount)
         {
-            if (ExceedsVisualWidth)
-            {
-                scrolledDistance.X = Math.Clamp(scrolledDistance.X + amount, 0, (int)(DocumentWidth - UIWidth));
-            }
+            SetHorizontalScroll(scrolledDistance.X + amount);
         }
 
         public void ScrollVertical(int amount)
         {
-            if (ExceedsVisualHeight)
-            {
-                scrolledDistance.Y = Math.Clamp(scrolledDistance.Y + amount, 0, (int)(DocumentHeight - UIHeight));
-            }
+            SetVerticalScroll(scrolledDistance.Y + amount);
         }
 
         public void SetHorizontalScroll(int xOffset)
         {
-            if (ExceedsVisualWidth)
+            if (ExceedsUIWidth)
             {
-                scrolledDistance.X = Math.Clamp(xOffset, 0, (int)(DocumentWidth - UIWidth));
+                scrolledDistance.X = Math.Clamp(xOffset, 0, (int)(TotalContentWidth - UIWidth));
             }
         }
 
         public void SetVerticalScroll(int yOffset)
         {
-            if (ExceedsVisualHeight)
+            if (ExceedsUIHeight)
             {
-                scrolledDistance.Y = Math.Clamp(yOffset, 0, (int)(DocumentHeight - UIHeight));
+                scrolledDistance.Y = Math.Clamp(yOffset, 0, (int)(TotalContentHeight - UIHeight));
             }
         }
     }

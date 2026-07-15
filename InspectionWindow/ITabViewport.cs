@@ -12,8 +12,8 @@ namespace NoteKeeper.InspectionWindow
         public int UIWidth { get; set; }
         public int UIHeight { get; set; }
 
-        public int DocumentHeight { get; }
-        public int DocumentWidth { get; }
+        public int TotalContentHeight { get; }
+        public int TotalContentWidth { get; }
 
         public void ScrollHorizontal(int amount);
         public void ScrollVertical(int amount);
