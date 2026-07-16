@@ -3,28 +3,33 @@ using PopUpUI.Input;
 using PopUpUI.Surface;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 
 namespace NoteKeeper.InspectionWindow.MultiPage
 {
     internal class MultiPageTab : Tab
     {
-        private bool inVerticalMode = true;
-        private readonly VerticalModeViewport verticalModeViewport;
-        private readonly HorizontalModeViewport horizontalModeViewport;
+        private readonly TabViewport viewport;
+        private readonly TabWindow window;
 
-        public override ITabViewport TabViewport => inVerticalMode ? verticalModeViewport : horizontalModeViewport;
-        public override PopWindow Window => throw new NotImplementedException();
+        public override ITabViewport TabViewport => viewport;
+        public override PopWindow Window => window;
 
-        public MultiPageTab()
+        public ObservableCollection<NotePage> NotePages { get; }
+
+        public MultiPageTab(Point size)
         {
-            verticalModeViewport = new VerticalModeViewport();
-            horizontalModeViewport = new HorizontalModeViewport();
+            NotePages = new ObservableCollection<NotePage>();
+
+            viewport = new TabViewport { UIWidth = size.X, UIHeight = size.Y };
+            window = new TabWindow(size, viewport, NotePages);
+
+            NotePages.CollectionChanged += (sender, _) => viewport.PageCount = ((ObservableCollection<NotePage>)sender).Count;
         }
 
         public override void AddContent(IPageContent content)
         {
-            throw new NotImplementedException();
         }
 
         public override Point GetContentScreenLocation(IPageContent content)
@@ -34,12 +39,10 @@ namespace NoteKeeper.InspectionWindow.MultiPage
 
         public override void ShellModeUpdated(ShellModes mode)
         {
-            throw new NotImplementedException();
         }
 
         public override void SimulateMouseButtonStateInput(PopWindowMouseEventArgs e)
         {
-            throw new NotImplementedException();
         }
     }
 }
