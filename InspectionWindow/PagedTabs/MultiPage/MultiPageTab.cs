@@ -6,9 +6,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
 
-namespace NoteKeeper.InspectionWindow.MultiPage
+namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
 {
-    internal class MultiPageTab : Tab
+    internal class MultiPageTab : PageContentTab
     {
         private readonly TabViewport viewport;
         private readonly TabWindow window;

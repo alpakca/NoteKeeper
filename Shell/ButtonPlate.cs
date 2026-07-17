@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using NoteKeeper.InspectionWindow;
+using NoteKeeper.InspectionWindow.PagedTabs;
 using NoteKeeper.Shell.PUIHelpers;
 using PopUpUI.Elements;
 using PopUpUI.Elements.Visual;
@@ -57,7 +58,7 @@ namespace NoteKeeper.Shell
 
         private void AddTextBlockCommander(Clickable clickable)
         {
-            if (panel.DisplayedTab == null)
+            if (panel.DisplayedTab is not PageContentTab pageContentTab)
             {
                 return;
             }
@@ -66,13 +67,13 @@ namespace NoteKeeper.Shell
             content.Location = new Point(100, 100);
             content.Size = new Point(200, 50);
 
-            panel.DisplayedTab.AddContent(content);
+            pageContentTab.AddContent(content);
             ActivateWritingMode();
 
-            panel.DisplayedTab.SimulateMouseButtonStateInput(new PopWindowMouseEventArgs(MouseButtons.Left,
-                                                                                         MouseButtons.Left,
-                                                                                         MouseButtons.None,
-                                                                                         panel.DisplayedTab.GetContentScreenLocation(content)));
+            pageContentTab.SimulateMouseButtonStateInput(new PopWindowMouseEventArgs(MouseButtons.Left,
+                                                                                     MouseButtons.Left,
+                                                                                     MouseButtons.None,
+                                                                                     pageContentTab.GetContentScreenLocation(content)));
         }
 
         private class OppositeToggleButtonsCommand : ICommander<ToggleButton>

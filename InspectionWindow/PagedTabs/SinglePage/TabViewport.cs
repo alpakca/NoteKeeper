@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
-namespace NoteKeeper.InspectionWindow.SinglePage
+namespace NoteKeeper.InspectionWindow.PagedTabs.SinglePage
 {
     internal class TabViewport : ITabViewport
     {

@@ -4,7 +4,7 @@ using PopUpUI.Input;
 using PopUpUI.Surface;
 using PopUpUI.Elements;
 
-namespace NoteKeeper.InspectionWindow.SinglePage
+namespace NoteKeeper.InspectionWindow.PagedTabs.SinglePage
 {
     internal class TabWindow : PopWindow
     {

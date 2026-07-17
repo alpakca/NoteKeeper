@@ -5,7 +5,7 @@ using PopUpUI.Toolkit;
 
 #nullable enable
 
-namespace NoteKeeper.InspectionWindow.SinglePage
+namespace NoteKeeper.InspectionWindow.PagedTabs.SinglePage
 {
     internal class TabInputHandler
     {

@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using PopUpUI.Toolkit;
 
-namespace NoteKeeper.InspectionWindow
+namespace NoteKeeper.InspectionWindow.PagedTabs
 {
     internal class PageImageContent : IPageContent
     {

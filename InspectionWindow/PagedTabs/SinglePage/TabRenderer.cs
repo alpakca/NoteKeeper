@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using PopUpUI.Toolkit;
 using System.Collections.Generic;
 
-namespace NoteKeeper.InspectionWindow.SinglePage
+namespace NoteKeeper.InspectionWindow.PagedTabs.SinglePage
 {
     internal class TabRenderer
     {

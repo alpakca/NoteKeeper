@@ -5,10 +5,10 @@ using System.Collections.Generic;
 using System.Text;
 using PopUpUI.Input;
 
-namespace NoteKeeper.InspectionWindow.SinglePage
+namespace NoteKeeper.InspectionWindow.PagedTabs.SinglePage
 {
     // talks to shell - only class that have connection between shell and inspection items
-    internal class SinglePageTab : Tab
+    internal class SinglePageTab : PageContentTab
     {
         private readonly NotePage page;
         private readonly TabViewport viewport;

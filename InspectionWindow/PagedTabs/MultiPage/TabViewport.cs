@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NoteKeeper.InspectionWindow.MultiPage
+namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
 {
     internal class TabViewport : ITabViewport
     {

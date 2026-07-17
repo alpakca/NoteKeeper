@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NoteKeeper.InspectionWindow
+namespace NoteKeeper.InspectionWindow.PagedTabs
 {
     internal static class ContentGetter
     {

@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using PopUpUI.Text;
 using PopUpUI.Toolkit;
 
-namespace NoteKeeper.InspectionWindow
+namespace NoteKeeper.InspectionWindow.PagedTabs
 {
     internal class PageTextContent : IPageContent, IKeyTextReceiverContent
     {

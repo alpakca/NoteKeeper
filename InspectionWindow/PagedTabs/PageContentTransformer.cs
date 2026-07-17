@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 #nullable enable
 
-namespace NoteKeeper.InspectionWindow
+namespace NoteKeeper.InspectionWindow.PagedTabs
 {
     internal class PageContentTransformer
     {
