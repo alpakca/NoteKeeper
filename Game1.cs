@@ -2,14 +2,12 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using PopUpUI.Toolkit;
-using NoteKeeper.InspectionWindow;
-using NoteKeeper.InspectionWindow.SinglePage;
 using System.Linq;
-using System.Diagnostics;
-using PopUpUI.Elements;
 using NoteKeeper.Shell;
 using PopUpUI.Text;
-using NoteKeeper.InspectionWindow.MultiPage;
+using NoteKeeper.InspectionWindow.PagedTabs.SinglePage;
+using NoteKeeper.InspectionWindow.PagedTabs.MultiPage;
+using NoteKeeper.InspectionWindow.PagedTabs;
 
 namespace NoteKeeper
 {
@@ -58,19 +56,23 @@ namespace NoteKeeper
 
             NotePage page = new NotePage();
             page.Contents.AddRange([
-               new PageImageContent(red)
-            {
-                Size = new Point(200, 200),
-                Location = new Point(50, 500)
-            }, new PageImageContent(green)
+               new PageImageContent(green)
             {
                 Size = new Point(50, 50),
                 Location = new Point(250, 250)
             },new PageImageContent(green) {
                 Size = new Point(200, 30),
                 Location = new Point(50, 50)
-            }, new PageTextContent(new TextProcesser { Font = font }) {
+            }]);
+
+            NotePage page2 = new NotePage();
+            page.Contents.AddRange([
+                new PageImageContent(red)
+            {
                 Size = new Point(200, 200),
+                Location = new Point(50, 500)
+            },new PageImageContent(green) {
+                Size = new Point(200, 30),
                 Location = new Point(50, 50)
             }]);
 
@@ -82,9 +84,7 @@ namespace NoteKeeper
             MultiPageTab multi = new MultiPageTab(viewerSize);
             multi.Window.Boundaries = new Rectangle(20, upMargin, viewerSize.X, viewerSize.Y);
             multi.NotePages.Add(page);
-            multi.NotePages.Add(page);
-            multi.NotePages.Add(page);
-            multi.NotePages.Add(page);
+            multi.NotePages.Add(page2);
 
             SinglePageTab single = new SinglePageTab(page, viewerSize);
             single.Window.Boundaries = new Rectangle(20, upMargin, viewerSize.X, viewerSize.Y);

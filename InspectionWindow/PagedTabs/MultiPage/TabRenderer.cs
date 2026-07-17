@@ -23,17 +23,30 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
 
         public void RenderPageBackgrounds()
         {
+            foreach (var page in notePages)
+            {
+                foreach (var content in page.Contents)
+                {
+                    content.RenderUpdate();
+                }
+            }
+
             DrawHelper.SetBeginBatch(target);
 
             Point pageOffset = viewport.FirstPageStartPosition;
 
-            for (int i = 0; i < notePages.Count; i++)
+            foreach (var page in notePages)
             {
-                if (viewport.PageWithOffsetOverlapsScreen(pageOffset)) 
+                if (viewport.PageWithOffsetOverlapsScreen(pageOffset))
                 {
-                    DrawHelper.DrawBackground(new Rectangle(pageOffset, 
+                    DrawHelper.DrawBackground(new Rectangle(pageOffset,
                                                             new Point(viewport.EachPageWidth, viewport.EachPageHeight).Times(viewport.Zoom)),
                                               Color.White);
+                }
+
+                foreach (var content in page.Contents)
+                {
+                    content.RenderToPage(pageOffset, viewport.Zoom);
                 }
 
                 pageOffset += viewport.MovingDimensionPageStep.Times(viewport.Zoom);

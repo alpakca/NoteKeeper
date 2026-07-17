@@ -37,7 +37,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
                                                        : GetAllPagesContentLength(EachPageWidth, HorizontalMargin);
 
         // by pixels
-        public int EachPageHeight { get; set; } = 1000;
+        public int EachPageHeight { get; set; } = 500;
         public int EachPageWidth { get; set; } = 700;
         public int HorizontalMargin { get; set; } = 20;
         public int VerticalMargin { get; set; } = 20;
@@ -93,15 +93,33 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             }
         }
 
+        public (int PageIndex, Point PagePosition) ToPagePosition(Point mousePosition)
+        {
+            Point normalizedPagedPosition = (mousePosition - FirstPageStartPosition).Times(1 / Zoom);
+
+            for (int i = 0; i < PageCount; i++)
+            {
+                if (0 <= normalizedPagedPosition.X && normalizedPagedPosition.X < EachPageWidth &&
+                    0 <= normalizedPagedPosition.Y && normalizedPagedPosition.Y < EachPageHeight)
+                {
+                    return (i, normalizedPagedPosition);
+                }
+
+                normalizedPagedPosition -= MovingDimensionPageStep;
+            }
+
+            return (-1, new Point());
+        }
+
         public bool PageWithOffsetOverlapsScreen(Point offset)
         {
             if (inVerticalMode)
             {
-                return offset.Y + EachPageHeight > 0;
+                return offset.Y + EachPageHeight * Zoom > 0;
             }
             else
             {
-                return offset.X + EachPageWidth > 0;
+                return offset.X + EachPageWidth * Zoom > 0;
             }
         }
 

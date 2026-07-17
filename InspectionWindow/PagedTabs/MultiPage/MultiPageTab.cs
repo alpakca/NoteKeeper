@@ -39,6 +39,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
 
         public override void ShellModeUpdated(ShellModes mode)
         {
+            window.ModeUpdated(mode);
         }
 
         public override void SimulateMouseButtonStateInput(PopWindowMouseEventArgs e)
