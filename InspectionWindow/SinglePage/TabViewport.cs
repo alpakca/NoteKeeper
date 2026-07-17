@@ -57,14 +57,14 @@ namespace NoteKeeper.InspectionWindow.SinglePage
                     position.Y = (ViewedHeight - TotalContentHeight) / 2;
                 }
 
-                return position;
+                return position.Times(Zoom);
             }
         }
 
         public Point ToPagePosition(Point mousePosition)
         {
             mousePosition -= PageTopLeftPosition;
-            return new Point((int)(mousePosition.X * (1 / Zoom)), (int)(mousePosition.Y * (1 / Zoom)));
+            return new Point((int)(mousePosition.X / Zoom), (int)(mousePosition.Y / Zoom));
         }
 
         public Point ToScreenLocation(Point pagePosition)

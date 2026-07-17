@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using PopUpUI.Text;
 using PopUpUI.Toolkit;
@@ -12,12 +13,18 @@ namespace NoteKeeper.InspectionWindow
         private bool receivingInput;
         private TextPosition caretPosition;
         private ITextProcesserResult lastResult;
+        private RenderTarget2D renderTarget;
 
         public Point Size
         {
             get;
             set
             {
+                if (field == value || value.X <= 0 || value.Y <= 0)
+                {
+                    return;
+                }
+
                 field = value;
                
                 processer.HorizontalTextLength = value.X;
@@ -27,6 +34,9 @@ namespace NoteKeeper.InspectionWindow
                 {
                     field.Y = (int)lastResult.TextSize.Y;
                 }
+
+                renderTarget?.Dispose();
+                renderTarget = DrawHelper.CreateRenderTarget(field.X, field.Y);
             }
         }
         public Point Location { get; set; }
@@ -36,26 +46,35 @@ namespace NoteKeeper.InspectionWindow
             this.processer = processer;
         }
 
-        public void Render(Point pageLocation)
+        public void RenderUpdate()
         {
-            lastResult.Render(PopUpUI.Surface.BatchDrawOptions.Default, (Location + pageLocation).ToVector2(), null, 1f);
+            DrawHelper.SetBeginBatch(renderTarget);
+
+            lastResult.Render(PopUpUI.Surface.BatchDrawOptions.Default, new Vector2(), null, 1f);
 
             if (receivingInput)
             {
                 Point caretPageLocation = lastResult.Caret.ScreenCaretPosition(caretPosition, null).ToPoint();
-                DrawHelper.DrawBackground(new Rectangle(Location + pageLocation + caretPageLocation, new Point(2, processer.Font.LineSpacing)), Color.Black);
+                DrawHelper.DrawBackground(new Rectangle(caretPageLocation, new Point(2, processer.Font.LineSpacing)), Color.Black);
 
                 // draw outline indicating the boundary of content
 
                 const int OutlineThickness = 2;
                 const int OutlineMargin = 4;
 
-                DrawHelper.DrawBackground(new Rectangle(Location + pageLocation + new Point(-OutlineMargin), new Point(Size.X + 2 * OutlineMargin, OutlineThickness)), Color.Black);
-                DrawHelper.DrawBackground(new Rectangle(Location + pageLocation + new Point(-OutlineMargin, OutlineMargin) + new Point(0, Size.Y - OutlineThickness), new Point(Size.X + 2 * OutlineMargin, OutlineThickness)), Color.Black);
+                DrawHelper.DrawBackground(new Rectangle(new Point(-OutlineMargin), new Point(Size.X + 2 * OutlineMargin, OutlineThickness)), Color.Black);
+                DrawHelper.DrawBackground(new Rectangle(new Point(-OutlineMargin, OutlineMargin) + new Point(0, Size.Y - OutlineThickness), new Point(Size.X + 2 * OutlineMargin, OutlineThickness)), Color.Black);
 
-                DrawHelper.DrawBackground(new Rectangle(Location + pageLocation + new Point(-OutlineMargin), new Point(OutlineThickness, Size.Y + 2 * OutlineMargin)), Color.Black);
-                DrawHelper.DrawBackground(new Rectangle(Location + pageLocation + new Point(OutlineMargin, -OutlineMargin) + new Point(Size.X - OutlineThickness, 0), new Point(OutlineThickness, Size.Y + 2 * OutlineMargin)), Color.Black);
+                DrawHelper.DrawBackground(new Rectangle(new Point(-OutlineMargin), new Point(OutlineThickness, Size.Y + 2 * OutlineMargin)), Color.Black);
+                DrawHelper.DrawBackground(new Rectangle(new Point(OutlineMargin, -OutlineMargin) + new Point(Size.X - OutlineThickness, 0), new Point(OutlineThickness, Size.Y + 2 * OutlineMargin)), Color.Black);
             }
+
+            DrawHelper.EndBatch();
+        }
+
+        public void RenderToPage(Point pageLocation, float zoomMutliplier)
+        {
+            DrawHelper.Batch.Draw(renderTarget, new Rectangle(pageLocation + Location.Times(zoomMutliplier), Size.Times(zoomMutliplier)), Color.White);
         }
 
         public void MouseSelected(Point pagePosition)

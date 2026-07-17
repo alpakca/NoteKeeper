@@ -9,52 +9,59 @@ namespace NoteKeeper.InspectionWindow.SinglePage
     {
         private readonly NotePage page;
         private readonly TabViewport viewport;
-        private readonly RenderTarget2D pageTexture;
+        private readonly RenderTarget2D target;
 
         public TabRenderer(NotePage page, TabViewport viewport)
         {
             this.page = page;
             this.viewport = viewport;
-            pageTexture = DrawHelper.CreateRenderTarget(viewport.PageDefaultWidth, viewport.PageDefaultHeight);
-        }
-
-        public void RenderWindowTexture(RenderTarget2D target)
-        {
-            DrawHelper.SetBeginBatch(target);
-
-            // viewer background
-            DrawHelper.DrawBackground(new Rectangle(default, new Point(viewport.ViewedWidth, viewport.ViewedHeight)), Color.Black);
-
-            DrawHelper.Batch.Draw(pageTexture, new Rectangle(viewport.PageTopLeftPosition, 
-                                                             new Point((int)(viewport.PageDefaultWidth * viewport.Zoom), (int)(viewport.PageDefaultHeight * viewport.Zoom))),
-                                  Color.White);
-
-            DrawHelper.EndBatch();
-        }
-
-        public void RenderTransformer(IEnumerable<Point> nodeScreenPositions)
-        {
-            DrawHelper.SetBeginBatch(pageTexture);
-
-            foreach (Point position in nodeScreenPositions)
-            {
-                // replace with actual image
-                DrawHelper.DrawBackground(new Rectangle(position, new Point(PageContentTransformer.NodeLength)), Color.Black);
-            }
-
-            DrawHelper.EndBatch();
+            target = DrawHelper.CreateRenderTarget(viewport.UISize.X, viewport.UISize.Y);
         }
 
         public void RenderPage()
         {
-            DrawHelper.SetBeginBatch(pageTexture);
+            foreach (var content in page.Contents)
+            {
+                content.RenderUpdate();
+            }
 
-            DrawHelper.DrawBackground(new Rectangle(Point.Zero, new Point(viewport.PageDefaultWidth, viewport.PageDefaultHeight)), Color.White);
+            DrawHelper.SetBeginBatch(target);
+
+            Point pageTopLeft = viewport.PageTopLeftPosition;
+            DrawHelper.DrawBackground(new Rectangle(pageTopLeft,
+                                                    new Point(viewport.PageDefaultWidth, viewport.PageDefaultHeight).Times(viewport.Zoom)),
+                                      Color.White);
 
             foreach (var content in page.Contents)
             {
-                content.Render(new Point());
+                content.RenderToPage(pageTopLeft, viewport.Zoom);
             }
+
+            DrawHelper.EndBatch();
+        }
+
+        public void RenderTransformerNodes(IEnumerable<Point> nodeScreenPositions)
+        {
+            DrawHelper.SetBeginBatch(target);
+
+            Point pageTopLeft = viewport.PageTopLeftPosition;
+            foreach (Point position in nodeScreenPositions)
+            {
+                // replace with actual image
+                DrawHelper.DrawBackground(new Rectangle(pageTopLeft + position.Times(viewport.Zoom), 
+                                                        new Point(PageContentTransformer.NodeLength).Times(viewport.Zoom)), 
+                                          Color.Black);
+            }
+
+            DrawHelper.EndBatch();
+        }
+
+        public void RenderToWindowTexture(RenderTarget2D windowTexture)
+        {
+            DrawHelper.SetBeginBatch(windowTexture);
+            DrawHelper.Device.Clear(Color.Black);
+
+            DrawHelper.Batch.Draw(target, new Vector2(), Color.White);
 
             DrawHelper.EndBatch();
         }

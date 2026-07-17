@@ -16,9 +16,13 @@ namespace NoteKeeper.InspectionWindow
             this.image = image;
         }
 
-        public void Render(Point pageLocation)
+        public void RenderUpdate()
         {
-            DrawHelper.Batch.Draw(image, new Rectangle(Location + pageLocation, Size), Color.White);
+        }
+
+        public void RenderToPage(Point offset, float zoomMultiplier)
+        {
+            DrawHelper.Batch.Draw(image, new Rectangle(offset + Location.Times(zoomMultiplier), Size.Times(zoomMultiplier)), Color.White);
         }
     }
 }

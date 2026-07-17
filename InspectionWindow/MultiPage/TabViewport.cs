@@ -89,7 +89,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage
                     position.X = (ViewedWidth - TotalContentWidth) / 2;
                 }
 
-                return position;
+                return position.Times(Zoom);
             }
         }
 

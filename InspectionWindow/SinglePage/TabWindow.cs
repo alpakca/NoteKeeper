@@ -32,11 +32,11 @@ namespace NoteKeeper.InspectionWindow.SinglePage
 
             if (currentMode == ShellModes.Transform && transformer.IsTransforming)
             {
-                renderer.RenderTransformer(transformer.NodeScreenPositions);
+                renderer.RenderTransformerNodes(transformer.NodeScreenPositions);
             }
 
             // render to window texture at last
-            renderer.RenderWindowTexture(WindowTexture);
+            renderer.RenderToWindowTexture(WindowTexture);
         }
 
         public void ModeUpdated(ShellModes mode)
