@@ -23,7 +23,7 @@ namespace NoteKeeper.InspectionWindow.SinglePage
             DrawHelper.SetBeginBatch(target);
 
             // viewer background
-            DrawHelper.DrawBackground(new Rectangle(default, new Point(viewport.UIWidth, viewport.UIHeight)), Color.Black);
+            DrawHelper.DrawBackground(new Rectangle(default, new Point(viewport.ViewedWidth, viewport.ViewedHeight)), Color.Black);
 
             DrawHelper.Batch.Draw(pageTexture, new Rectangle(viewport.PageTopLeftPosition, 
                                                              new Point((int)(viewport.PageDefaultWidth * viewport.Zoom), (int)(viewport.PageDefaultHeight * viewport.Zoom))),

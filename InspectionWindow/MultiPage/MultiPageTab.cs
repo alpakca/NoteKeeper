@@ -22,7 +22,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage
         {
             NotePages = new ObservableCollection<NotePage>();
 
-            viewport = new TabViewport { UIWidth = size.X, UIHeight = size.Y };
+            viewport = new TabViewport { UISize = size };
             window = new TabWindow(size, viewport, NotePages);
 
             NotePages.CollectionChanged += (sender, _) => viewport.PageCount = ((ObservableCollection<NotePage>)sender).Count;

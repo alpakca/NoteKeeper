@@ -14,26 +14,33 @@ namespace NoteKeeper.InspectionWindow.SinglePage
 
         private Point scrolledDistance;
 
-        public int PageDefaultWidth { get; set; } = 1000;
-        public int PageDefaultHeight { get; set; } = 1800;
-        public int HorizontalMargin { get; set; } = 100;
-        public int VerticalMargin { get; set; } = 50;
+        public int PageDefaultWidth { get; set; } = 700;
+        public int PageDefaultHeight { get; set; } = 1000;
+        public int HorizontalMargin { get; set; } = 20;
+        public int VerticalMargin { get; set; } = 20;
 
         public float Zoom
         {
             get;
-            set => field = Math.Clamp(value, MinimumZoomValue, MaximumZoomValue);
+            set
+            {
+                field = Math.Clamp(value, MinimumZoomValue, MaximumZoomValue);
+                ZoomChanged?.Invoke();
+            }
         } = 1f;
+        public event Action ZoomChanged;
+
         public Point ScrolledDistance => scrolledDistance;
+        public Point UISize { get; set; }
 
-        public int UIWidth { get; set; }
-        public int UIHeight { get; set; }
+        public int ViewedWidth => (int)(UISize.X / Zoom);
+        public int ViewedHeight => (int)(UISize.Y / Zoom);
 
-        public int TotalContentHeight => (int)(PageDefaultHeight * Zoom + 2 * VerticalMargin);
-        public int TotalContentWidth => (int)(PageDefaultWidth * Zoom + 2 * HorizontalMargin);
+        public int TotalContentHeight => PageDefaultHeight + 2 * VerticalMargin;
+        public int TotalContentWidth => PageDefaultWidth + 2 * HorizontalMargin;
 
-        private bool ExceedsUIHeight => TotalContentHeight > UIHeight;
-        private bool ExceedsUIWidth => TotalContentWidth > UIWidth;
+        private bool ExceedsUIHeight => TotalContentHeight > ViewedHeight;
+        private bool ExceedsUIWidth => TotalContentWidth > ViewedWidth;
 
         public Point PageTopLeftPosition
         {
@@ -42,12 +49,12 @@ namespace NoteKeeper.InspectionWindow.SinglePage
                 Point position = new Point(HorizontalMargin, VerticalMargin) - scrolledDistance;
                 if (!ExceedsUIWidth)
                 {
-                    position.X = (int)((UIWidth - PageDefaultWidth * Zoom) / 2);
+                    position.X = (ViewedWidth - TotalContentWidth) / 2;
                 }
 
                 if (!ExceedsUIHeight)
                 {
-                    position.Y = (int)((UIHeight - PageDefaultHeight * Zoom) / 2);
+                    position.Y = (ViewedHeight - TotalContentHeight) / 2;
                 }
 
                 return position;
@@ -80,7 +87,7 @@ namespace NoteKeeper.InspectionWindow.SinglePage
         {
             if (ExceedsUIWidth)
             {
-                scrolledDistance.X = Math.Clamp(xOffset, 0, (int)(TotalContentWidth - UIWidth));
+                scrolledDistance.X = Math.Clamp(xOffset, 0, TotalContentWidth - ViewedWidth);
             }
         }
 
@@ -88,7 +95,7 @@ namespace NoteKeeper.InspectionWindow.SinglePage
         {
             if (ExceedsUIHeight)
             {
-                scrolledDistance.Y = Math.Clamp(yOffset, 0, (int)(TotalContentHeight - UIHeight));
+                scrolledDistance.Y = Math.Clamp(yOffset, 0, TotalContentHeight - ViewedHeight);
             }
         }
     }

@@ -19,7 +19,7 @@ namespace NoteKeeper.InspectionWindow.SinglePage
 
         public SinglePageTab(NotePage page, Point windowSize)
         {
-            viewport = new TabViewport { UIWidth = windowSize.X, UIHeight = windowSize.Y };
+            viewport = new TabViewport { UISize = windowSize };
 
             this.page = page;
             window = new TabWindow(page, viewport);

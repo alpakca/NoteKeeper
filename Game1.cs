@@ -79,15 +79,19 @@ namespace NoteKeeper
             int verticalSize = 700;
             Point viewerSize = new Point(WindowOptions.Size.X - leftMargin * 2, verticalSize);
 
-            MultiPageTab tab = new MultiPageTab(viewerSize);
-            tab.Window.Boundaries = new Rectangle(20, upMargin, viewerSize.X, viewerSize.Y);
-            tab.NotePages.Add(page);
-            tab.NotePages.Add(page);
-            tab.NotePages.Add(page);
-            tab.NotePages.Add(page);
+            MultiPageTab multi = new MultiPageTab(viewerSize);
+            multi.Window.Boundaries = new Rectangle(20, upMargin, viewerSize.X, viewerSize.Y);
+            multi.NotePages.Add(page);
+            multi.NotePages.Add(page);
+            multi.NotePages.Add(page);
+            multi.NotePages.Add(page);
+
+            SinglePageTab single = new SinglePageTab(page, viewerSize);
+            single.Window.Boundaries = new Rectangle(20, upMargin, viewerSize.X, viewerSize.Y);
 
             ControlPanel panel = new ControlPanel();
-            panel.ActiveTabs.Add(tab);
+            panel.ActiveTabs.Add(multi);
+            panel.ActiveTabs.Add(single);
         }
 
         protected override void Update(GameTime gameTime)

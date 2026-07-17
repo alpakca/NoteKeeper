@@ -8,24 +8,22 @@ namespace NoteKeeper.Shell
 {
     internal class VerticalScroller : VisualVerticalSlider, ITabUpdateReceiver
     {
-        private const int Speed = 10;
-
         private ITabViewport displayedTabViewport;
 
         public void DisplayedTabChanged(Tab setTab)
         {
             displayedTabViewport = setTab.TabViewport;
+            AdjustSliderHeight();
         }
 
-        public override void Update()
+        public void ZoomChanged()
         {
             AdjustSliderHeight();
-            base.Update();
         }
 
         public override IEnumerable<UIDrawInfo> GetDrawInfos()
         {
-            if (displayedTabViewport == null || displayedTabViewport.TotalContentHeight - displayedTabViewport.UIHeight <= 0)
+            if (displayedTabViewport == null || displayedTabViewport.TotalContentHeight - displayedTabViewport.ViewedHeight <= 0)
             {
                 return [];
             }
@@ -35,7 +33,16 @@ namespace NoteKeeper.Shell
 
         protected override void OnSliding()
         {
-            displayedTabViewport?.SetVerticalScroll(ScrollOffset * Speed);
+            if (displayedTabViewport != null)
+            {
+                float scrolledRatio = (float)ScrollOffset / (this.Range - this.Boundaries.Height);
+                int scrollableDistance = displayedTabViewport.TotalContentHeight - displayedTabViewport.ViewedHeight;
+
+                int offset = (int)(scrollableDistance * scrolledRatio);
+                displayedTabViewport.SetVerticalScroll(offset);
+            }
+
+            base.OnSliding();
         }
 
         private void AdjustSliderHeight()
@@ -45,14 +52,20 @@ namespace NoteKeeper.Shell
                 return;
             }
 
-            int remaining = displayedTabViewport.TotalContentHeight - displayedTabViewport.UIHeight;
-            if (remaining > 0)
+            if (displayedTabViewport.ViewedHeight > displayedTabViewport.TotalContentHeight)
             {
-                SlideTo(displayedTabViewport.ScrolledDistance.Y / Speed);
-                Boundaries = new Rectangle(Boundaries.X, Boundaries.Y, Boundaries.Width, Range - remaining / Speed);
-
-                base.OnSliding();
+                return;
             }
+
+            float thumbVisibleRatio = (float)displayedTabViewport.ViewedHeight / displayedTabViewport.TotalContentHeight;
+            int thumbHeight = (int)(this.Range * thumbVisibleRatio);
+
+            int thumbTravelDistance = this.Range - thumbHeight;
+            float scrolledYRatio = (float)displayedTabViewport.ScrolledDistance.Y / (displayedTabViewport.TotalContentHeight - displayedTabViewport.ViewedHeight);
+            int thumbYPosition = (int)(thumbTravelDistance * scrolledYRatio);
+
+            Boundaries = new Rectangle(Boundaries.X, Boundaries.Y, Boundaries.Width, thumbHeight);
+            SlideTo(thumbYPosition);
         }
     }
 }

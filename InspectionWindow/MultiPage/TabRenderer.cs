@@ -18,7 +18,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage
             this.viewport = viewport;
             this.notePages = notePages;
 
-            target = DrawHelper.CreateRenderTarget(viewport.UIWidth, viewport.UIHeight);
+            target = DrawHelper.CreateRenderTarget(viewport.ViewedWidth, viewport.ViewedHeight);
         }
 
         public void RenderPageBackgrounds()
@@ -31,7 +31,8 @@ namespace NoteKeeper.InspectionWindow.MultiPage
             {
                 if (viewport.PageWithOffsetOverlapsScreen(pageOffset)) 
                 {
-                    DrawHelper.DrawBackground(new Rectangle(pageOffset, 
+                    DrawHelper.DrawBackground(new Rectangle(new Point((int)(pageOffset.X * viewport.Zoom),
+                                                                      (int)(pageOffset.Y * viewport.Zoom)), 
                                                             new Point((int)(viewport.EachPageWidth * viewport.Zoom),
                                                                       (int)(viewport.EachPageHeight * viewport.Zoom))), 
                                               Color.White);

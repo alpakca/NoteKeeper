@@ -8,5 +8,6 @@ namespace NoteKeeper.Shell
     internal interface ITabUpdateReceiver
     {
         public void DisplayedTabChanged(Tab setTab);
+        public void ZoomChanged();
     }
 }

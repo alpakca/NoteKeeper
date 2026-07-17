@@ -16,13 +16,20 @@ namespace NoteKeeper.InspectionWindow.MultiPage
         public float Zoom
         {
             get;
-            set => field = Math.Clamp(value, MinimumZoomValue, MaximumZoomValue);
+            set
+            {
+                field = Math.Clamp(value, MinimumZoomValue, MaximumZoomValue);
+                ZoomChanged?.Invoke();
+            }
         } = 1f;
+        public event Action ZoomChanged;
+
         public bool InVerticalMode => inVerticalMode;
         public Point ScrolledDistance => scrolledDistance;
+        public Point UISize { get; set; }
 
-        public int UIWidth { get; set; }
-        public int UIHeight { get; set; }
+        public int ViewedWidth => (int)(UISize.X / Zoom);
+        public int ViewedHeight => (int)(UISize.Y / Zoom);
 
         public int TotalContentHeight => InVerticalMode ? GetAllPagesContentLength(EachPageHeight, VerticalMargin) 
                                                         : GetSinglePageContentLength(EachPageHeight, VerticalMargin);
@@ -36,7 +43,6 @@ namespace NoteKeeper.InspectionWindow.MultiPage
         public int VerticalMargin { get; set; } = 20;
         public int PageSpacing { get; set; } = 30;
 
-        // TODO: Bunu MultiPageTab.NotePages.Count ile bağla
         public int PageCount { get; set; }
         public int MovingDimensionPageLength => inVerticalMode ? EachPageHeight : EachPageWidth;
         public int MovingDimensionScroll => inVerticalMode ? scrolledDistance.Y : scrolledDistance.X;
@@ -45,8 +51,8 @@ namespace NoteKeeper.InspectionWindow.MultiPage
         private bool ExceedsUIHeight => ScrollableHeight > 0;
         private bool ExceedsUIWidth => ScrollableWidth > 0;
 
-        private float ScrollableHeight => TotalContentHeight - UIHeight;
-        private float ScrollableWidth => TotalContentWidth - UIWidth;
+        private float ScrollableHeight => TotalContentHeight - ViewedHeight;
+        private float ScrollableWidth => TotalContentWidth - ViewedWidth;
 
         public int FocusedPageIndex
         {
@@ -72,14 +78,15 @@ namespace NoteKeeper.InspectionWindow.MultiPage
             get
             {
                 Point position = new Point(HorizontalMargin, VerticalMargin) - scrolledDistance;
+
                 if (!ExceedsUIHeight)
                 {
-                    position.Y = (int)((UIHeight - TotalContentHeight * Zoom) / 2);
+                    position.Y = (ViewedHeight - TotalContentHeight) / 2;
                 }
 
                 if (!ExceedsUIWidth)
                 {
-                    position.X = (int)((UIWidth - TotalContentWidth * Zoom) / 2);
+                    position.X = (ViewedWidth - TotalContentWidth) / 2;
                 }
 
                 return position;
@@ -90,11 +97,11 @@ namespace NoteKeeper.InspectionWindow.MultiPage
         {
             if (inVerticalMode)
             {
-                return offset.X + EachPageWidth > 0;
+                return offset.Y + EachPageHeight > 0;
             }
             else
             {
-                return offset.Y + EachPageHeight > 0;
+                return offset.X + EachPageWidth > 0;
             }
         }
 
@@ -135,7 +142,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage
         {
             if (ExceedsUIWidth)
             {
-                scrolledDistance.X = Math.Clamp(xOffset, 0, TotalContentWidth - UIWidth);
+                scrolledDistance.X = Math.Clamp(xOffset, 0, (int)ScrollableWidth);
             }
         }
 
@@ -143,18 +150,18 @@ namespace NoteKeeper.InspectionWindow.MultiPage
         {
             if (ExceedsUIHeight)
             {
-                scrolledDistance.Y = Math.Clamp(yOffset, 0, TotalContentHeight - UIHeight);
+                scrolledDistance.Y = Math.Clamp(yOffset, 0, (int)ScrollableHeight);
             }
         }
 
         private int GetAllPagesContentLength(int mainLength, int margin)
         {
-            return (int)(Zoom * (PageCount * (mainLength + PageSpacing) - PageSpacing)) + 2 * margin;
+            return PageCount * (mainLength + PageSpacing) - PageSpacing + 2 * margin;
         }
 
-        private int GetSinglePageContentLength(int mainLength, int margin)
+        private static int GetSinglePageContentLength(int mainLength, int margin)
         {
-            return (int)(Zoom * mainLength) + 2 * margin;
+            return mainLength + 2 * margin;
         }
     }
 }

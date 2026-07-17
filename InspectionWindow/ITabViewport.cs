@@ -8,12 +8,15 @@ namespace NoteKeeper.InspectionWindow
     {
         public float Zoom { get; set; }
         public Point ScrolledDistance { get; }
+        public Point UISize { get; set; }
 
-        public int UIWidth { get; set; }
-        public int UIHeight { get; set; }
+        public int ViewedWidth { get; }
+        public int ViewedHeight { get; }
 
         public int TotalContentHeight { get; }
         public int TotalContentWidth { get; }
+
+        public event Action ZoomChanged;
 
         public void ScrollHorizontal(int amount);
         public void ScrollVertical(int amount);

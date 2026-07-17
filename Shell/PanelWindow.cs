@@ -41,5 +41,9 @@ namespace NoteKeeper.Shell
         {
             displayedTab = setTab;
         }
+
+        public void ZoomChanged()
+        {
+        }
     }
 }

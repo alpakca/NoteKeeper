@@ -81,7 +81,11 @@ namespace NoteKeeper.Shell
 
         public void DisplayTab(Tab tab)
         {
-            PopWindowManager.ActiveWindows.Remove(displayedTab?.Window);
+            if (displayedTab != null)
+            {
+                displayedTab.TabViewport.ZoomChanged -= TabViewport_ZoomChanged;
+                PopWindowManager.ActiveWindows.Remove(displayedTab.Window);
+            }
 
             displayedTab = tab;
             tab.ShellModeUpdated(Mode);
@@ -93,11 +97,21 @@ namespace NoteKeeper.Shell
 
             if (tab != null)
             {
+                tab.TabViewport.ZoomChanged += TabViewport_ZoomChanged;
+
                 PopWindowManager.ActiveWindows.Add(tab.Window);
                 PopWindowManager.ActiveWindows.MoveToBottom(tab.Window);
             }
 
             RearrangeUISizes();
+        }
+
+        private void TabViewport_ZoomChanged()
+        {
+            foreach (var receiver in tabUpdateReceivers)
+            {
+                receiver.ZoomChanged();
+            }
         }
     }
 }
