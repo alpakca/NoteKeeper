@@ -121,9 +121,15 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
                     _notePages[pageIndex].Contents.Add(transformedContent);
 
                     transformedContentPageIndex = pageIndex;
-                }
 
-                transformedContent!.Location += pagePosition - lastMousePosition;
+                    // place it as node appears at the middle of content
+                    transformedContent!.Location = pagePosition - transformedContent.Size / new Point(2);
+                }
+                else
+                {
+                    // carry by position change
+                    transformedContent!.Location += pagePosition - lastMousePosition;
+                }
 
                 lastMousePosition = pagePosition;
                 AlignNodePositions();

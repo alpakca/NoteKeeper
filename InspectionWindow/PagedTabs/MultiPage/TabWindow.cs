@@ -50,8 +50,8 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             {
                 if (transformer.AnyNodeSelected)
                 {
-                    (int pageIndex, _) = viewport.ToPagePosition(e.MousePosition);
-                    transformer.MouseMove(pageIndex, e.MousePosition);
+                    (int pageIndex, Point pagePosition) = viewport.ToPagePosition(e.MousePosition);
+                    transformer.MouseMove(pageIndex, pagePosition);
                 }
             }
         }
