@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using NoteKeeper.InspectionWindow.PagedTabs.SinglePage;
 using PopUpUI.Toolkit;
 using System;
 using System.Collections.Generic;
@@ -66,7 +67,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             {
                 // replace with actual image
                 DrawHelper.DrawBackground(new Rectangle(pageOffset + position.Times(viewport.Zoom),
-                                                        new Point(PageContentTransformer.NodeLength).Times(viewport.Zoom)),
+                                                        new Point(SinglePage.ContentTransformer.NodeLength).Times(viewport.Zoom)),
                                           Color.Black);
             }
 

@@ -16,14 +16,14 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         private readonly TabViewport viewport;
         private readonly TabRenderer renderer;
         private readonly TabInputHandler inputHandler;
-        private readonly PageContentTransformer transformer;
+        private readonly ContentTransformer transformer;
 
         public TabWindow(Point size, TabViewport viewport, IList<NotePage> notePages) : base(size)
         {
             this.viewport = viewport;
             renderer = new TabRenderer(viewport, notePages);
             inputHandler = new TabInputHandler(viewport, notePages);
-            transformer = new PageContentTransformer(notePages);
+            transformer = new ContentTransformer(notePages, viewport);
         }
 
         public void ModeUpdated(ShellModes mode)
@@ -72,7 +72,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
 
                 if (!transformer.AnyNodeSelected && e.FirstTimeButtons.HasLeft)
                 {
-                    transformer.MouseHoldStart(viewport.ToPagePosition(e.MousePosition).PagePosition, e.MousePosition);
+                    transformer.MouseHoldStart(pageIndex, pagePosition);
                 }
                 else if (transformer.AnyNodeSelected && !e.CurrentButtons.HasLeft)
                 {

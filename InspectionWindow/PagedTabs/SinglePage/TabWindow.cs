@@ -12,14 +12,14 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.SinglePage
 
         private readonly TabRenderer renderer;
         private readonly TabViewport viewport;
-        private readonly PageContentTransformer transformer;
+        private readonly ContentTransformer transformer;
         private readonly TabInputHandler inputHandler;
 
         public TabWindow(NotePage page, TabViewport viewport) : base(new Point(viewport.ViewedWidth, viewport.ViewedHeight))
         {
             this.viewport = viewport;
 
-            transformer = new PageContentTransformer([page]);
+            transformer = new ContentTransformer();
             renderer = new TabRenderer(page, viewport);
             inputHandler = new TabInputHandler(page, viewport);
 
@@ -51,7 +51,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.SinglePage
             {
                 if (transformer.AnyNodeSelected)
                 {
-                    transformer.MouseMove(0, e.MousePosition);
+                    transformer.MouseMove(viewport.ToPagePosition(e.MousePosition));
                 }
             }
         }

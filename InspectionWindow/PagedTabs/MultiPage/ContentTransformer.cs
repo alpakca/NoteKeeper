@@ -1,20 +1,26 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text;
 
 #nullable enable
 
-namespace NoteKeeper.InspectionWindow.PagedTabs
+namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
 {
-    internal class PageContentTransformer
+    internal class ContentTransformer
     {
         public const int NodeLength = 10;
 
         private int transformedContentPageIndex;
         private IPageContent? transformedContent;
+
+        private readonly TabViewport _viewport;
         private readonly IList<NotePage> _notePages;
 
         private NodePlacement selectedNode;
+        private int lastPageIndex;
         private Point lastMousePosition;
         private readonly Dictionary<NodePlacement, Point> nodePagePositions;
 
@@ -37,9 +43,10 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
             Right = 16
         }
 
-        public PageContentTransformer(IList<NotePage> notePages)
+        public ContentTransformer(IList<NotePage> notePages, TabViewport viewport)
         {
             _notePages = notePages;
+            _viewport = viewport;
 
             nodePagePositions = new Dictionary<NodePlacement, Point>
             {
@@ -78,7 +85,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
             return GetHitNode(pagePosition) != NodePlacement.None;
         }
 
-        public void MouseHoldStart(Point pagePosition, Point mousePosition)
+        public void MouseHoldStart(int pageIndex, Point pagePosition)
         {
             if (TransformedContent == null)
             {
@@ -87,7 +94,8 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
             }
 
             selectedNode = GetHitNode(pagePosition);
-            lastMousePosition = mousePosition;
+            lastPageIndex = pageIndex;
+            lastMousePosition = pagePosition;
         }
 
         public void MouseHoldEnd()
@@ -95,30 +103,46 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
             selectedNode = NodePlacement.None;
         }
 
-        public void MouseMove(int pageIndex, Point mousePosition)
+        public void MouseMove(int pageIndex, Point pagePosition)
         {
             if (selectedNode == NodePlacement.None)
             {
                 return;
             }
 
-            if (selectedNode == NodePlacement.Carry && transformedContentPageIndex != pageIndex)
-            {
-                _notePages[transformedContentPageIndex].Contents.Remove(transformedContent);
-                _notePages[pageIndex].Contents.Add(transformedContent);
-
-                transformedContentPageIndex = pageIndex;
-            }
-
-            Point difference = mousePosition - lastMousePosition;
-            lastMousePosition = mousePosition;
-
             if (selectedNode == NodePlacement.Carry)
             {
-                transformedContent!.Location += difference;
+                if (transformedContentPageIndex != pageIndex)
+                {
+                    _notePages[transformedContentPageIndex].Contents.Remove(transformedContent);
+                    _notePages[pageIndex].Contents.Add(transformedContent);
+
+                    transformedContentPageIndex = pageIndex;
+                }
+
+                transformedContent!.Location += pagePosition - lastMousePosition;
+
+                lastMousePosition = pagePosition;
                 AlignNodePositions();
                 return;
             }
+
+            Point difference;
+            if (pageIndex == lastPageIndex)
+            {
+                difference = pagePosition - lastMousePosition;
+            }
+            else if (pageIndex > lastPageIndex)
+            {
+                difference = pagePosition + _viewport.MovingDimensionPageStep - lastMousePosition;
+            }
+            else
+            {
+                difference = pagePosition - _viewport.MovingDimensionPageStep - lastMousePosition;
+            }
+
+            lastPageIndex = pageIndex;
+            lastMousePosition = pagePosition;
 
             Point locationChange = new Point();
             Point sizeChange = new Point();

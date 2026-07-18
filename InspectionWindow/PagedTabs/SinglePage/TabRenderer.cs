@@ -49,7 +49,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.SinglePage
             {
                 // replace with actual image
                 DrawHelper.DrawBackground(new Rectangle(pageTopLeft + position.Times(viewport.Zoom), 
-                                                        new Point(PageContentTransformer.NodeLength).Times(viewport.Zoom)), 
+                                                        new Point(ContentTransformer.NodeLength).Times(viewport.Zoom)), 
                                           Color.Black);
             }
 
