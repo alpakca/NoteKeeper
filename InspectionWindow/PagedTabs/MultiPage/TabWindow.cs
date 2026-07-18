@@ -50,8 +50,8 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             {
                 if (transformer.AnyNodeSelected)
                 {
-                    (int pageIndex, Point pagePosition) = viewport.ToPagePosition(e.MousePosition);
-                    transformer.MouseMove(pageIndex, pagePosition);
+                    (int pageIndex, _) = viewport.ToPagePosition(e.MousePosition);
+                    transformer.MouseMove(pageIndex, e.MousePosition);
                 }
             }
         }
@@ -72,7 +72,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
 
                 if (!transformer.AnyNodeSelected && e.FirstTimeButtons.HasLeft)
                 {
-                    transformer.MouseHoldStart(viewport.ToPagePosition(e.MousePosition).PagePosition);
+                    transformer.MouseHoldStart(viewport.ToPagePosition(e.MousePosition).PagePosition, e.MousePosition);
                 }
                 else if (transformer.AnyNodeSelected && !e.CurrentButtons.HasLeft)
                 {

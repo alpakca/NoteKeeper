@@ -51,7 +51,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.SinglePage
             {
                 if (transformer.AnyNodeSelected)
                 {
-                    transformer.MouseMove(0, viewport.ToPagePosition(e.MousePosition));
+                    transformer.MouseMove(0, e.MousePosition);
                 }
             }
         }
@@ -71,7 +71,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.SinglePage
 
                 if (!transformer.AnyNodeSelected && e.FirstTimeButtons.HasLeft)
                 {
-                    transformer.MouseHoldStart(viewport.ToPagePosition(e.MousePosition));
+                    transformer.MouseHoldStart(viewport.ToPagePosition(e.MousePosition), e.MousePosition);
                 }
                 else if (transformer.AnyNodeSelected && !e.CurrentButtons.HasLeft)
                 {

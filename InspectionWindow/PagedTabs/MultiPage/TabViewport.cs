@@ -112,7 +112,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
 
                 // mouse is in between two pages (at PageSpace area): current i value and next one
                 // return that PageSpace area, so contents can still be visible in there
-                if (normalizedPagedPosition.X < 0 || normalizedPagedPosition.Y < 0)
+                if ((inVerticalMode && normalizedPagedPosition.Y < 0) || (!inVerticalMode && normalizedPagedPosition.X < 0))
                 {
                     return (i, normalizedPagedPosition + MovingDimensionPageStep);
                 }

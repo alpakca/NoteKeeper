@@ -78,7 +78,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
             return GetHitNode(pagePosition) != NodePlacement.None;
         }
 
-        public void MouseHoldStart(Point pagePosition)
+        public void MouseHoldStart(Point pagePosition, Point mousePosition)
         {
             if (TransformedContent == null)
             {
@@ -87,7 +87,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
             }
 
             selectedNode = GetHitNode(pagePosition);
-            lastMousePosition = pagePosition;
+            lastMousePosition = mousePosition;
         }
 
         public void MouseHoldEnd()
@@ -95,14 +95,14 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
             selectedNode = NodePlacement.None;
         }
 
-        public void MouseMove(int pageIndex, Point pagePosition)
+        public void MouseMove(int pageIndex, Point mousePosition)
         {
             if (selectedNode == NodePlacement.None)
             {
                 return;
             }
 
-            if (transformedContentPageIndex != pageIndex)
+            if (selectedNode == NodePlacement.Carry && transformedContentPageIndex != pageIndex)
             {
                 _notePages[transformedContentPageIndex].Contents.Remove(transformedContent);
                 _notePages[pageIndex].Contents.Add(transformedContent);
@@ -110,8 +110,8 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
                 transformedContentPageIndex = pageIndex;
             }
 
-            Point difference = pagePosition - lastMousePosition;
-            lastMousePosition = pagePosition;
+            Point difference = mousePosition - lastMousePosition;
+            lastMousePosition = mousePosition;
 
             if (selectedNode == NodePlacement.Carry)
             {
