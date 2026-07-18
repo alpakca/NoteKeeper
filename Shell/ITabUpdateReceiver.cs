@@ -9,5 +9,6 @@ namespace NoteKeeper.Shell
     {
         public void DisplayedTabChanged(Tab setTab);
         public void ZoomChanged();
+        public void ScrollChanged();
     }
 }

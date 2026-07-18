@@ -8,6 +8,7 @@ using PopUpUI.Text;
 using NoteKeeper.InspectionWindow.PagedTabs.SinglePage;
 using NoteKeeper.InspectionWindow.PagedTabs.MultiPage;
 using NoteKeeper.InspectionWindow.PagedTabs;
+using System.Collections.Generic;
 
 namespace NoteKeeper
 {
@@ -83,8 +84,32 @@ namespace NoteKeeper
 
             MultiPageTab multi = new MultiPageTab(viewerSize);
             multi.Window.Boundaries = new Rectangle(20, upMargin, viewerSize.X, viewerSize.Y);
-            multi.NotePages.Add(page);
-            multi.NotePages.Add(page2);
+
+            NotePage first = new NotePage();
+            first.Contents.AddRange(
+                new PageImageContent(green)
+                {
+                    Location = new Point(50, 50),
+                    Size = new Point(50, 50)
+                },
+                new PageImageContent(red)
+                {
+                    Location = new Point(100, 100),
+                    Size = new Point(50, 50)
+                }
+            );
+
+            NotePage second = new NotePage();
+            second.Contents.Add(
+                new PageImageContent(Util.GetTexture(1, 1, Color.Pink))
+                {
+                    Location = new Point(70, 70),
+                    Size = new Point(50, 50)
+                }
+            );
+
+            multi.NotePages.Add(first);
+            multi.NotePages.Add(second);
 
             SinglePageTab single = new SinglePageTab(page, viewerSize);
             single.Window.Boundaries = new Rectangle(20, upMargin, viewerSize.X, viewerSize.Y);

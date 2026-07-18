@@ -2,14 +2,13 @@
 using NoteKeeper.InspectionWindow;
 using PopUpUI.Elements.Visual;
 using PopUpUI.Surface;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace NoteKeeper.Shell
 {
     internal class HorizontalScroller : VisualHorizontalSlider, ITabUpdateReceiver
     {
+        private bool slidedWithViewport = false;
         private ITabViewport displayedTabViewport;
 
         public void DisplayedTabChanged(Tab setTab)
@@ -21,6 +20,19 @@ namespace NoteKeeper.Shell
         public void ZoomChanged()
         {
             AdjustSliderHeight();
+        }
+
+        public void ScrollChanged()
+        {
+            if (displayedTabViewport != null)
+            {
+                int thumbTravelDistance = this.Range - this.Boundaries.Width;
+                float scrolledXRatio = (float)displayedTabViewport.ScrolledDistance.X / (displayedTabViewport.TotalContentWidth - displayedTabViewport.ViewedWidth);
+                int thumbXPosition = (int)(thumbTravelDistance * scrolledXRatio);
+
+                slidedWithViewport = true;
+                SlideTo(thumbXPosition);
+            }
         }
 
         public override IEnumerable<UIDrawInfo> GetDrawInfos()
@@ -35,6 +47,14 @@ namespace NoteKeeper.Shell
 
         protected override void OnSliding()
         {
+            if (slidedWithViewport)
+            {
+                slidedWithViewport = false;
+                base.OnSliding();
+
+                return;
+            }
+
             if (displayedTabViewport != null)
             {
                 float scrolledRatio = (float)ScrollOffset / (this.Range - this.Boundaries.Width);

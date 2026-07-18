@@ -84,6 +84,8 @@ namespace NoteKeeper.Shell
             if (displayedTab != null)
             {
                 displayedTab.TabViewport.ZoomChanged -= TabViewport_ZoomChanged;
+                displayedTab.TabViewport.ScrollChanged -= TabViewport_ScrollChanged;
+
                 PopWindowManager.ActiveWindows.Remove(displayedTab.Window);
             }
 
@@ -98,12 +100,21 @@ namespace NoteKeeper.Shell
             if (tab != null)
             {
                 tab.TabViewport.ZoomChanged += TabViewport_ZoomChanged;
+                tab.TabViewport.ScrollChanged += TabViewport_ScrollChanged;
 
                 PopWindowManager.ActiveWindows.Add(tab.Window);
                 PopWindowManager.ActiveWindows.MoveToBottom(tab.Window);
             }
 
             RearrangeUISizes();
+        }
+
+        private void TabViewport_ScrollChanged()
+        {
+            foreach (var receiver in tabUpdateReceivers)
+            {
+                receiver.ScrollChanged();
+            }
         }
 
         private void TabViewport_ZoomChanged()

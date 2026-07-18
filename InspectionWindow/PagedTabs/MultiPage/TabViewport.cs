@@ -22,7 +22,6 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
                 ZoomChanged?.Invoke();
             }
         } = 1f;
-        public event Action ZoomChanged;
 
         public bool InVerticalMode => inVerticalMode;
         public Point ScrolledDistance => scrolledDistance;
@@ -36,8 +35,11 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         public int TotalContentWidth => InVerticalMode ? GetSinglePageContentLength(EachPageWidth, HorizontalMargin) 
                                                        : GetAllPagesContentLength(EachPageWidth, HorizontalMargin);
 
+        public event Action ZoomChanged;
+        public event Action ScrollChanged;
+
         // by pixels
-        public int EachPageHeight { get; set; } = 500;
+        public int EachPageHeight { get; set; } = 1000;
         public int EachPageWidth { get; set; } = 700;
         public int HorizontalMargin { get; set; } = 20;
         public int VerticalMargin { get; set; } = 20;
@@ -162,6 +164,8 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             {
                 scrolledDistance.X = Math.Clamp(xOffset, 0, (int)ScrollableWidth);
             }
+
+            ScrollChanged?.Invoke();
         }
 
         public void SetVerticalScroll(int yOffset)
@@ -170,6 +174,8 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             {
                 scrolledDistance.Y = Math.Clamp(yOffset, 0, (int)ScrollableHeight);
             }
+
+            ScrollChanged?.Invoke();
         }
 
         private int GetAllPagesContentLength(int mainLength, int margin)

@@ -28,7 +28,6 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.SinglePage
                 ZoomChanged?.Invoke();
             }
         } = 1f;
-        public event Action ZoomChanged;
 
         public Point ScrolledDistance => scrolledDistance;
         public Point UISize { get; set; }
@@ -38,6 +37,9 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.SinglePage
 
         public int TotalContentHeight => PageDefaultHeight + 2 * VerticalMargin;
         public int TotalContentWidth => PageDefaultWidth + 2 * HorizontalMargin;
+
+        public event Action ZoomChanged;
+        public event Action ScrollChanged;
 
         private bool ExceedsUIHeight => TotalContentHeight > ViewedHeight;
         private bool ExceedsUIWidth => TotalContentWidth > ViewedWidth;
@@ -89,6 +91,8 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.SinglePage
             {
                 scrolledDistance.X = Math.Clamp(xOffset, 0, TotalContentWidth - ViewedWidth);
             }
+
+            ScrollChanged?.Invoke();
         }
 
         public void SetVerticalScroll(int yOffset)
@@ -97,6 +101,8 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.SinglePage
             {
                 scrolledDistance.Y = Math.Clamp(yOffset, 0, TotalContentHeight - ViewedHeight);
             }
+
+            ScrollChanged?.Invoke();
         }
     }
 }

@@ -8,6 +8,7 @@ namespace NoteKeeper.Shell
 {
     internal class VerticalScroller : VisualVerticalSlider, ITabUpdateReceiver
     {
+        private bool slidedWithViewport = false;
         private ITabViewport displayedTabViewport;
 
         public void DisplayedTabChanged(Tab setTab)
@@ -19,6 +20,19 @@ namespace NoteKeeper.Shell
         public void ZoomChanged()
         {
             AdjustSliderHeight();
+        }
+
+        public void ScrollChanged()
+        {
+            if (displayedTabViewport != null)
+            {
+                int thumbTravelDistance = this.Range - Boundaries.Height;
+                float scrolledYRatio = (float)displayedTabViewport.ScrolledDistance.Y / (displayedTabViewport.TotalContentHeight - displayedTabViewport.ViewedHeight);
+                int thumbYPosition = (int)(thumbTravelDistance * scrolledYRatio);
+
+                slidedWithViewport = true;
+                SlideTo(thumbYPosition);
+            }
         }
 
         public override IEnumerable<UIDrawInfo> GetDrawInfos()
@@ -33,6 +47,14 @@ namespace NoteKeeper.Shell
 
         protected override void OnSliding()
         {
+            if (slidedWithViewport)
+            {
+                slidedWithViewport = false;
+                base.OnSliding();
+
+                return;
+            }
+
             if (displayedTabViewport != null)
             {
                 float scrolledRatio = (float)ScrollOffset / (this.Range - this.Boundaries.Height);
