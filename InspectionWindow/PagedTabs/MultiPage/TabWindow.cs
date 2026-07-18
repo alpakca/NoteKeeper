@@ -61,7 +61,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             if (currentMode == ShellModes.Transform)
             {
                 (int pageIndex, Point pagePosition) = viewport.ToPagePosition(e.MousePosition);
-                if (!transformer.HitAnyNode(pagePosition))
+                if (!transformer.HitAnyNode(pageIndex, pagePosition))
                 {
                     IPageContent hitContent = inputHandler.HitContent(e.MousePosition);
                     if (transformer.TransformedContent != hitContent && e.FirstTimeButtons.HasLeft)

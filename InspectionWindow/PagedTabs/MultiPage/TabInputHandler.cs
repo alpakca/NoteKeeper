@@ -28,12 +28,6 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         public IPageContent? HitContent(Point mousePosition)
         {
             (int pageIndex, Point pagePosition) = viewport.ToPagePosition(mousePosition);
-            Trace.WriteLine(pageIndex);
-
-            if (pageIndex == -1)
-            {
-                return null;
-            }
 
             for (int i = notePages[pageIndex].Contents.Count - 1; i >= 0; i--)
             {

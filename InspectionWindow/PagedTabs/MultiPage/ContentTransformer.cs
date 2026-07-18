@@ -59,8 +59,11 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             };
         }
 
-        private NodePlacement GetHitNode(Point pagePosition)
+        private NodePlacement GetHitNode(int pageIndex, Point pagePosition)
         {
+            // if node that tried to hit is at another page (stretched to) than content, we need to adjust page position
+            pagePosition += (pageIndex - transformedContentPageIndex) * _viewport.MovingDimensionPageStep;
+
             foreach ((NodePlacement node, Point position) in nodePagePositions)
             {
                 if (position.X <= pagePosition.X && pagePosition.X < position.X + NodeLength &&
@@ -80,9 +83,9 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             AlignNodePositions();
         }
 
-        public bool HitAnyNode(Point pagePosition)
+        public bool HitAnyNode(int pageIndex, Point pagePosition)
         {
-            return GetHitNode(pagePosition) != NodePlacement.None;
+            return GetHitNode(pageIndex, pagePosition) != NodePlacement.None;
         }
 
         public void MouseHoldStart(int pageIndex, Point pagePosition)
@@ -93,7 +96,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
                 return;
             }
 
-            selectedNode = GetHitNode(pagePosition);
+            selectedNode = GetHitNode(pageIndex, pagePosition);
             lastPageIndex = pageIndex;
             lastMousePosition = pagePosition;
         }
@@ -127,19 +130,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
                 return;
             }
 
-            Point difference;
-            if (pageIndex == lastPageIndex)
-            {
-                difference = pagePosition - lastMousePosition;
-            }
-            else if (pageIndex > lastPageIndex)
-            {
-                difference = pagePosition + _viewport.MovingDimensionPageStep - lastMousePosition;
-            }
-            else
-            {
-                difference = pagePosition - _viewport.MovingDimensionPageStep - lastMousePosition;
-            }
+            Point difference = pagePosition + (pageIndex - lastPageIndex) * _viewport.MovingDimensionPageStep - lastMousePosition;
 
             lastPageIndex = pageIndex;
             lastMousePosition = pagePosition;
