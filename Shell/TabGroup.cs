@@ -49,6 +49,12 @@ namespace NoteKeeper.Shell
 
         public void Holding(Point mousePosition)
         {
+            // Cannot perform switching tabs if displayed tab does not exist
+            if (panel.DisplayedTab == null)
+            {
+                return;
+            }
+
             Tab hit = renderer.HitTab(mousePosition - Boundaries.Location);
 
             // if hit the displayed tab, clear the cache
