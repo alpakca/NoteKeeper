@@ -40,12 +40,12 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.SinglePage
             DrawHelper.EndBatch();
         }
 
-        public void RenderTransformerNodes(IEnumerable<Point> nodeScreenPositions)
+        public void RenderTransformerNodes(IEnumerable<Point> nodePagePositions)
         {
             DrawHelper.SetBeginBatch(target);
 
             Point pageTopLeft = viewport.PageTopLeftPosition;
-            foreach (Point position in nodeScreenPositions)
+            foreach (Point position in nodePagePositions)
             {
                 // replace with actual image
                 DrawHelper.DrawBackground(new Rectangle(pageTopLeft + position.Times(viewport.Zoom), 

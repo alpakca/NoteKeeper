@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Input;
 using PopUpUI.Input;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 #nullable enable
@@ -27,6 +28,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         public IPageContent? HitContent(Point mousePosition)
         {
             (int pageIndex, Point pagePosition) = viewport.ToPagePosition(mousePosition);
+            Trace.WriteLine(pageIndex);
 
             if (pageIndex == -1)
             {

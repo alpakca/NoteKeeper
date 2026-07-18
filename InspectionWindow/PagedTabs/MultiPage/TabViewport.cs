@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
@@ -108,9 +109,16 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
                 }
 
                 normalizedPagedPosition -= MovingDimensionPageStep;
+
+                // mouse is in between two pages (at PageSpace area): current i value and next one
+                // return that PageSpace area, so contents can still be visible in there
+                if (normalizedPagedPosition.X < 0 || normalizedPagedPosition.Y < 0)
+                {
+                    return (i, normalizedPagedPosition + MovingDimensionPageStep);
+                }
             }
 
-            return (-1, new Point());
+            throw new InvalidOperationException("MutliPageTab.TabViewport.ToPagePosition shouldn't return -1 as PageIndex");
         }
 
         public bool PageWithOffsetOverlapsScreen(Point offset)

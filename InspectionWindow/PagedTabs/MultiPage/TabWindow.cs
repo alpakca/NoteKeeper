@@ -23,7 +23,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             this.viewport = viewport;
             renderer = new TabRenderer(viewport, notePages);
             inputHandler = new TabInputHandler(viewport, notePages);
-            transformer = new PageContentTransformer();
+            transformer = new PageContentTransformer(notePages);
         }
 
         public void ModeUpdated(ShellModes mode)
@@ -36,6 +36,11 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         {
             renderer.RenderPageBackgrounds();
 
+            if (currentMode == ShellModes.Transform && transformer.IsTransforming)
+            {
+                renderer.RenderTransformerNodes(transformer.TransformedContentPageIndex, transformer.NodePagePositions);
+            }
+
             renderer.RenderWindowTexture(WindowTexture);
         }
 
@@ -45,7 +50,8 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             {
                 if (transformer.AnyNodeSelected)
                 {
-                    transformer.MouseMove(viewport.ToPagePosition(e.MousePosition).PagePosition);
+                    (int pageIndex, Point pagePosition) = viewport.ToPagePosition(e.MousePosition);
+                    transformer.MouseMove(pageIndex, pagePosition);
                 }
             }
         }
@@ -54,12 +60,13 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         {
             if (currentMode == ShellModes.Transform)
             {
-                if (!transformer.HitAnyNode(viewport.ToPagePosition(e.MousePosition).PagePosition))
+                (int pageIndex, Point pagePosition) = viewport.ToPagePosition(e.MousePosition);
+                if (!transformer.HitAnyNode(pagePosition))
                 {
                     IPageContent hitContent = inputHandler.HitContent(e.MousePosition);
                     if (transformer.TransformedContent != hitContent && e.FirstTimeButtons.HasLeft)
                     {
-                        transformer.TransformedContent = hitContent;
+                        transformer.SetTransformedContent(hitContent, pageIndex);
                     }
                 }
 

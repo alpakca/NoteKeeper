@@ -32,6 +32,8 @@ namespace NoteKeeper
                                            GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height);
             WindowOptions.AllowUserResizing = true;
 
+            WindowOptions.Position = new Point(10);
+
             base.Initialize();
         }
 
@@ -110,6 +112,7 @@ namespace NoteKeeper
 
             multi.NotePages.Add(first);
             multi.NotePages.Add(second);
+            multi.NotePages.Add(new NotePage());
 
             SinglePageTab single = new SinglePageTab(page, viewerSize);
             single.Window.Boundaries = new Rectangle(20, upMargin, viewerSize.X, viewerSize.Y);

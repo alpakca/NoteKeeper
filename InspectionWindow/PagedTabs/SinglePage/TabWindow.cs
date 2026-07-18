@@ -19,7 +19,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.SinglePage
         {
             this.viewport = viewport;
 
-            transformer = new PageContentTransformer();
+            transformer = new PageContentTransformer([page]);
             renderer = new TabRenderer(page, viewport);
             inputHandler = new TabInputHandler(page, viewport);
 
@@ -32,7 +32,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.SinglePage
 
             if (currentMode == ShellModes.Transform && transformer.IsTransforming)
             {
-                renderer.RenderTransformerNodes(transformer.NodeScreenPositions);
+                renderer.RenderTransformerNodes(transformer.NodePagePositions);
             }
 
             // render to window texture at last
@@ -51,7 +51,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.SinglePage
             {
                 if (transformer.AnyNodeSelected)
                 {
-                    transformer.MouseMove(viewport.ToPagePosition(e.MousePosition));
+                    transformer.MouseMove(0, viewport.ToPagePosition(e.MousePosition));
                 }
             }
         }
@@ -65,7 +65,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.SinglePage
                     IPageContent hitContent = inputHandler.HitContent(e.MousePosition);
                     if (transformer.TransformedContent != hitContent && e.FirstTimeButtons.HasLeft)
                     {
-                        transformer.TransformedContent = hitContent;
+                        transformer.SetTransformedContent(hitContent, 0);
                     }
                 }
 

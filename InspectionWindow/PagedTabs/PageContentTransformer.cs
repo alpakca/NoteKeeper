@@ -10,24 +10,20 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
     {
         public const int NodeLength = 10;
 
+        private int transformedContentPageIndex;
+        private IPageContent? transformedContent;
+        private readonly IList<NotePage> _notePages;
+
         private NodePlacement selectedNode;
         private Point lastMousePosition;
-        private IPageContent? transformedContent;
-        private readonly Dictionary<NodePlacement, Point> nodeScreenPositions;
+        private readonly Dictionary<NodePlacement, Point> nodePagePositions;
 
-        public IPageContent? TransformedContent
-        {
-            get => transformedContent;
-            set
-            {
-                transformedContent = value;
-                AlignNodePositions();
-            }
-        }
+        public int TransformedContentPageIndex => transformedContentPageIndex;
+        public IPageContent? TransformedContent => transformedContent;
 
         public bool AnyNodeSelected => selectedNode != NodePlacement.None;
         public bool IsTransforming => transformedContent != null;
-        public IEnumerable<Point> NodeScreenPositions => nodeScreenPositions.Values;
+        public IEnumerable<Point> NodePagePositions => nodePagePositions.Values;
 
         private enum NodePlacement
         {
@@ -41,9 +37,11 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
             Right = 16
         }
 
-        public PageContentTransformer()
+        public PageContentTransformer(IList<NotePage> notePages)
         {
-            nodeScreenPositions = new Dictionary<NodePlacement, Point>
+            _notePages = notePages;
+
+            nodePagePositions = new Dictionary<NodePlacement, Point>
             {
                 { NodePlacement.Carry, default },
                 { NodePlacement.Top | NodePlacement.Left, default }, { NodePlacement.Top, default },
@@ -56,7 +54,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
 
         private NodePlacement GetHitNode(Point pagePosition)
         {
-            foreach ((NodePlacement node, Point position) in nodeScreenPositions)
+            foreach ((NodePlacement node, Point position) in nodePagePositions)
             {
                 if (position.X <= pagePosition.X && pagePosition.X < position.X + NodeLength &&
                     position.Y <= pagePosition.Y && pagePosition.Y < position.Y + NodeLength)
@@ -66,6 +64,13 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
             }
 
             return NodePlacement.None;
+        }
+
+        public void SetTransformedContent(IPageContent? content, int contentPageIndex)
+        {
+            transformedContent = content;
+            transformedContentPageIndex = contentPageIndex;
+            AlignNodePositions();
         }
 
         public bool HitAnyNode(Point pagePosition)
@@ -90,9 +95,20 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
             selectedNode = NodePlacement.None;
         }
 
-        public void MouseMove(Point pagePosition)
+        public void MouseMove(int pageIndex, Point pagePosition)
         {
-            if (selectedNode == NodePlacement.None) return;
+            if (selectedNode == NodePlacement.None)
+            {
+                return;
+            }
+
+            if (transformedContentPageIndex != pageIndex)
+            {
+                _notePages[transformedContentPageIndex].Contents.Remove(transformedContent);
+                _notePages[pageIndex].Contents.Add(transformedContent);
+
+                transformedContentPageIndex = pageIndex;
+            }
 
             Point difference = pagePosition - lastMousePosition;
             lastMousePosition = pagePosition;
@@ -140,7 +156,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
             int halfHorizontal = transformedContent.Size.X / 2;
             Point carryPosition = transformedContent.Location + new Point(halfHorizontal - NodeLength / 2, halfVertical - NodeLength / 2);
 
-            foreach (NodePlacement node in nodeScreenPositions.Keys)
+            foreach (NodePlacement node in nodePagePositions.Keys)
             {
                 Point position = carryPosition;
 
@@ -156,7 +172,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
                 else if (node.HasFlag(NodePlacement.Right))
                     position.X += halfHorizontal;
 
-                nodeScreenPositions[node] = position;
+                nodePagePositions[node] = position;
             }
         }
     }
