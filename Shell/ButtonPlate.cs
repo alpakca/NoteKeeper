@@ -64,16 +64,18 @@ namespace NoteKeeper.Shell
             }
 
             PageTextContent content = ContentGetter.GetTextContent();
-            content.Location = new Point(100, 100);
             content.Size = new Point(200, 50);
 
             pageContentTab.AddContent(content);
             ActivateWritingMode();
 
-            pageContentTab.SimulateMouseButtonStateInput(new PopWindowMouseEventArgs(MouseButtons.Left,
-                                                                                     MouseButtons.Left,
-                                                                                     MouseButtons.None,
-                                                                                     pageContentTab.GetContentScreenLocation(content)));
+            // apply margin to Screen Location of content that may appear a little lower due to rounding errors
+            // which shouldn't happen with zoom value of 1f
+            const int RoundingErrorMargin = 3;
+
+            pageContentTab.SimulateMouseButtonStateInput(
+                new PopWindowMouseEventArgs(MouseButtons.Left, MouseButtons.Left, MouseButtons.None,
+                                            pageContentTab.GetContentScreenLocation(content) + new Point(RoundingErrorMargin)));
         }
 
         private class OppositeToggleButtonsCommand : ICommander<ToggleButton>
