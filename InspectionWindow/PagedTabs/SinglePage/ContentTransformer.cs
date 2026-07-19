@@ -75,7 +75,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.SinglePage
             return GetHitNode(pagePosition) != NodePlacement.None;
         }
 
-        public void MouseHoldStart(Point pagePosition, Point mousePosition)
+        public void MouseHoldStart(Point pagePosition)
         {
             if (TransformedContent == null)
             {
@@ -84,7 +84,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.SinglePage
             }
 
             selectedNode = GetHitNode(pagePosition);
-            lastMousePosition = mousePosition;
+            lastMousePosition = pagePosition;
         }
 
         public void MouseHoldEnd()

@@ -69,12 +69,6 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.SinglePage
             return new Point((int)(mousePosition.X / Zoom), (int)(mousePosition.Y / Zoom));
         }
 
-        public Point ToScreenLocation(Point pagePosition)
-        {
-            pagePosition = new Point((int)(pagePosition.X * Zoom), (int)(pagePosition.Y * Zoom));
-            return pagePosition + PageTopLeftPosition;
-        }
-
         public void ScrollHorizontal(int amount)
         {
             SetHorizontalScroll(scrolledDistance.X + amount);

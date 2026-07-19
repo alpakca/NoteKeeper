@@ -32,12 +32,13 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.SinglePage
 
         public override void AddContent(IPageContent content)
         {
+            content.Location = viewport.ScrolledDistance + new Point(50);
             page.Contents.Add(content);
         }
 
         public override Point GetContentScreenLocation(IPageContent content)
         {
-            return viewport.ToScreenLocation(content.Location);
+            return viewport.PageTopLeftPosition + content.Location.Times(viewport.Zoom);
         }
 
         public override void SimulateMouseButtonStateInput(PopWindowMouseEventArgs e)
