@@ -30,10 +30,14 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
 
         public override void AddContent(IPageContent content)
         {
-            int focusedPageIndex = viewport.FocusedPageIndex;
+            // UISize / 2 gives the center of screen, in mousePosition units, which is the focused part of the page
+            (int focusedPageIndex, Point focusedPageViewedCenter) = viewport.ToPagePosition(viewport.UISize / new Point(2));
 
-            Point location = viewport.ScrolledDistance - focusedPageIndex * viewport.MovingDimensionPageStep;
-            location += new Point(50);
+            Point location = focusedPageViewedCenter - content.Size / new Point(2);
+            location -= new Point(0, 50); // to make it appear at eye-sight
+
+            location.X = Math.Max(location.X, 50);
+            location.Y = Math.Max(location.Y, 50);
 
             content.Location = location;
             NotePages[focusedPageIndex].Contents.Add(content);

@@ -47,7 +47,8 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         public int PageSpacing { get; set; } = 30;
 
         public int PageCount { get; set; }
-        public int MovingDimensionPageLength => inVerticalMode ? EachPageHeight : EachPageWidth;
+
+        public int MovingDimensionPageStepLength => inVerticalMode ? EachPageHeight + PageSpacing : EachPageWidth + PageSpacing;
         public int MovingDimensionScroll => inVerticalMode ? scrolledDistance.Y : scrolledDistance.X;
         public Point MovingDimensionPageStep => inVerticalMode ? new Point(0, EachPageHeight + PageSpacing) : new Point(EachPageWidth + PageSpacing, 0);
 
@@ -56,25 +57,6 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
 
         private float ScrollableHeight => TotalContentHeight - ViewedHeight;
         private float ScrollableWidth => TotalContentWidth - ViewedWidth;
-
-        public int FocusedPageIndex
-        {
-            get
-            {
-                int offset = 0;
-                int movingDimPageLength = MovingDimensionPageLength;
-                int end = inVerticalMode ? scrolledDistance.Y : scrolledDistance.X;
-
-                int i = 0;
-                while (offset + movingDimPageLength < end)
-                {
-                    offset += movingDimPageLength + PageSpacing;
-                    i++;
-                }
-
-                return i;
-            }
-        }
 
         public Point FirstPageStartPosition
         {
