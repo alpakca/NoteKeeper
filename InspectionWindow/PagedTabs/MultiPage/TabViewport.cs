@@ -82,25 +82,18 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         {
             Point normalizedPagedPosition = (mousePosition - FirstPageStartPosition).Times(1 / Zoom);
 
+            int movingDimentionPosition = inVerticalMode ? normalizedPagedPosition.Y : normalizedPagedPosition.X;
             for (int i = 0; i < PageCount; i++)
             {
-                if (0 <= normalizedPagedPosition.X && normalizedPagedPosition.X < EachPageWidth &&
-                    0 <= normalizedPagedPosition.Y && normalizedPagedPosition.Y < EachPageHeight)
+                if (0 <= movingDimentionPosition && movingDimentionPosition < MovingDimensionPageStepLength)
                 {
-                    return (i, normalizedPagedPosition);
+                    return (i, normalizedPagedPosition - MovingDimensionPageStep * i);
                 }
 
-                normalizedPagedPosition -= MovingDimensionPageStep;
-
-                // mouse is in between two pages (at PageSpace area): current i value and next one
-                // return that PageSpace area, so contents can still be visible in there
-                if ((inVerticalMode && normalizedPagedPosition.Y < 0) || (!inVerticalMode && normalizedPagedPosition.X < 0))
-                {
-                    return (i, normalizedPagedPosition + MovingDimensionPageStep);
-                }
+                movingDimentionPosition -= MovingDimensionPageStepLength;
             }
 
-            throw new InvalidOperationException("MutliPageTab.TabViewport.ToPagePosition shouldn't return -1 as PageIndex");
+            return (-1, normalizedPagedPosition);
         }
 
         public bool PageWithOffsetOverlapsScreen(Point offset)

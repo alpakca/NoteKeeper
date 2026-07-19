@@ -46,11 +46,12 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
 
         protected override void OnMousePositionChange(PopWindowMouseEventArgs e)
         {
-            if (currentMode == ShellModes.Transform)
+            if (currentMode == ShellModes.Transform && transformer.AnyNodeSelected)
             {
-                if (transformer.AnyNodeSelected)
+                (int pageIndex, Point pagePosition) = viewport.ToPagePosition(e.MousePosition);
+
+                if (pageIndex != -1)
                 {
-                    (int pageIndex, Point pagePosition) = viewport.ToPagePosition(e.MousePosition);
                     transformer.MouseMove(pageIndex, pagePosition);
                 }
             }
@@ -60,28 +61,39 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         {
             if (currentMode == ShellModes.Transform)
             {
-                (int pageIndex, Point pagePosition) = viewport.ToPagePosition(e.MousePosition);
-                if (!transformer.HitAnyNode(pageIndex, pagePosition))
-                {
-                    IPageContent hitContent = inputHandler.HitContent(e.MousePosition);
-                    if (transformer.TransformedContent != hitContent && e.FirstTimeButtons.HasLeft)
-                    {
-                        transformer.SetTransformedContent(hitContent, pageIndex);
-                    }
-                }
-
-                if (!transformer.AnyNodeSelected && e.FirstTimeButtons.HasLeft)
-                {
-                    transformer.MouseHoldStart(pageIndex, pagePosition);
-                }
-                else if (transformer.AnyNodeSelected && !e.CurrentButtons.HasLeft)
-                {
-                    transformer.MouseHoldEnd();
-                }
+                HandleTransformer(e);
             }
             else if (e.FirstTimeButtons.HasLeft)
             {
                 inputHandler.LeftMouseSelection(e.MousePosition);
+            }
+        }
+
+        private void HandleTransformer(PopWindowMouseEventArgs e)
+        {
+            (int pageIndex, Point pagePosition) = viewport.ToPagePosition(e.MousePosition);
+
+            if (pageIndex == -1)
+            {
+                return;
+            }
+
+            if (!transformer.HitAnyNode(pageIndex, pagePosition))
+            {
+                IPageContent hitContent = inputHandler.HitContent(e.MousePosition);
+                if (transformer.TransformedContent != hitContent && e.FirstTimeButtons.HasLeft)
+                {
+                    transformer.SetTransformedContent(hitContent, pageIndex);
+                }
+            }
+
+            if (!transformer.AnyNodeSelected && e.FirstTimeButtons.HasLeft)
+            {
+                transformer.MouseHoldStart(pageIndex, pagePosition);
+            }
+            else if (transformer.AnyNodeSelected && !e.CurrentButtons.HasLeft)
+            {
+                transformer.MouseHoldEnd();
             }
         }
 
