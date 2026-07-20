@@ -14,6 +14,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
         public PageImageContent(Texture2D image)
         {
             this.image = image;
+            Size = image.Bounds.Size;
         }
 
         public void RenderUpdate()
