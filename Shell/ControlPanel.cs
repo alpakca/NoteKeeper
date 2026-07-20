@@ -4,6 +4,7 @@ using PopUpUI.Toolkit;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using System.Collections.ObjectModel;
+using NoteKeeper.Shell.ContextMenus;
 
 namespace NoteKeeper.Shell
 {
@@ -37,7 +38,7 @@ namespace NoteKeeper.Shell
             buttonPlate = new ButtonPlate(this);
             tabGroup = new TabGroup(this) { Boundaries = new Rectangle(20, 170, 1720, 30) };
 
-            window = new PanelWindow(WindowOptions.Size);
+            window = new PanelWindow(this, WindowOptions.Size);
             InitializeWindow();
 
             PopWindowManager.ActiveWindows.Add(window);
@@ -71,6 +72,11 @@ namespace NoteKeeper.Shell
             window.Elements.Add(tabGroup.UIElement);
 
             tabUpdateReceivers.AddRange(verticalScroller, horizontalScroller, window);
+        }
+
+        public ContextMenu? GetContextMenu(Point mousePosition)
+        {
+            return null;
         }
 
         /// <summary>Rearranges heights of TabGroup, ButtonPlate and DisplayedTab; by chaning DisplayedTab's height and keeping others minimum.</summary>

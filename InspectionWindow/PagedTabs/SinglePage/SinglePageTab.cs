@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using PopUpUI.Input;
+using NoteKeeper.Shell.ContextMenus;
 
 namespace NoteKeeper.InspectionWindow.PagedTabs.SinglePage
 {
@@ -44,6 +45,11 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.SinglePage
         public override void SimulateMouseButtonStateInput(PopWindowMouseEventArgs e)
         {
             window.SimulateMouseButtonStateInput(e);
+        }
+
+        public override ContextMenu? GetContextMenu(Point mousePosition)
+        {
+            return null;
         }
     }
 }

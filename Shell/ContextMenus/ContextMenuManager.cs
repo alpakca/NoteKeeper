@@ -59,7 +59,14 @@ namespace NoteKeeper.Shell.ContextMenus
             }
         }
 
-        public void HoverUpdate(PopWindowMouseEventArgs e)
+        public void MouseButtonStateUpdate(PopWindowMouseEventArgs e)
+        {
+            HoverUpdate(e);
+            HoldUpdate(e);
+            SelectUpdate(e);
+        }
+
+        private void HoverUpdate(PopWindowMouseEventArgs e)
         {
             // if mouse is NOT inside openMenus.Peek at somewhere OR at the button that opened it;
             // pop it from the stack
@@ -120,7 +127,7 @@ namespace NoteKeeper.Shell.ContextMenus
             return null;
         }
 
-        public void HoldUpdate(PopWindowMouseEventArgs e)
+        private void HoldUpdate(PopWindowMouseEventArgs e)
         {
             if (openMenus.Count == 0)
             {
@@ -130,7 +137,7 @@ namespace NoteKeeper.Shell.ContextMenus
             isHoveredItemHeld = e.CurrentButtons.HasLeft;
         }
 
-        public void SelectUpdate(PopWindowMouseEventArgs e)
+        private void SelectUpdate(PopWindowMouseEventArgs e)
         {
             if (openMenus.Count == 0)
             {

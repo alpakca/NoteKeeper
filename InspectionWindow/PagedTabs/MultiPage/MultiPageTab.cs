@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using NoteKeeper.Shell.ContextMenus;
 using PopUpUI.Input;
 using PopUpUI.Surface;
 using System;
@@ -71,6 +72,11 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         public override void SimulateMouseButtonStateInput(PopWindowMouseEventArgs e)
         {
             window.SimulateMouseButtonStateInput(e);
+        }
+
+        public override ContextMenu? GetContextMenu(Point mousePosition)
+        {
+            return null;
         }
     }
 }

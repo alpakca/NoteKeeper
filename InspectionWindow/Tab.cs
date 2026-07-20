@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using NoteKeeper.Shell.ContextMenus;
 using PopUpUI.Input;
 using PopUpUI.Surface;
 using System;
@@ -11,13 +12,12 @@ namespace NoteKeeper.InspectionWindow
 {
     internal abstract class Tab
     {
-        public int Width { get; set; }
-        public int Height { get; set; }
         public string Name { get; set; } = "Unnamed";
 
         public abstract ITabViewport TabViewport { get; }
         public abstract PopWindow Window { get; }
 
+        public abstract ContextMenu? GetContextMenu(Point mousePosition);
         public abstract void ShellModeUpdated(ShellModes mode);
         public abstract void SimulateMouseButtonStateInput(PopWindowMouseEventArgs e);
     }

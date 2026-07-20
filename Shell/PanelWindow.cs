@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using NoteKeeper.InspectionWindow;
+using NoteKeeper.Shell.ContextMenus;
 using PopUpUI.Input;
 using PopUpUI.Surface;
 using PopUpUI.Toolkit;
@@ -16,13 +17,19 @@ namespace NoteKeeper.Shell
     internal class PanelWindow : PopWindow, ITabUpdateReceiver
     {
         private Tab? displayedTab;
+
+        private readonly ControlPanel panel;
+        private readonly ContextMenuManager contextMenuManager;
         private readonly KeyboardShortcutManager shortcutManager;
 
-        public PanelWindow(Point size) : base(size)
+        public PanelWindow(ControlPanel panel, Point size) : base(size)
         {
-            shortcutManager = new KeyboardShortcutManager();
-            Elements.Add(shortcutManager);
+            this.panel = panel;
 
+            contextMenuManager = new ContextMenuManager();
+            shortcutManager = new KeyboardShortcutManager();
+
+            Elements.Add(shortcutManager);
             InitializeShortcuts();
         }
 
@@ -49,6 +56,44 @@ namespace NoteKeeper.Shell
         public void ScrollChanged()
         {
 
+        }
+
+        protected override void Update()
+        {
+            contextMenuManager.Update();
+            base.Update();
+        }
+
+        protected override void RenderUpdate()
+        {
+            base.RenderUpdate();
+
+            // render context menu on top of everything
+            contextMenuManager.RenderUpdate(WindowTexture);
+        }
+
+        protected override void OnMouseButtonStateChange(PopWindowMouseEventArgs e)
+        {
+            if (e.ReleasedButtons.HasRight)
+            {
+                ContextMenu? contextMenu;
+                if (displayedTab != null && displayedTab.Window.Boundaries.Contains(e.MousePosition))
+                {
+                    contextMenu = displayedTab.GetContextMenu(e.MousePosition - displayedTab.Window.Boundaries.Location);
+                }
+                else
+                {
+                    contextMenu = panel.GetContextMenu(e.MousePosition);
+                }
+
+                if (contextMenu != null)
+                {
+                    contextMenuManager.Show(contextMenu);
+                }
+            }
+
+            contextMenuManager.MouseButtonStateUpdate(e);
+            base.OnMouseButtonStateChange(e);
         }
     }
 }
