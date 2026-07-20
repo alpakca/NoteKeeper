@@ -15,6 +15,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
 
         private int transformedContentPageIndex;
         private IPageContent? transformedContent;
+        private Point cumulativeSizeChange;
 
         private readonly TabViewport _viewport;
         private readonly IList<NotePage> _notePages;
@@ -80,7 +81,12 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         {
             transformedContent = content;
             transformedContentPageIndex = contentPageIndex;
-            AlignNodePositions();
+
+            if (transformedContent != null)
+            {
+                cumulativeSizeChange = transformedContent.Size;
+                AlignNodePositions();
+            }
         }
 
         public bool HitAnyNode(int pageIndex, Point pagePosition)
@@ -90,7 +96,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
 
         public void MouseHoldStart(int pageIndex, Point pagePosition)
         {
-            if (TransformedContent == null)
+            if (transformedContent == null)
             {
                 selectedNode = NodePlacement.None;
                 return;
@@ -99,11 +105,16 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             selectedNode = GetHitNode(pageIndex, pagePosition);
             lastPageIndex = pageIndex;
             lastMousePosition = pagePosition;
+
+            cumulativeSizeChange = transformedContent.Size;
         }
 
         public void MouseHoldEnd()
         {
             selectedNode = NodePlacement.None;
+
+            transformedContent!.SetSize(cumulativeSizeChange);
+            cumulativeSizeChange = new Point();
         }
 
         public void MouseMove(int pageIndex, Point pagePosition)
@@ -165,7 +176,9 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             }
 
             transformedContent!.Location += locationChange;
-            transformedContent.Size += sizeChange;
+            transformedContent.ResizeUpdate(sizeChange);
+
+            cumulativeSizeChange += sizeChange;
             AlignNodePositions();
         }
 
@@ -173,8 +186,8 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         {
             if (transformedContent == null) return;
 
-            int halfVertical = transformedContent.Size.Y / 2;
-            int halfHorizontal = transformedContent.Size.X / 2;
+            int halfVertical = cumulativeSizeChange.Y / 2;
+            int halfHorizontal = cumulativeSizeChange.X / 2;
             Point carryPosition = transformedContent.Location + new Point(halfHorizontal - NodeLength / 2, halfVertical - NodeLength / 2);
 
             foreach (NodePlacement node in nodePagePositions.Keys)

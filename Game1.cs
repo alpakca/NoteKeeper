@@ -59,23 +59,19 @@ namespace NoteKeeper
 
             NotePage page = new NotePage();
             page.Contents.AddRange([
-               new PageImageContent(green)
+               new PageImageContent(green, new Point(50, 50))
             {
-                Size = new Point(50, 50),
                 Location = new Point(250, 250)
-            },new PageImageContent(green) {
-                Size = new Point(200, 30),
+            },new PageImageContent(green, new Point(200, 30)) {
                 Location = new Point(50, 50)
             }]);
 
             NotePage page2 = new NotePage();
             page.Contents.AddRange([
-                new PageImageContent(red)
+                new PageImageContent(red, new Point(200, 200))
             {
-                Size = new Point(200, 200),
                 Location = new Point(50, 500)
-            },new PageImageContent(green) {
-                Size = new Point(200, 30),
+            },new PageImageContent(green, new Point(200, 200)) {
                 Location = new Point(50, 50)
             }]);
 
@@ -89,24 +85,21 @@ namespace NoteKeeper
 
             NotePage first = new NotePage();
             first.Contents.AddRange(
-                new PageImageContent(green)
+                new PageImageContent(green, new Point(50, 50))
                 {
                     Location = new Point(50, 50),
-                    Size = new Point(50, 50)
                 },
-                new PageImageContent(red)
+                new PageImageContent(red, new Point(50, 50))
                 {
-                    Location = new Point(100, 100),
-                    Size = new Point(50, 50)
+                    Location = new Point(100, 100)
                 }
             );
 
             NotePage second = new NotePage();
             second.Contents.Add(
-                new PageImageContent(Util.GetTexture(1, 1, Color.Pink))
+                new PageImageContent(Util.GetTexture(1, 1, Color.Pink), new Point(50, 50))
                 {
-                    Location = new Point(70, 70),
-                    Size = new Point(50, 50)
+                    Location = new Point(70, 70)
                 }
             );
 

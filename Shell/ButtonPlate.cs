@@ -64,7 +64,7 @@ namespace NoteKeeper.Shell
             }
 
             PageTextContent content = ContentGetter.GetTextContent();
-            content.Size = new Point(200, 50);
+            content.SetSize(new Point(200, 50));
 
             pageContentTab.AddContent(content);
             ActivateWritingMode();

@@ -6,15 +6,22 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
 {
     internal class PageImageContent : IPageContent
     {
+        private Point size;
         private readonly Texture2D image;
 
-        public Point Size { get; set; }
         public Point Location { get; set; }
+        public Point Size => size;
 
         public PageImageContent(Texture2D image)
         {
             this.image = image;
-            Size = image.Bounds.Size;
+            size = image.Bounds.Size;
+        }
+
+        public PageImageContent(Texture2D image, Point size)
+        {
+            this.image = image;
+            this.size = size;
         }
 
         public void RenderUpdate()
@@ -26,20 +33,30 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
             Point location = Location;
             SpriteEffects effects = SpriteEffects.None;
 
-            if (Size.X < 0)
+            if (size.X < 0)
             {
                 effects |= SpriteEffects.FlipHorizontally;
-                location.X += Size.X;
+                location.X += size.X;
             }
 
-            if (Size.Y < 0)
+            if (size.Y < 0)
             {
                 effects |= SpriteEffects.FlipVertically;
-                location.Y += Size.Y;
+                location.Y += size.Y;
             }
 
-            DrawHelper.Batch.Draw(image, new Rectangle(offset + location.Times(zoomMultiplier), Size.Times(zoomMultiplier).Abs()), 
+            DrawHelper.Batch.Draw(image, new Rectangle(offset + location.Times(zoomMultiplier), size.Times(zoomMultiplier).Abs()), 
                                   null, Color.White, 0, default, effects, 0);
+        }
+
+        public void ResizeUpdate(Point change)
+        {
+            size += change;
+        }
+
+        public void SetSize(Point value)
+        {
+            size = value;
         }
     }
 }

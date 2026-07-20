@@ -12,6 +12,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.SinglePage
 
         private int transformedContentPageIndex;
         private IPageContent? transformedContent;
+        private Point cumulativeSizeChange;
 
         private NodePlacement selectedNode;
         private Point lastMousePosition;
@@ -67,7 +68,12 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.SinglePage
         {
             transformedContent = content;
             transformedContentPageIndex = contentPageIndex;
-            AlignNodePositions();
+
+            if (transformedContent != null)
+            {
+                cumulativeSizeChange = transformedContent.Size;
+                AlignNodePositions();
+            }
         }
 
         public bool HitAnyNode(Point pagePosition)
@@ -77,7 +83,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.SinglePage
 
         public void MouseHoldStart(Point pagePosition)
         {
-            if (TransformedContent == null)
+            if (transformedContent == null)
             {
                 selectedNode = NodePlacement.None;
                 return;
@@ -85,11 +91,16 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.SinglePage
 
             selectedNode = GetHitNode(pagePosition);
             lastMousePosition = pagePosition;
+
+            cumulativeSizeChange = transformedContent.Size;
         }
 
         public void MouseHoldEnd()
         {
             selectedNode = NodePlacement.None;
+
+            transformedContent!.SetSize(cumulativeSizeChange);
+            cumulativeSizeChange = new Point();
         }
 
         public void MouseMove(Point pagePosition)
@@ -133,7 +144,9 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.SinglePage
             }
 
             transformedContent!.Location += locationChange;
-            transformedContent.Size += sizeChange;
+            transformedContent.ResizeUpdate(sizeChange);
+
+            cumulativeSizeChange += sizeChange;
             AlignNodePositions();
         }
 
@@ -141,8 +154,8 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.SinglePage
         {
             if (transformedContent == null) return;
 
-            int halfVertical = transformedContent.Size.Y / 2;
-            int halfHorizontal = transformedContent.Size.X / 2;
+            int halfVertical = cumulativeSizeChange.Y / 2;
+            int halfHorizontal = cumulativeSizeChange.X / 2;
             Point carryPosition = transformedContent.Location + new Point(halfHorizontal - NodeLength / 2, halfVertical - NodeLength / 2);
 
             foreach (NodePlacement node in nodePagePositions.Keys)

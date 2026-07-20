@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using PopUpUI.Text;
 using PopUpUI.Toolkit;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace NoteKeeper.InspectionWindow.PagedTabs
 {
@@ -10,40 +11,46 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
     {
         private readonly BasicProcesser processer;
 
+        private Point size;
+        private Point absSize;
+
         private bool receivingInput;
         private TextPosition caretPosition;
         private ITextProcesserResult lastResult;
         private RenderTarget2D renderTarget;
 
-        public Point Size
-        {
-            get;
-            set
-            {
-                if (field == value || value.X <= 0 || value.Y <= 0)
-                {
-                    return;
-                }
-
-                field = value;
-               
-                processer.HorizontalTextLength = value.X;
-                lastResult = processer.GetParseResult();
-
-                if (field.Y < lastResult.TextSize.Y)
-                {
-                    field.Y = (int)lastResult.TextSize.Y;
-                }
-
-                renderTarget?.Dispose();
-                renderTarget = DrawHelper.CreateRenderTarget(field.X, field.Y);
-            }
-        }
         public Point Location { get; set; }
+        public Point Size => size;
 
         public PageTextContent(BasicProcesser processer)
         {
             this.processer = processer;
+        }
+
+        public void ResizeUpdate(Point change)
+        {
+        }
+
+        public void SetSize(Point value)
+        {
+            if (size == value || value.X == 0 || value.Y == 0)
+            {
+                return;
+            }
+
+            size = value;
+            absSize = value.Abs();
+
+            processer.HorizontalTextLength = absSize.X;
+            lastResult = processer.GetParseResult();
+
+            if (absSize.Y < lastResult.TextSize.Y)
+            {
+                absSize.Y = (int)lastResult.TextSize.Y;
+            }
+
+            renderTarget?.Dispose();
+            renderTarget = DrawHelper.CreateRenderTarget(absSize.X, absSize.Y);
         }
 
         public void RenderUpdate()
@@ -62,19 +69,35 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
                 const int OutlineThickness = 2;
                 const int OutlineMargin = 4;
 
-                DrawHelper.DrawBackground(new Rectangle(new Point(-OutlineMargin), new Point(Size.X + 2 * OutlineMargin, OutlineThickness)), Color.Black);
-                DrawHelper.DrawBackground(new Rectangle(new Point(-OutlineMargin, OutlineMargin) + new Point(0, Size.Y - OutlineThickness), new Point(Size.X + 2 * OutlineMargin, OutlineThickness)), Color.Black);
+                DrawHelper.DrawBackground(new Rectangle(new Point(-OutlineMargin), new Point(absSize.X + 2 * OutlineMargin, OutlineThickness)), Color.Black);
+                DrawHelper.DrawBackground(new Rectangle(new Point(-OutlineMargin, OutlineMargin) + new Point(0, absSize.Y - OutlineThickness), new Point(absSize.X + 2 * OutlineMargin, OutlineThickness)), Color.Black);
 
-                DrawHelper.DrawBackground(new Rectangle(new Point(-OutlineMargin), new Point(OutlineThickness, Size.Y + 2 * OutlineMargin)), Color.Black);
-                DrawHelper.DrawBackground(new Rectangle(new Point(OutlineMargin, -OutlineMargin) + new Point(Size.X - OutlineThickness, 0), new Point(OutlineThickness, Size.Y + 2 * OutlineMargin)), Color.Black);
+                DrawHelper.DrawBackground(new Rectangle(new Point(-OutlineMargin), new Point(OutlineThickness, absSize.Y + 2 * OutlineMargin)), Color.Black);
+                DrawHelper.DrawBackground(new Rectangle(new Point(OutlineMargin, -OutlineMargin) + new Point(absSize.X - OutlineThickness, 0), new Point(OutlineThickness, absSize.Y + 2 * OutlineMargin)), Color.Black);
             }
 
             DrawHelper.EndBatch();
         }
 
-        public void RenderToPage(Point pageLocation, float zoomMutliplier)
+        public void RenderToPage(Point offset, float zoomMultiplier)
         {
-            DrawHelper.Batch.Draw(renderTarget, new Rectangle(pageLocation + Location.Times(zoomMutliplier), Size.Times(zoomMutliplier)), Color.White);
+            Point location = Location;
+            SpriteEffects effects = SpriteEffects.None;
+
+            if (size.X < 0)
+            {
+                effects |= SpriteEffects.FlipHorizontally;
+                location.X += size.X;
+            }
+
+            if (size.Y < 0)
+            {
+                effects |= SpriteEffects.FlipVertically;
+                location.Y += size.Y;
+            }
+
+            DrawHelper.Batch.Draw(renderTarget, new Rectangle(offset + location.Times(zoomMultiplier), size.Times(zoomMultiplier).Abs()),
+                                  null, Color.White, 0, default, effects, 0);
         }
 
         public void MouseSelected(Point pagePosition)
@@ -114,9 +137,9 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
             lastResult = processer.GetParseResult();
             caretPosition = lastResult.Caret.Advance(caretPosition, 1);
 
-            if (lastResult.TextSize.Y > Size.Y)
+            if (lastResult.TextSize.Y > absSize.Y)
             {
-                Size = lastResult.TextSize.ToPoint();
+                SetSize(lastResult.TextSize.ToPoint());
             }
         }
 
@@ -128,9 +151,9 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
             lastResult = processer.GetParseResult();
             caretPosition = lastResult.Caret.Advance(caretPosition, text.Length);
 
-            if (lastResult.TextSize.Y > Size.Y)
+            if (lastResult.TextSize.Y > absSize.Y)
             {
-                Size = lastResult.TextSize.ToPoint();
+                SetSize(lastResult.TextSize.ToPoint());
             }
         }
 
