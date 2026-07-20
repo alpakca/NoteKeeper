@@ -11,5 +11,10 @@ namespace NoteKeeper.InspectionWindow
         {
             return new Point((int)(point.X * multiplier), (int)(point.Y * multiplier));
         }
+
+        public static Point Abs(this Point point)
+        {
+            return new Point(Math.Abs(point.X), Math.Abs(point.Y));
+        }
     }
 }
