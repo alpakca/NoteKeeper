@@ -7,10 +7,8 @@ using System.Text;
 
 namespace NoteKeeper.Shell.ContextMenus
 {
-    internal class SubContextMenuButton : IContextMenuItem
+    internal class SubContextMenuButton : IContextMenuItem, IHasRightIcon
     {
-        private readonly SubMenuButtonRenderer _renderer;
-
         private Point location;
         private Point size;
 
@@ -33,13 +31,12 @@ namespace NoteKeeper.Shell.ContextMenus
         }
 
         public Point Size => size;
-        public IContextMenuItemRenderer Renderer => _renderer;
         public ContextMenu SubMenu { get; }
 
-        public SubContextMenuButton(ContextMenu subMenu, Texture2D icon, string text, SpriteFont font, Texture2D arrowTexture,
-                                    Texture2D background, Texture2D hoverOverlay, Texture2D heldOverlay)
+        public Texture2D? RightIcon { get; init; }
+
+        public SubContextMenuButton(ContextMenu subMenu)
         {
-            _renderer = new SubMenuButtonRenderer(icon, text, font, arrowTexture, background, hoverOverlay, heldOverlay);
             SubMenu = subMenu;
         }
 

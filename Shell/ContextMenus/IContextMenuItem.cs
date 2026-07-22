@@ -13,8 +13,6 @@ namespace NoteKeeper.Shell.ContextMenus
         public Point Location { get; set; }
         public Point Size { get; }
 
-        public IContextMenuItemRenderer Renderer { get; }
-
         public void SetActualSize(Point size);
         public void Selected();
     }

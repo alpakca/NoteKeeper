@@ -61,6 +61,11 @@ namespace NoteKeeper.Shell.ContextMenus
 
         public void MouseButtonStateUpdate(PopWindowMouseEventArgs e)
         {
+            if (openMenus.Count == 0)
+            {
+                return;
+            }
+
             HoverUpdate(e);
             HoldUpdate(e);
             SelectUpdate(e);
@@ -73,11 +78,6 @@ namespace NoteKeeper.Shell.ContextMenus
 
             // if mouse is on a SubContextMenuButton AND its timer goes off (so enough time past)
             // push its submenu to stack
-
-            if (openMenus.Count == 0)
-            {
-                return;
-            }
 
             while (openMenus.Count > 1) // always remain the root context button
             {
@@ -129,21 +129,11 @@ namespace NoteKeeper.Shell.ContextMenus
 
         private void HoldUpdate(PopWindowMouseEventArgs e)
         {
-            if (openMenus.Count == 0)
-            {
-                return;
-            }
-
             isHoveredItemHeld = e.CurrentButtons.HasLeft;
         }
 
         private void SelectUpdate(PopWindowMouseEventArgs e)
         {
-            if (openMenus.Count == 0)
-            {
-                return;
-            }
-
             bool anyContextMenuSelected = false;
             foreach (var entry in openMenus)
             {
