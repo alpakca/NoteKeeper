@@ -1,13 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using PopUpUI.Elements;
-using PopUpUI.Input;
-using PopUpUI.Surface;
 using PopUpUI.Toolkit;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace NoteKeeper.Shell.ContextMenus
 {

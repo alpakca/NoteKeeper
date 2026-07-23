@@ -11,7 +11,6 @@ namespace NoteKeeper.Shell.ContextMenus
 
         public ContextMenu SubMenu { get; }
 
-        public string Name { get; set; }
         public Texture2D? RightIcon { get; init; }
 
         public SubContextMenuButton(ContextMenu subMenu)
