@@ -1,9 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using PopUpUI.Toolkit;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace NoteKeeper.Shell.ContextMenus
 {
@@ -14,6 +11,7 @@ namespace NoteKeeper.Shell.ContextMenus
 
         public ContextMenu SubMenu { get; }
 
+        public string Name { get; set; }
         public Texture2D? RightIcon { get; init; }
 
         public SubContextMenuButton(ContextMenu subMenu)

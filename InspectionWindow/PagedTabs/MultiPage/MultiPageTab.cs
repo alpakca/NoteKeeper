@@ -77,36 +77,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
 
         public override ContextMenu? GetContextMenu(Point mousePosition)
         {
-            return new ContextMenu([
-            new ActionContextMenuButton(() => { })
-            {
-                RightText = "Ctrl + F",
-                RightTextColor = Color.Gray,
-                RightTextFont = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans"),
-                RightTextHorizontalPadding = 4
-            },
-            new SubContextMenuButton(new ContextMenu([
-                new ActionContextMenuButton(() => { Trace.WriteLine("yep"); })
-                {
-                    RightText = "Ctrl + F",
-                    RightTextColor = Color.Gray,
-                    RightTextFont = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans"),
-                    RightTextHorizontalPadding = 4
-                },
-                new SubContextMenuButton(new ContextMenu([
-                new ActionContextMenuButton(() => { })
-                {
-                    RightText = "Ctrl + F",
-                    RightTextColor = Color.Gray,
-                    RightTextFont = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans"),
-                    RightTextHorizontalPadding = 4
-                }]){Background = Util.GetTexture(1, 1, Color.Tomato)}){ RightIcon = Util.GetTexture(1, 1, Color.Aqua) }]){Background = Util.GetTexture(1, 1, Color.Tomato)})
-            {
-                RightIcon = Util.GetTexture(1, 1, Color.Aqua)
-            }])
-            {
-                Background = Util.GetTexture(1, 1, Color.Tomato)
-            };
+            return new ContextMenu([]);
         }
     }
 }

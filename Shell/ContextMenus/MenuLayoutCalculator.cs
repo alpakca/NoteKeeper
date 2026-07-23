@@ -66,5 +66,40 @@ namespace NoteKeeper.Shell.ContextMenus
 
             return size;
         }
+
+        public MenuItemLayout GetItemLayout(IContextMenuItem item)
+        {
+            MenuItemStyle style = styleProvider.GetStyle(item);
+            Rectangle boundaries = new Rectangle(item.Location, item.Size);
+            
+            Rectangle leftIconBounds = new Rectangle(boundaries.Location + style.BoundaryPadding, style.IconSize);
+            Vector2 leftTextPosition = new Vector2(boundaries.X + style.BoundaryPadding.X + style.IconSize.X + style.IconHorizontalPadding,
+                                                   boundaries.Y + style.BoundaryPadding.Y);
+
+            Rectangle rightIconBounds = new Rectangle();
+            if (item is IHasRightIcon rightIcon && rightIcon.RightIcon != null)
+            {
+                rightIconBounds = new Rectangle(boundaries.Right - style.BoundaryPadding.X - style.IconSize.X, boundaries.Y + style.BoundaryPadding.Y,
+                                                style.IconSize.X, style.IconSize.Y);
+            }
+
+            Vector2 rightTextPosition = new Vector2();
+            if (item is IHasRightText rightText && rightText.RightTextFont != null && !string.IsNullOrEmpty(rightText.RightText))
+            {
+                int textWidth = (int)rightText.RightTextFont.MeasureString(rightText.RightText).X;
+
+                rightTextPosition = new Vector2(boundaries.Right - style.BoundaryPadding.X - textWidth,
+                                                boundaries.Y + style.BoundaryPadding.Y);
+            }
+
+            return new MenuItemLayout
+            {
+                ItemBounds = boundaries,
+                LeftIconBounds = leftIconBounds,
+                LeftTextPosition = leftTextPosition,
+                RightIconBounds = rightIconBounds,
+                RightTextPosition = rightTextPosition
+            };
+        }
     }
 }
