@@ -16,6 +16,10 @@ namespace NoteKeeper.Shell.ContextMenus
         public SpriteFont LeftTextFont { get; init; }
         public Color LeftTextColor { get; init; }
         public Texture2D? LeftIcon { get; init; }
+
+        public int IconHorizontalPadding { get; init; }
+        public Point IconSize { get; init; }
+        public Point BoundaryPadding { get; init; }
     }
 
     internal interface IHasRightText
@@ -23,6 +27,8 @@ namespace NoteKeeper.Shell.ContextMenus
         public string? RightText { get; }
         public SpriteFont? RightTextFont { get; }
         public Color RightTextColor { get; }
+
+        public int RightTextHorizontalPadding { get; }
     }
 
     internal interface IHasRightIcon

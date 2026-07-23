@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using NoteKeeper.InspectionWindow;
 using NoteKeeper.Shell.ContextMenus;
@@ -28,6 +29,38 @@ namespace NoteKeeper.Shell
 
             contextMenuManager = new ContextMenuManager();
             shortcutManager = new KeyboardShortcutManager();
+
+            MenuItemStyle actionButtonStyle = new MenuItemStyle
+            {
+                Background = Util.GetTexture(1, 1, Color.DarkRed),
+                BoundaryPadding = new Point(4),
+                IconHorizontalPadding = 4,
+                IconSize = new Point(32),
+                LeftText = "Action!",
+                LeftTextColor = Color.DarkTurquoise,
+                LeftTextFont = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans"),
+                LeftIcon = Util.GetTexture(1, 1, Color.DarkSlateBlue),
+                HeldOverlay = Util.GetTexture(1, 1, Color.Firebrick),
+                HoverOverlay = Util.GetTexture(1, 1, Color.DimGray)
+            };
+
+            MenuItemStyle subMenuStyle = new MenuItemStyle
+            {
+                Background = Util.GetTexture(1, 1, Color.DarkRed),
+                BoundaryPadding = new Point(4),
+                IconHorizontalPadding = 4,
+                IconSize = new Point(32),
+                LeftText = "Action!",
+                LeftTextColor = Color.DarkTurquoise,
+                LeftTextFont = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans"),
+                LeftIcon = Util.GetTexture(1, 1, Color.DarkSlateBlue)
+            };
+
+            Dictionary<Type, MenuItemStyle> defaultTheme = new Dictionary<Type, MenuItemStyle>
+            {
+                { typeof(ActionContextMenuButton), actionButtonStyle }, { typeof(SubContextMenuButton), subMenuStyle }
+            };
+            contextMenuManager.StyleProvider.ApplyTheme(defaultTheme);
 
             Elements.Add(shortcutManager);
             InitializeShortcuts();
@@ -76,24 +109,24 @@ namespace NoteKeeper.Shell
         {
             if (e.ReleasedButtons.HasRight)
             {
-                ContextMenu? contextMenu;
-                if (displayedTab != null && displayedTab.Window.Boundaries.Contains(e.MousePosition))
-                {
-                    contextMenu = displayedTab.GetContextMenu(e.MousePosition - displayedTab.Window.Boundaries.Location);
-                }
-                else
-                {
-                    contextMenu = panel.GetContextMenu(e.MousePosition);
-                }
+                bool mouseInsideTabWindow = displayedTab != null && displayedTab.Window.Boundaries.Contains(e.MousePosition);
 
+                ContextMenu? contextMenu = mouseInsideTabWindow ? displayedTab!.GetContextMenu(e.MousePosition - displayedTab.Window.Boundaries.Location)
+                                                                : panel.GetContextMenu(e.MousePosition);
                 if (contextMenu != null)
                 {
-                    contextMenuManager.Show(contextMenu);
+                    contextMenuManager.Show(contextMenu, e.MousePosition);
                 }
             }
 
             contextMenuManager.MouseButtonStateUpdate(e);
             base.OnMouseButtonStateChange(e);
+        }
+
+        protected override void OnMousePositionChange(PopWindowMouseEventArgs e)
+        {
+            contextMenuManager.MousePositionChangeUpdate(e);
+            base.OnMousePositionChange(e);
         }
     }
 }

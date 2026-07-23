@@ -11,9 +11,7 @@ namespace NoteKeeper.Shell.ContextMenus
     internal interface IContextMenuItem
     {
         public Point Location { get; set; }
-        public Point Size { get; }
-
-        public void SetActualSize(Point size);
+        public Point Size { get; set; }
         public void Selected();
     }
 }

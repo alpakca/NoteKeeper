@@ -15,51 +15,36 @@ namespace NoteKeeper.Shell.ContextMenus
     {
         private const int FrameMargin = 2;
 
-        private Rectangle _boundaries;
-        private readonly Texture2D _background;
         private readonly IContextMenuItem[] _items;
 
-        public Rectangle Boundaries { get; }
+        public Point Location { get; set; }
+        /// <summary>Size of context menu without frame margin. Its where IContextMenuItem/s will belong in.</summary>
+        public Point Size { get; set; }
+
+        public Point FramedLocation => Location - new Point(FrameMargin);
+        /// <summary>Size of context menu with frame margin. Its the total rendered size.</summary>
+        public Point FramedSize => Size + new Point(FrameMargin * 2);
+
         public IContextMenuItem[] Items => _items;
 
-        public ContextMenu(IContextMenuItem[] items, Texture2D background)
+        public Texture2D Background { get; init; }
+
+        public ContextMenu(IContextMenuItem[] items)
         {
             _items = items;
-
-            int maxWidth = 0;
-            int height = 0;
-
-            foreach (var item in items)
-            {
-                maxWidth = Math.Max(maxWidth, item.Renderer.MinimumWidth);
-                height += item.Renderer.MinimumHeight;
-            }
-
-            _boundaries = new Rectangle(0, 0, maxWidth, height);
-        }
-
-        public void SetLocation(Point location)
-        {
-            Point adjusted = location;
-
-            if (location.X + _boundaries.Width + 2 * FrameMargin >= WindowOptions.Width)
-            {
-                adjusted.X = location.X - _boundaries.Width - 2 * FrameMargin;
-            }
-
-            if (location.Y + _boundaries.Height + 2 * FrameMargin >= WindowOptions.Height)
-            {
-                adjusted.Y = location.Y - _boundaries.Height - 2 * FrameMargin;
-            }
-
-            _boundaries = new Rectangle(adjusted, _boundaries.Size);
         }
 
         public void RenderBackground()
         {
-            DrawHelper.Batch.Draw(_background, 
-                                  new Rectangle(_boundaries.Location - new Point(FrameMargin), _boundaries.Size + new Point(FrameMargin * 2)), 
+            DrawHelper.Batch.Draw(Background, 
+                                  new Rectangle(FramedLocation, FramedSize), 
                                   Color.White);
+        }
+
+        public bool InsideBoundaries(Point p)
+        {
+            return FramedLocation.X <= p.X && p.X < FramedLocation.X + FramedSize.X &&
+                   FramedLocation.Y <= p.Y && p.Y < FramedLocation.Y + FramedSize.Y;
         }
     }
 }

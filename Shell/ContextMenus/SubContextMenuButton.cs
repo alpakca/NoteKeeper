@@ -9,28 +9,9 @@ namespace NoteKeeper.Shell.ContextMenus
 {
     internal class SubContextMenuButton : IContextMenuItem, IHasRightIcon
     {
-        private Point location;
-        private Point size;
+        public Point Location { get; set; }
+        public Point Size { get; set; }
 
-        public Point Location
-        {
-            get => location;
-            set
-            {
-                this.location = value;
-
-                if (this.location.X + size.X + SubMenu.Boundaries.Width < WindowOptions.Size.X)
-                {
-                    SubMenu.SetLocation(new Point(this.location.X + size.X, value.Y));
-                }
-                else
-                {
-                    SubMenu.SetLocation(new Point(this.location.X - SubMenu.Boundaries.Width, value.Y));
-                }
-            }
-        }
-
-        public Point Size => size;
         public ContextMenu SubMenu { get; }
 
         public Texture2D? RightIcon { get; init; }
@@ -40,13 +21,20 @@ namespace NoteKeeper.Shell.ContextMenus
             SubMenu = subMenu;
         }
 
-        public void SetActualSize(Point size)
-        {
-            this.size = size;
-        }
-
         public void Selected()
         {
+        }
+
+        public Point GetPossibleSubMenuPlacement()
+        {
+            if (Location.X + Size.X + SubMenu.FramedSize.X < WindowOptions.Size.X)
+            {
+                return new Point(Location.X + Size.X, Location.Y);
+            }
+            else
+            {
+                return new Point(Location.X - SubMenu.FramedSize.X, Location.Y);
+            }
         }
     }
 }

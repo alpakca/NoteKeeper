@@ -1,10 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using PopUpUI.Input;
 using PopUpUI.Toolkit;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 #nullable enable
 
@@ -20,17 +19,29 @@ namespace NoteKeeper.Shell.ContextMenus
         private float subMenuOpenRemainingTime;
 
         private readonly ContextMenuRenderer renderer;
+        private readonly MenuLayoutCalculator layoutCalculator;
         private readonly LinkedList<SubMenuEntry> openMenus;
+
+        public MenuItemStyleProvider StyleProvider { get; }
 
         public ContextMenuManager()
         {
+            StyleProvider = new MenuItemStyleProvider();
             openMenus = new LinkedList<SubMenuEntry>();
-            renderer = new ContextMenuRenderer(openMenus);
+
+            renderer = new ContextMenuRenderer(openMenus, StyleProvider);
+            layoutCalculator = new MenuLayoutCalculator(StyleProvider);
         }
 
-        public void Show(ContextMenu menu)
+        public void Show(ContextMenu menu, Point mousePosition)
         {
             HideAll();
+
+            layoutCalculator.CalculateContextMenuSize(menu);
+
+            menu.Location = AdjustedMenuTopLeftPosition(mousePosition, menu);
+            layoutCalculator.PositionContextMenuItems(menu);
+
             openMenus.AddLast(new SubMenuEntry(null, menu));
         }
 
@@ -41,22 +52,50 @@ namespace NoteKeeper.Shell.ContextMenus
 
         public void Update()
         {
-            if (openMenus.Count <= 1)
+            if (openMenus.Count > 1)
+            {
+                LinkedListNode<SubMenuEntry> peek = openMenus.Last!;
+                while (peek != openMenus.First)
+                {
+                    peek.Value.Update();
+                    peek = peek.Previous!;
+                }
+
+                while (openMenus.Last != openMenus.First)
+                {
+                    if (!openMenus.Last!.Value.ReadyToClose)
+                    {
+                        break;
+                    }
+
+                    openMenus.RemoveLast();
+                }
+            }
+
+            if (hoveredItem is SubContextMenuButton button && openMenus.Last?.Value.Button != button)
+            {
+                subMenuOpenRemainingTime -= Time.DeltaTime;
+                if (subMenuOpenRemainingTime <= 0)
+                {
+                    PushContextMenu(button);
+                }
+            }
+        }
+
+        public void RenderUpdate(RenderTarget2D windowTexture)
+        {
+            renderer.Render(windowTexture, hoveredItem, isHoveredItemHeld);
+        }
+
+        public void MousePositionChangeUpdate(PopWindowMouseEventArgs e)
+        {
+            if (openMenus.Count == 0)
             {
                 return;
             }
 
-            LinkedListNode<SubMenuEntry> entry = openMenus.First!.Next!;
-            for (int i = 1; i < openMenus.Count; i++)
-            {
-                if (entry.Value.CanBeClosedUpdate())
-                {
-                    LinkedListNode<SubMenuEntry> toRemove = entry;
-                    entry = entry.Next!;
-
-                    openMenus.Remove(toRemove);
-                }
-            }
+            HoverUpdate(e);
+            HoldUpdate(e);
         }
 
         public void MouseButtonStateUpdate(PopWindowMouseEventArgs e)
@@ -66,49 +105,100 @@ namespace NoteKeeper.Shell.ContextMenus
                 return;
             }
 
-            HoverUpdate(e);
             HoldUpdate(e);
             SelectUpdate(e);
         }
 
         private void HoverUpdate(PopWindowMouseEventArgs e)
         {
-            // if mouse is NOT inside openMenus.Peek at somewhere OR at the button that opened it;
-            // pop it from the stack
-
-            // if mouse is on a SubContextMenuButton AND its timer goes off (so enough time past)
-            // push its submenu to stack
-
-            while (openMenus.Count > 1) // always remain the root context button
+            LinkedListNode<SubMenuEntry> peek = openMenus.Last!;
+            while (peek != openMenus.First)
             {
-                SubMenuEntry peek = openMenus.Last!.Value;
-                if (InsideContextMenuItem(peek.Button, e.MousePosition) || peek.ContextMenu.Boundaries.Contains(e.MousePosition))
+                SubMenuEntry value = peek.Value;
+                if (!InsideContextMenuItem(value.Button, e.MousePosition) && !value.ContextMenu.InsideBoundaries(e.MousePosition))
                 {
-                    break;
+                    value.ActiveCloseTime(SubMenuCloseOpenTime);
                 }
 
-                peek.ActiveCloseTime(SubMenuCloseOpenTime);
+                peek = peek.Previous!;
             }
 
             IContextMenuItem? hovered = FindItemOnPosition(e.MousePosition);
-            
-            if (hoveredItem is SubContextMenuButton button)
+            if (hovered != hoveredItem)
             {
-                if (hovered == hoveredItem)
-                {
-                    subMenuOpenRemainingTime -= Time.DeltaTime;
-                    if (subMenuOpenRemainingTime <= 0)
-                    {
-                        openMenus.AddLast(new SubMenuEntry(button, button.SubMenu));
-                    }
-                }
-                else
-                {
-                    subMenuOpenRemainingTime = SubMenuCloseOpenTime;
-                }
+                subMenuOpenRemainingTime = SubMenuCloseOpenTime;
             }
 
             hoveredItem = hovered;
+        }
+
+        private void HoldUpdate(PopWindowMouseEventArgs e)
+        {
+            isHoveredItemHeld = e.CurrentButtons.HasLeft;
+        }
+
+        private void SelectUpdate(PopWindowMouseEventArgs e)
+        {
+            if (!e.ReleasedButtons.HasLeft)
+            {
+                return;
+            }
+
+            bool anyContextMenuSelected = false;
+            foreach (var entry in openMenus)
+            {
+                if (entry.ContextMenu.InsideBoundaries(e.MousePosition))
+                {
+                    anyContextMenuSelected = true;
+                    break;
+                }
+            }
+
+            if (!anyContextMenuSelected)
+            {
+                HideAll();
+                return;
+            }
+
+            // if selected button is SubContextMenuButton; immediately add it to stack
+            if (hoveredItem is SubContextMenuButton subContextMenuButton)
+            {
+                PushContextMenu(subContextMenuButton);
+                return;
+            }
+
+            if (hoveredItem != null)
+            {
+                hoveredItem?.Selected();
+                HideAll();
+            }
+        }
+
+        private void PushContextMenu(SubContextMenuButton contextMenuButton)
+        {
+            ContextMenu contextMenu = contextMenuButton.SubMenu;
+            layoutCalculator.CalculateContextMenuSize(contextMenu);
+
+            contextMenu.Location = AdjustedMenuTopLeftPosition(contextMenuButton.GetPossibleSubMenuPlacement(), contextMenu);
+            layoutCalculator.PositionContextMenuItems(contextMenu);
+
+            openMenus.AddLast(new SubMenuEntry(contextMenuButton, contextMenu));
+        }
+
+        private static Point AdjustedMenuTopLeftPosition(Point topLeftPosition, ContextMenu menu)
+        {
+            Point location = topLeftPosition;
+            if (topLeftPosition.X + menu.FramedSize.X >= WindowOptions.Width)
+            {
+                location.X -= topLeftPosition.X + menu.FramedSize.X - WindowOptions.Width;
+            }
+
+            if (topLeftPosition.Y + menu.FramedSize.Y >= WindowOptions.Height)
+            {
+                location.Y -= topLeftPosition.Y + menu.FramedSize.Y - WindowOptions.Height;
+            }
+
+            return location;
         }
 
         private IContextMenuItem? FindItemOnPosition(Point mousePosition)
@@ -125,43 +215,6 @@ namespace NoteKeeper.Shell.ContextMenus
             }
 
             return null;
-        }
-
-        private void HoldUpdate(PopWindowMouseEventArgs e)
-        {
-            isHoveredItemHeld = e.CurrentButtons.HasLeft;
-        }
-
-        private void SelectUpdate(PopWindowMouseEventArgs e)
-        {
-            bool anyContextMenuSelected = false;
-            foreach (var entry in openMenus)
-            {
-                if (entry.ContextMenu.Boundaries.Contains(e.MousePosition))
-                {
-                    anyContextMenuSelected = true;
-                    break;
-                }
-            }
-
-            if (!anyContextMenuSelected)
-            {
-                HideAll();
-                return;
-            }
-
-            hoveredItem?.Selected();
-
-            // if selected button is SubContextMenuButton; immediately add it to stack
-            if (hoveredItem is SubContextMenuButton contextMenuButton)
-            {
-                openMenus.AddLast(new SubMenuEntry(contextMenuButton, contextMenuButton.SubMenu));
-            }
-        }
-
-        public void RenderUpdate(RenderTarget2D windowTexture)
-        {
-            renderer.Render(windowTexture, hoveredItem, isHoveredItemHeld);
         }
 
         private static bool InsideContextMenuItem(IContextMenuItem? item, Point mousePosition)
@@ -182,6 +235,8 @@ namespace NoteKeeper.Shell.ContextMenus
         public SubContextMenuButton? Button { get; }
         public ContextMenu ContextMenu { get; }
 
+        public bool ReadyToClose => isClosing && remainingCloseTime <= 0;
+
         public SubMenuEntry(SubContextMenuButton? button, ContextMenu contextMenu)
         {
             Button = button;
@@ -190,23 +245,19 @@ namespace NoteKeeper.Shell.ContextMenus
 
         public void ActiveCloseTime(float time)
         {
-            isClosing = true;
-            remainingCloseTime = time;
+            if (!isClosing)
+            {
+                isClosing = true;
+                remainingCloseTime = time;
+            }
         }
 
-        public bool CanBeClosedUpdate()
+        public void Update()
         {
             if (isClosing)
             {
                 remainingCloseTime -= Time.DeltaTime;
-
-                if (remainingCloseTime <= 0)
-                {
-                    return true;
-                }
             }
-
-            return false;
         }
     }
 }

@@ -9,9 +9,6 @@ namespace NoteKeeper.Shell.ContextMenus
 {
     internal class ContextMenuRenderer
     {
-        private readonly Point iconSize = new Point();
-        private readonly Point boundaryPadding = new Point();
-
         private readonly IEnumerable<SubMenuEntry> openMenuEntries;
         private readonly MenuItemStyleProvider styleProvider;
 
@@ -29,25 +26,27 @@ namespace NoteKeeper.Shell.ContextMenus
             {
                 entry.ContextMenu.RenderBackground();
 
-                Point eachButtonSize = entry.ContextMenu.Boundaries.Size;
                 foreach (var item in entry.ContextMenu.Items)
                 {
                     MenuItemStyle style = styleProvider.GetStyle(item);
-                    Rectangle boundaries = new Rectangle(item.Location, eachButtonSize);
+                    Rectangle boundaries = new Rectangle(item.Location, item.Size);
 
                     DrawHelper.Batch.Draw(style.Background, boundaries, Color.White);
 
                     if (style.LeftIcon != null)
                     {
-                        DrawHelper.Batch.Draw(style.LeftIcon, new Rectangle(boundaries.Location + boundaryPadding, iconSize), Color.White);
+                        DrawHelper.Batch.Draw(style.LeftIcon, new Rectangle(boundaries.Location + style.BoundaryPadding, style.IconSize), Color.White);
                     }
 
-                    DrawHelper.Batch.DrawString(style.LeftTextFont, style.LeftText, new Vector2(boundaries.X + boundaryPadding.X, boundaries.Y + boundaryPadding.Y), Color.White);
+                    DrawHelper.Batch.DrawString(style.LeftTextFont, style.LeftText, 
+                                                new Vector2(boundaries.X + style.BoundaryPadding.X + style.IconSize.X + style.IconHorizontalPadding, 
+                                                            boundaries.Y + style.BoundaryPadding.Y), 
+                                                Color.White);
 
                     if (item is IHasRightIcon rightIcon)
-                        RenderRightIcon(rightIcon, boundaries);
+                        RenderRightIcon(rightIcon, style, boundaries);
                     else if (item is IHasRightText rightText)
-                        RenderRightText(rightText, boundaries);
+                        RenderRightText(rightText, style, boundaries);
 
                     if (item == hoveredItem)
                     {
@@ -66,23 +65,23 @@ namespace NoteKeeper.Shell.ContextMenus
             DrawHelper.EndBatch();
         }
 
-        private void RenderRightIcon(IHasRightIcon rightIcon, Rectangle boundaries)
+        private void RenderRightIcon(IHasRightIcon rightIcon, MenuItemStyle style, Rectangle boundaries)
         {
             if (rightIcon.RightIcon == null)
                 return;
 
-            DrawHelper.Batch.Draw(rightIcon.RightIcon, new Rectangle(boundaries.X - boundaryPadding.X - iconSize.X, boundaries.Y + boundaryPadding.Y, 
-                                                                     iconSize.X, iconSize.Y), Color.White);
+            DrawHelper.Batch.Draw(rightIcon.RightIcon, new Rectangle(boundaries.Right - style.BoundaryPadding.X - style.IconSize.X, boundaries.Y + style.BoundaryPadding.Y, 
+                                                                     style.IconSize.X, style.IconSize.Y), Color.White);
         }
 
-        private void RenderRightText(IHasRightText rightText, Rectangle boundaries)
+        private void RenderRightText(IHasRightText rightText, MenuItemStyle style, Rectangle boundaries)
         {
             if (string.IsNullOrEmpty(rightText.RightText) || rightText.RightTextFont == null)
                 return;
 
             int textWidth = (int)rightText.RightTextFont.MeasureString(rightText.RightText).X;
-            DrawHelper.Batch.DrawString(rightText.RightTextFont, rightText.RightText, new Vector2(boundaries.Right - boundaryPadding.X - textWidth,
-                                                                                                  boundaries.Y + boundaryPadding.Y),
+            DrawHelper.Batch.DrawString(rightText.RightTextFont, rightText.RightText, new Vector2(boundaries.Right - style.BoundaryPadding.X - textWidth,
+                                                                                                  boundaries.Y + style.BoundaryPadding.Y),
                                                                                        Color.White);
         }
     }

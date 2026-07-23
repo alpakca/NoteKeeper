@@ -1,11 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using NoteKeeper.Shell.ContextMenus;
 using PopUpUI.Input;
 using PopUpUI.Surface;
+using PopUpUI.Toolkit;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Text;
+using System.Diagnostics;
 
 namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
 {
@@ -76,7 +77,36 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
 
         public override ContextMenu? GetContextMenu(Point mousePosition)
         {
-            return null;
+            return new ContextMenu([
+            new ActionContextMenuButton(() => { })
+            {
+                RightText = "Ctrl + F",
+                RightTextColor = Color.Gray,
+                RightTextFont = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans"),
+                RightTextHorizontalPadding = 4
+            },
+            new SubContextMenuButton(new ContextMenu([
+                new ActionContextMenuButton(() => { Trace.WriteLine("yep"); })
+                {
+                    RightText = "Ctrl + F",
+                    RightTextColor = Color.Gray,
+                    RightTextFont = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans"),
+                    RightTextHorizontalPadding = 4
+                },
+                new SubContextMenuButton(new ContextMenu([
+                new ActionContextMenuButton(() => { })
+                {
+                    RightText = "Ctrl + F",
+                    RightTextColor = Color.Gray,
+                    RightTextFont = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans"),
+                    RightTextHorizontalPadding = 4
+                }]){Background = Util.GetTexture(1, 1, Color.Tomato)}){ RightIcon = Util.GetTexture(1, 1, Color.Aqua) }]){Background = Util.GetTexture(1, 1, Color.Tomato)})
+            {
+                RightIcon = Util.GetTexture(1, 1, Color.Aqua)
+            }])
+            {
+                Background = Util.GetTexture(1, 1, Color.Tomato)
+            };
         }
     }
 }

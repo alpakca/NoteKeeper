@@ -8,9 +8,13 @@ namespace NoteKeeper.Shell.ContextMenus
     {
         private Dictionary<Type, MenuItemStyle> _styles;
 
+        public event Action ThemeChanged;
+
         public void ApplyTheme(Dictionary<Type, MenuItemStyle> styles)
         {
             _styles = styles;
+
+            ThemeChanged?.Invoke();
         }
 
         public MenuItemStyle GetStyle(IContextMenuItem item)

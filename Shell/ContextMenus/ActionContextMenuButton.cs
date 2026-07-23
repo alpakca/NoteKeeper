@@ -15,11 +15,13 @@ namespace NoteKeeper.Shell.ContextMenus
         private readonly Action _action;
 
         public Point Location { get; set; }
-        public Point Size => size;
+        public Point Size { get; set; }
 
         public string? RightText { get; init; }
         public SpriteFont? RightTextFont { get; init; }
         public Color RightTextColor { get; init; }
+
+        public int RightTextHorizontalPadding { get; init; }
 
         public ActionContextMenuButton(Action action)
         {
@@ -29,11 +31,6 @@ namespace NoteKeeper.Shell.ContextMenus
         public void Selected()
         {
             _action();
-        }
-
-        public void SetActualSize(Point size)
-        {
-            this.size = size;
         }
     }
 }
