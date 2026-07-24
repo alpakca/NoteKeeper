@@ -6,6 +6,6 @@ namespace NoteKeeper.Shell.PropertyExplorer
 {
     internal interface IPropertyCollection
     {
-        public IEnumerable<IPropertyEntry> Properties { get; }
+        public IPropertyEntry[] Properties { get; }
     }
 }

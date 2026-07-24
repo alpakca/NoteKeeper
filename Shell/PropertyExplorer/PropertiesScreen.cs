@@ -1,15 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using PopUpUI.Input;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Diagnostics;
 
 namespace NoteKeeper.Shell.PropertyExplorer
 {
     internal class PropertiesScreen
     {
-        private readonly PanelWindow panelWindow;
         private readonly PropertiesLayoutCalculator layoutCalculator;
         private readonly PropertiesScreenRenderer renderer;
 
@@ -29,11 +26,10 @@ namespace NoteKeeper.Shell.PropertyExplorer
             PickingDropdownOption
         }
 
-        public PropertiesScreen(PanelWindow window)
+        public PropertiesScreen()
         {
-            panelWindow = window;
-
             StyleProvider = new PropertyScreenStyleProvider();
+            StyleProvider.ThemeChanged += () => _valueTextBox.SetFont(StyleProvider.Style.Font);
 
             layoutCalculator = new PropertiesLayoutCalculator(StyleProvider);
             renderer = new PropertiesScreenRenderer(StyleProvider, layoutCalculator);
@@ -62,23 +58,30 @@ namespace NoteKeeper.Shell.PropertyExplorer
             if (_shownCollection == null)
                 return;
 
-            renderer.Render(_shownCollection, _focusedEntry);
-
-            if (_state == ScreenState.EditingTextBoxValue)
+            if (_state == ScreenState.Idle)
             {
-                renderer.RenderTextBox(_valueTextBox);
+                renderer.Render(_shownCollection, _focusedEntry);
+            }
+            else if (_state == ScreenState.EditingTextBoxValue)
+            {
+                renderer.RenderWithTextBox(_shownCollection, _focusedEntry, _valueTextBox);
             }
             else if (_state == ScreenState.PickingDropdownOption)
             {
+                renderer.Render(_shownCollection, _focusedEntry);
                 renderer.RenderDropdown(_optionDropdown);
             }
         }
 
         public void OnMouseButtonStateChange(PopWindowMouseEventArgs e)
         {
-            if (e.FirstTimeButtons.HasLeft && !layoutCalculator.ScreenBounds.Contains(e.MousePosition))
+            if (_shownCollection == null || !e.FirstTimeButtons.HasLeft)
+                return;
+
+            if (!layoutCalculator.ScreenBounds.Contains(e.MousePosition))
             {
                 Hide();
+                return;
             }
 
             int index = 0;
@@ -96,22 +99,20 @@ namespace NoteKeeper.Shell.PropertyExplorer
                 index++;
             }
 
-            if (newFocused == null)
+            PropertyRowLayout focusedLayout = layoutCalculator.GetRowLayout(newFocused, index);
+
+            if ((_state == ScreenState.Idle || _state == ScreenState.EditingTextBoxValue) &&
+                newFocused == _focusedEntry && focusedLayout.DropdownButtonBounds.Contains(e.MousePosition))
             {
-                _focusedEntry = newFocused;
+                _state = ScreenState.PickingDropdownOption;
+                _optionDropdown.Open(newFocused.GetDropdownOptions(), focusedLayout.DropdownButtonBounds);
+
                 return;
             }
 
-            if (_state == ScreenState.Idle)
+            if (_state == ScreenState.Idle && newFocused != null)
             {
-                PropertyRowLayout focusedLayout = layoutCalculator.GetRowLayout(newFocused, index);
-
-                // can only select dropdown button if row was already focused
-                if (newFocused == _focusedEntry && focusedLayout.DropdownButtonBounds.Contains(e.MousePosition))
-                {
-                    _state = ScreenState.PickingDropdownOption;
-                }
-                else if (focusedLayout.ValueBounds.Contains(e.MousePosition))
+                if (focusedLayout.ValueBounds.Contains(e.MousePosition))
                 {
                     _state = ScreenState.EditingTextBoxValue;
 
@@ -126,12 +127,9 @@ namespace NoteKeeper.Shell.PropertyExplorer
                 {
                     _valueTextBox.Selected(e.MousePosition);
                 }
-                else if (_focusedEntry.TryValidate(_valueTextBox.Text)) // outside selected
+                else // outside selected, try validate & set
                 {
-                    _focusedEntry.SetValue(_valueTextBox.Text);
-                    _state = ScreenState.Idle;
-
-                    _valueTextBox.Bounds = Rectangle.Empty;
+                    TrySetFocusedEntryValue();
                 }
             }
             else if (_state == ScreenState.PickingDropdownOption)
@@ -150,6 +148,9 @@ namespace NoteKeeper.Shell.PropertyExplorer
 
         public void OnTextInsert(PopWindowMouseEventArgs e, char ch)
         {
+            if (_shownCollection == null)
+                return;
+
             if (_state == ScreenState.EditingTextBoxValue)
             {
                 _valueTextBox.InsertChar(ch);
@@ -158,16 +159,30 @@ namespace NoteKeeper.Shell.PropertyExplorer
 
         public void OnKeyDown(PopWindowMouseEventArgs e, Keys key)
         {
+            if (_shownCollection == null)
+                return;
+
             if (_state == ScreenState.EditingTextBoxValue)
             {
-                if (key == Keys.Enter && _focusedEntry.TryValidate(_valueTextBox.Text))
+                if (key == Keys.Enter && _focusedEntry != null)
                 {
-                    _focusedEntry.SetValue(_valueTextBox.Text);
+                    TrySetFocusedEntryValue();
                     return;
                 }
 
                 _valueTextBox.KeyPressed(key);
             }
+        }
+
+        private void TrySetFocusedEntryValue()
+        {
+            if (_focusedEntry.TryValidate(_valueTextBox.Text))
+            {
+                _focusedEntry.SetValue(_valueTextBox.Text);
+            }
+
+            _state = ScreenState.Idle;
+            _valueTextBox.Bounds = Rectangle.Empty;
         }
     }
 }

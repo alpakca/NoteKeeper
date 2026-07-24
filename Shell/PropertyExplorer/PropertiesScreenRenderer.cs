@@ -1,9 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using PopUpUI.Toolkit;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace NoteKeeper.Shell.PropertyExplorer
 {
@@ -59,9 +56,38 @@ namespace NoteKeeper.Shell.PropertyExplorer
             }
         }
 
-        public void RenderTextBox(ValueTextBox valueTextBox)
+        public void RenderWithTextBox(IPropertyCollection collection, IPropertyEntry focusedEntry, ValueTextBox valueTextBox)
         {
-            valueTextBox.Render();
+            PropertyScreenStyle style = _styleProvider.Style;
+            Rectangle textBoxBounds = valueTextBox.Bounds;
+
+            DrawHelper.Batch.Draw(style.ScreenBackground, _layoutCalculator.ScreenBounds, Color.White);
+
+            int index = 0;
+            foreach (var entry in collection.Properties)
+            {
+                PropertyRowLayout rowLayout = _layoutCalculator.GetRowLayout(entry, index);
+
+                DrawBox(focusedEntry == entry ? style.FocusedBoxBackground : style.BoxBackground, style.Font, entry.Name, rowLayout.LabelBounds);
+
+                if (rowLayout.ValueBounds == textBoxBounds)
+                {
+                    DrawHelper.Batch.Draw(style.BoxBackground, rowLayout.ValueBounds, Color.White);
+                    valueTextBox.Render();
+                }
+                else
+                    DrawBox(style.BoxBackground, style.Font, entry.CurrentValueAsString, rowLayout.ValueBounds);
+
+                // Dropdown box is rendered here, only if it is contained in focusedEntry
+                // its options are drawn in RenderDropdown(), since only one Dropdown can be
+                // open at a time
+                if (focusedEntry == entry && entry.HasDropdownOptions)
+                {
+                    DrawHelper.Batch.Draw(style.DropdownButtonTexture, rowLayout.DropdownButtonBounds, Color.White);
+                }
+
+                index++;
+            }
         }
     }
 }

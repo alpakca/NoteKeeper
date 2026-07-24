@@ -10,9 +10,13 @@ namespace NoteKeeper.Shell.PropertyExplorer
 
         public PropertyScreenStyle Style => _style;
 
+        public event Action ThemeChanged;
+
         public void ApplyTheme(PropertyScreenStyle style)
         {
             _style = style;
+
+            ThemeChanged?.Invoke();
         }
     }
 }

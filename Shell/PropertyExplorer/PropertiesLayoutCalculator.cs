@@ -38,6 +38,11 @@ namespace NoteKeeper.Shell.PropertyExplorer
 
         public PropertyRowLayout GetRowLayout(IPropertyEntry entry, int index)
         {
+            if (entry == null)
+            {
+                return new PropertyRowLayout();
+            }
+
             Point startPosition = ScreenBounds.Location + BoxesStartPositionOffset;
 
             Rectangle label = new Rectangle(startPosition.X, startPosition.Y + index * (MarginBetweenBoxes + BoxBounds.Y), BoxBounds.X, BoxBounds.Y);

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using PopUpUI.Text;
 using System;
@@ -19,6 +20,16 @@ namespace NoteKeeper.Shell.PropertyExplorer
 
         public string Text => processer.Text;
 
+        public ValueTextBox()
+        {
+            processer = new TextProcesser();
+        }
+
+        public void SetFont(SpriteFont font)
+        {
+            processer.Font = font;
+        }
+
         public void Render()
         {
             lastResult.Render(PopUpUI.Surface.BatchDrawOptions.Default, Bounds.Location.ToVector2(), null, 1f);
@@ -34,7 +45,9 @@ namespace NoteKeeper.Shell.PropertyExplorer
         public void Selected(Point mousePosition)
         {
             Vector2 inTextBoxPosition = (mousePosition - Bounds.Location).ToVector2();
-            caretPosition = lastResult.Caret.MouseCaretPosition(inTextBoxPosition, null);
+
+            // input inside box will be single line, so we can directly pass zero as Y value
+            caretPosition = lastResult.Caret.MouseCaretPosition(new Vector2(inTextBoxPosition.X, 0), null);
         }
 
         public void InsertChar(char ch)
