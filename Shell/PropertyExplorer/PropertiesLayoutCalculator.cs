@@ -40,7 +40,7 @@ namespace NoteKeeper.Shell.PropertyExplorer
         {
             Point startPosition = ScreenBounds.Location + BoxesStartPositionOffset;
 
-            Rectangle label = new Rectangle(new Point(startPosition.X, startPosition.Y + index * MarginBetweenBoxes), BoxBounds);
+            Rectangle label = new Rectangle(startPosition.X, startPosition.Y + index * (MarginBetweenBoxes + BoxBounds.Y), BoxBounds.X, BoxBounds.Y);
             Rectangle value = new Rectangle(label.Right + MarginBetweenBoxes, label.Y, BoxBounds.X, BoxBounds.Y);
 
             if (entry.HasDropdownOptions)

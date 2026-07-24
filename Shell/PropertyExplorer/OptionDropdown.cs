@@ -7,12 +7,11 @@ namespace NoteKeeper.Shell.PropertyExplorer
 {
     internal class OptionDropdown
     {
-        private bool isActive;
-
         private readonly PropertiesLayoutCalculator _layoutCalculator;
         private readonly List<(string Option, Rectangle Bounds)> _optionBounds;
 
-        public bool IsActive => isActive;
+        private IEnumerable<string> _cachedOptions;
+
         public IEnumerable<(string Option, Rectangle Bounds)> OptionBounds => _optionBounds;
 
         public OptionDropdown(PropertiesLayoutCalculator layoutCalculator)
@@ -23,6 +22,11 @@ namespace NoteKeeper.Shell.PropertyExplorer
 
         public void Open(IEnumerable<string> options, Rectangle dropdownBoxBounds)
         {
+            if (options == _cachedOptions)
+            {
+                return;
+            }
+
             _optionBounds.Clear();
 
             Point optionSize = _layoutCalculator.GetDropdownOptionsSize(options);
@@ -36,7 +40,7 @@ namespace NoteKeeper.Shell.PropertyExplorer
                 y += optionSize.Y;
             }
 
-            isActive = true;
+            _cachedOptions = options;
         }
 
         public bool TrySelectOption(Point mousePosition, out string selected)
@@ -52,7 +56,6 @@ namespace NoteKeeper.Shell.PropertyExplorer
                 }
             }
 
-            isActive = false;
             return selected != null;
         }
     }

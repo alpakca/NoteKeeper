@@ -12,36 +12,33 @@ namespace NoteKeeper.Shell.PropertyExplorer
     {
         private readonly BasicProcesser processer;
 
-        private bool isActive;
         private TextPosition caretPosition;
         private ITextProcesserResult lastResult;
 
-        public Point Location { get; set; }
-        public Point Size { get; set; }
+        public Rectangle Bounds { get; set; }
 
-        public bool IsActive => isActive;
+        public string Text => processer.Text;
 
         public void Render()
         {
-            lastResult.Render(PopUpUI.Surface.BatchDrawOptions.Default, Location.ToVector2(), null, 1f);
+            lastResult.Render(PopUpUI.Surface.BatchDrawOptions.Default, Bounds.Location.ToVector2(), null, 1f);
         }
 
-        public void Selected(Point mousePosition, string value)
+        public void SetText(string value)
         {
-            Vector2 inTextBoxPosition = (mousePosition - Location).ToVector2();
-            caretPosition = lastResult.Caret.MouseCaretPosition(inTextBoxPosition, null);
+            processer.Text = value;
+            lastResult = processer.GetParseResult();
+            caretPosition = lastResult.Caret.MaximumPosition;
+        }
 
-            isActive = true;
+        public void Selected(Point mousePosition)
+        {
+            Vector2 inTextBoxPosition = (mousePosition - Bounds.Location).ToVector2();
+            caretPosition = lastResult.Caret.MouseCaretPosition(inTextBoxPosition, null);
         }
 
         public void InsertChar(char ch)
         {
-            if (ch == '\n')
-            {
-                isActive = false;
-                return;
-            }
-
             if (!processer.Font.Characters.Contains(ch))
             {
                 return;
@@ -85,10 +82,6 @@ namespace NoteKeeper.Shell.PropertyExplorer
                 case Keys.Right:
 
                     caretPosition = lastResult.Caret.Advance(caretPosition, +1);
-                    break;
-                case Keys.Enter:
-
-                    InsertChar('\n');
                     break;
 
                 case Keys.Back:

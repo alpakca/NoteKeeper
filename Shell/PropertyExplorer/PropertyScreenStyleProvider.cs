@@ -6,7 +6,7 @@ namespace NoteKeeper.Shell.PropertyExplorer
 {
     internal class PropertyScreenStyleProvider
     {
-        private readonly PropertyScreenStyle _style;
+        private PropertyScreenStyle _style;
 
         public PropertyScreenStyle Style => _style;
 
