@@ -28,7 +28,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             PageActions actions = new PageActions(TabHistory);
 
             viewport = new TabViewport { UISize = size };
-            window = new TabWindow(size, viewport, NotePages);
+            window = new TabWindow(size, actions, viewport, NotePages);
 
             NotePages.CollectionChanged += (sender, _) => viewport.PageCount = ((ObservableCollection<NotePage>)sender!).Count;
         }

@@ -18,13 +18,15 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         private readonly IList<NotePage> notePages;
         private readonly Random random;
 
+        private readonly PageActions actions;
         private readonly TabViewport viewport;
         private readonly TabRenderer renderer;
         private readonly TabInputHandler inputHandler;
         private readonly ContentTransformer transformer;
 
-        public TabWindow(Point size, TabViewport viewport, IList<NotePage> notePages) : base(size)
+        public TabWindow(Point size, PageActions actions, TabViewport viewport, IList<NotePage> notePages) : base(size)
         {
+            this.actions = actions;
             this.viewport = viewport;
             this.notePages = notePages;
             this.random = new Random();
@@ -156,6 +158,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
                 PageImageContent? content = LoadContent(fileArgs.Files[0]);
                 if (content != null)
                 {
+                    actions.
                     content.Location = pagePosition - content.Size / new Point(2);
                     notePages[pageIndex].Contents.Add(content);
                 }
