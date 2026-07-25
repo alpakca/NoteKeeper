@@ -92,6 +92,8 @@ namespace NoteKeeper.Shell
                 displayedTab.TabViewport.ZoomChanged -= TabViewport_ZoomChanged;
                 displayedTab.TabViewport.ScrollChanged -= TabViewport_ScrollChanged;
 
+                displayedTab.TabHistory.HistoryUpdated -= TabHistory_HistoryUpdated;
+
                 PopWindowManager.ActiveWindows.Remove(displayedTab.Window);
             }
 
@@ -108,11 +110,20 @@ namespace NoteKeeper.Shell
                 tab.TabViewport.ZoomChanged += TabViewport_ZoomChanged;
                 tab.TabViewport.ScrollChanged += TabViewport_ScrollChanged;
 
+                displayedTab.TabHistory.HistoryUpdated += TabHistory_HistoryUpdated;
+                displayedTab.TabHistory.Clear();
+
                 PopWindowManager.ActiveWindows.Add(tab.Window);
                 PopWindowManager.ActiveWindows.MoveToBottom(tab.Window);
             }
 
             RearrangeUISizes();
+        }
+
+        private void TabHistory_HistoryUpdated(TabHistory history)
+        {
+            buttonPlate.UndoButton.Enabled = history.CanUndo;
+            buttonPlate.RedoButton.Enabled = history.CanRedo;
         }
 
         private void TabViewport_ScrollChanged()

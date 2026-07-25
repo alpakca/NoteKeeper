@@ -18,11 +18,17 @@ namespace NoteKeeper.Shell
         public List<Clickable> Buttons { get; }
         public int MinimumVisualHeight { get; }
 
+        public VisualClickable UndoButton { get; }
+        public VisualClickable RedoButton { get; }
+
         public ButtonPlate(ControlPanel panel)
         {
             this.panel = panel;
 
             Buttons = new List<Clickable>();
+            UndoButton = new VisualClickable();
+            RedoButton = new VisualClickable();
+
             InitializeButtons();
         }
 
@@ -40,7 +46,21 @@ namespace NoteKeeper.Shell
             VisualClickable addTextBlock = interpreter.CreateFromProperties(PUIHelper.VisualClickableInstantiator, "Add_Text_Block");
             addTextBlock.ClickCommand = new ActionCommander<Clickable>(AddTextBlockCommander);
 
-            Buttons.AddRange(writingModeToggle, transformModeToggle, addTextBlock);
+            interpreter.AssignProperties(PUIHelper.VisualClickableAssigner, "Undo", UndoButton);
+            UndoButton.ClickCommand = new ActionCommander<Clickable>(_ =>
+            {
+                panel.DisplayedTab?.TabHistory.Undo();
+            });
+            UndoButton.Enabled = false;
+
+            interpreter.AssignProperties(PUIHelper.VisualClickableAssigner, "Redo", RedoButton);
+            RedoButton.ClickCommand = new ActionCommander<Clickable>(_ =>
+            {
+                panel.DisplayedTab?.TabHistory.Redo();
+            });
+            RedoButton.Enabled = false;
+
+            Buttons.AddRange(writingModeToggle, transformModeToggle, addTextBlock, UndoButton, RedoButton);
 
             ActivateWritingMode();
             transformModeToggle.SetCheckStatus(false); // don't actually need this line; its here in case of broken UI.

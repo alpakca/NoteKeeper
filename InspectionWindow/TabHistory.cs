@@ -15,7 +15,7 @@ namespace NoteKeeper.InspectionWindow
         public IEnumerable<IHistoryAction> UndoableActions => _undoStack;
         public IEnumerable<IHistoryAction> RedoableActions => _redoStack;
 
-        public event Action<IHistoryAction> HistoryUpdated;
+        public event Action<TabHistory> HistoryUpdated;
 
         public TabHistory()
         {
@@ -30,7 +30,7 @@ namespace NoteKeeper.InspectionWindow
             _undoStack.Push(action);
             _redoStack.Clear();
 
-            HistoryUpdated?.Invoke(action);
+            HistoryUpdated?.Invoke(this);
         }
 
         public void Undo()
@@ -42,7 +42,7 @@ namespace NoteKeeper.InspectionWindow
             undoAction.Undo();
 
             _redoStack.Push(undoAction);
-            HistoryUpdated?.Invoke(undoAction);
+            HistoryUpdated?.Invoke(this);
         }
 
         public void Redo()
@@ -54,7 +54,15 @@ namespace NoteKeeper.InspectionWindow
             redoAction.Run();
 
             _undoStack.Push(redoAction);
-            HistoryUpdated?.Invoke(redoAction);
+            HistoryUpdated?.Invoke(this);
+        }
+
+        public void Clear()
+        {
+            _undoStack.Clear();
+            _redoStack.Clear();
+
+            HistoryUpdated?.Invoke(this);
         }
     }
 }

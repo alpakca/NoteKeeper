@@ -22,6 +22,7 @@ namespace NoteKeeper.Shell.PUIHelpers
                 DefaultAnimation = desc.GetPropertyOrDefault<Animation2D>("DefaultAnimation", null),
                 HoldAnimation = desc.GetPropertyOrDefault<Animation2D>("HoldAnimation", null),
                 HoverAnimation = desc.GetPropertyOrDefault<Animation2D>("HoverAnimation", null),
+                UnenabledAnimation = desc.GetPropertyOrDefault<Animation2D>("UnenabledAnimation", null),
 
                 SelectablePacket = desc.GetPropertyOrDefault<SelectablePacket>("SelectablePacket", null),
                 HoldPacket = desc.GetPropertyOrDefault<HoldablePacket>("HoldablePacket", null)
