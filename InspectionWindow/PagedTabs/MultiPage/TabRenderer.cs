@@ -77,20 +77,20 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             DrawHelper.EndBatch();
         }
 
-        public void RenderWritingContentCaretBoundary(IKeyTextReceiverContent writingContent, int writingContentPagePosition, Point caretContentPosition, int lineSpacing)
+        public void RenderWritingSession(int writingContentPagePosition, WritingSession writingSession)
         {
             Point pageOffset = viewport.FirstPageStartPosition + viewport.MovingDimensionPageStep.Times(viewport.Zoom).Times(writingContentPagePosition);
 
-            (Point transformedLocation, SpriteEffects _) = PageContentUtil.GetTransformedLocation(writingContent.Location, writingContent.Size);
+            (Point transformedLocation, SpriteEffects _) = PageContentUtil.GetTransformedLocation(writingSession.WritingContent.Location, writingSession.WritingContent.Size);
             Point contentLocation = pageOffset + transformedLocation.Times(viewport.Zoom);
 
             const int CaretWidth = 2;
-            caretContentPosition = caretContentPosition.Times(viewport.Zoom);
-            Rectangle caretBounds = new Rectangle(contentLocation + caretContentPosition, new Point(CaretWidth, lineSpacing).Times(viewport.Zoom));
+            Point caretContentPosition = writingSession.CaretContentPosition.Times(viewport.Zoom);
+            Rectangle caretBounds = new Rectangle(contentLocation + caretContentPosition, new Point(CaretWidth, writingSession.LineSpacing).Times(viewport.Zoom));
 
             int zoomedMargin = (int)(WritingBoundaryOutlineMargin * viewport.Zoom);
             int zoomedThinkness = (int)(WritingBoundaryOutlineThickness * viewport.Zoom);
-            Point absoluteSize = writingContent.Size;
+            Point absoluteSize = writingSession.WritingContent.Size;
 
             DrawHelper.SetBeginBatch(target);
 

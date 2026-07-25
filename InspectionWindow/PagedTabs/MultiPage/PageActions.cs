@@ -10,9 +10,17 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
     {
         private readonly TabHistory _history;
 
+        public event TabHistoryCommandApplied CommandApplied;
+
         public PageActions(TabHistory history)
         {
             _history = history;
+            _history.CommandApplied += (command, isUndo) => CommandApplied?.Invoke(command, isUndo);
+        }
+
+        public void RunAction(IHistoryAction action)
+        {
+            _history.RunAction(action);
         }
 
         public void ChangeContentProperty<T>(T oldValue, T newValue, Action<T> setAction)

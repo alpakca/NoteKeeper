@@ -5,6 +5,8 @@ using System.Text;
 
 namespace NoteKeeper.InspectionWindow
 {
+    internal delegate void TabHistoryCommandApplied(IHistoryAction appliedCommand, bool isUndo);
+
     internal class TabHistory
     {
         private readonly Stack<IHistoryAction> _undoStack;
@@ -17,6 +19,7 @@ namespace NoteKeeper.InspectionWindow
         public IEnumerable<IHistoryAction> RedoableActions => _redoStack;
 
         public event Action<TabHistory> HistoryUpdated;
+        public event TabHistoryCommandApplied CommandApplied;
 
         public TabHistory()
         {
@@ -32,6 +35,7 @@ namespace NoteKeeper.InspectionWindow
             _redoStack.Clear();
 
             HistoryUpdated?.Invoke(this);
+            CommandApplied?.Invoke(action, isUndo: false); // forward -> redo
         }
 
         public void Undo()
@@ -44,6 +48,7 @@ namespace NoteKeeper.InspectionWindow
 
             _redoStack.Push(undoAction);
             HistoryUpdated?.Invoke(this);
+            CommandApplied?.Invoke(undoAction, isUndo: true);
         }
 
         public void Redo()
@@ -56,6 +61,7 @@ namespace NoteKeeper.InspectionWindow
 
             _undoStack.Push(redoAction);
             HistoryUpdated?.Invoke(this);
+            CommandApplied?.Invoke(redoAction, isUndo: false);
         }
 
         public void Clear()

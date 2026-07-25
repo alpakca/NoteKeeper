@@ -21,6 +21,15 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
         public Point Location { get; set; }
         public Point Size => size;
 
+        public string Text
+        {
+            get => processer.Text;
+            set
+            {
+                processer.Text = value;
+                lastResult = processer.GetParseResult();
+            }
+        }
         public ITextProcesserResult LastResult => lastResult;
 
         public PageTextContent(string fontName)
@@ -89,105 +98,100 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
             }
         }
 
-        public TextPosition InsertChar(char ch, TextPosition caretPosition, PageActions pageActions)
+        public void InsertChar(char ch, WritingSession writingSession)
         {
             if (ch != '\n' && !processer.Font.Characters.Contains(ch))
             {
-                return caretPosition;
+                return;
             }
 
-            int indexInText = lastResult.Caret.GetLineFreePosition(caretPosition);
+            int indexInText = lastResult.Caret.GetLineFreePosition(writingSession.CaretPosition);
             processer.Text = processer.Text.Insert(indexInText, ch.ToString());
 
             lastResult = processer.GetParseResult();
-            caretPosition = lastResult.Caret.Advance(caretPosition, 1);
+            writingSession.CaretPosition = lastResult.Caret.Advance(writingSession.CaretPosition, 1);
 
-            ExpandHeightIfNeed(pageActions);
-
-            return caretPosition;
+            ExpandHeightIfNeed();
         }
 
-        public TextPosition InsertText(string text, TextPosition caretPosition, PageActions pageActions)
+        public void InsertText(string text, WritingSession writingSession)
         {
-            int indexInText = lastResult.Caret.GetLineFreePosition(caretPosition);
+            int indexInText = lastResult.Caret.GetLineFreePosition(writingSession.CaretPosition);
             processer.Text = processer.Text.Insert(indexInText, text);
 
             lastResult = processer.GetParseResult();
-            caretPosition = lastResult.Caret.Advance(caretPosition, text.Length);
+            writingSession.CaretPosition = lastResult.Caret.Advance(writingSession.CaretPosition, text.Length);
 
-            ExpandHeightIfNeed(pageActions);
-
-            return caretPosition;
+            ExpandHeightIfNeed();
         }
 
-        private void ExpandHeightIfNeed(PageActions pageActions)
+        private void ExpandHeightIfNeed()
         {
             if (lastResult.TextSize.Y > absSize.Y)
             {
                 // let lastResult's size copy the signs of actual size (so rendered text won't become normal from a upside state)
                 Point transformedSize = new Point((int)lastResult.TextSize.X * int.Sign(size.X), (int)lastResult.TextSize.Y * int.Sign(size.Y));
-                pageActions.ChangeContentProperty(size, transformedSize, this.SetSize);
+                SetSize(transformedSize);
             }
         }
 
-        public TextPosition Backspace(TextPosition caretPosition)
+        public void Backspace(WritingSession writingSession)
         {
-            if (processer.Text.Length == 0 || (caretPosition.IndexInsideLine == 0 && caretPosition.LineIndex == 0))
-                return caretPosition;
+            if (processer.Text.Length == 0 || (writingSession.CaretPosition.IndexInsideLine == 0 && writingSession.CaretPosition.LineIndex == 0))
+                return;
 
-            int indexInText = lastResult.Caret.GetLineFreePosition(caretPosition);
+            int indexInText = lastResult.Caret.GetLineFreePosition(writingSession.CaretPosition);
             processer.Text = processer.Text[..(indexInText - 1)] + processer.Text[indexInText..];
 
             lastResult = processer.GetParseResult();
-            caretPosition = lastResult.Caret.GetCaretPosition(indexInText - 1);
-
-            return caretPosition;
+            writingSession.CaretPosition = lastResult.Caret.GetCaretPosition(indexInText - 1);
         }
 
-        public TextPosition KeyPressed(Keys key, TextPosition caretPosition, PageActions pageActions)
+        public void KeyPressed(Keys key, WritingSession writingSession)
         {
+            TextPosition caretPosition = writingSession.CaretPosition;
             switch (key)
             {
                 case Keys.Up:
                     
-                    if (caretPosition.LineIndex == 0)
+                    if (writingSession.CaretPosition.LineIndex == 0)
                     {
-                        return lastResult.Caret.MinimumPosition;
+                        writingSession.CaretPosition = lastResult.Caret.MinimumPosition;
                     }
                     else
                     {
-                        return lastResult.Caret.Clamp(new TextPosition(caretPosition.LineIndex - 1, caretPosition.IndexInsideLine));
+                        writingSession.CaretPosition = lastResult.Caret.Clamp(new TextPosition(caretPosition.LineIndex - 1, caretPosition.IndexInsideLine));
                     }
 
+                    break;
                 case Keys.Down:
 
                     if (caretPosition.LineIndex == lastResult.Lines.LineCount - 1)
                     {
-                        return lastResult.Caret.MaximumPosition;
+                        writingSession.CaretPosition = lastResult.Caret.MaximumPosition;
                     }
                     else
                     {
-                        return lastResult.Caret.Clamp(new TextPosition(caretPosition.LineIndex + 1, caretPosition.IndexInsideLine));
+                        writingSession.CaretPosition = lastResult.Caret.Clamp(new TextPosition(caretPosition.LineIndex + 1, caretPosition.IndexInsideLine));
                     }
 
+                    break;
                 case Keys.Left:
 
-                    return lastResult.Caret.Advance(caretPosition, -1);
-
+                    writingSession.CaretPosition = lastResult.Caret.Advance(caretPosition, -1);
+                    break;
                 case Keys.Right:
 
-                    return lastResult.Caret.Advance(caretPosition, +1);
-
+                    writingSession.CaretPosition = lastResult.Caret.Advance(caretPosition, +1);
+                    break;
                 case Keys.Enter:
 
-                    return InsertChar('\n', caretPosition, pageActions);
-
+                    InsertChar('\n', writingSession);
+                    break;
                 case Keys.Back:
 
-                    return Backspace(caretPosition);
-
-                default:
-                    return caretPosition;
+                    Backspace(writingSession);
+                    break;
             }
         }
     }

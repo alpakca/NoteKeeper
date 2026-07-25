@@ -13,24 +13,18 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
 {
     internal class TabInputHandler
     {
-        private IKeyTextReceiverContent? currentKeyTextReceiver;
-        private TextPosition textReceiverCaretPosition;
-
-        private readonly PageActions pageActions;
         private readonly TabViewport viewport;
         private readonly IList<NotePage> notePages;
 
-        public int? WritingContentLineSpacing => currentKeyTextReceiver?.LastResult.Data.LineSpacing;
-        public Point? CaretContentPosition => currentKeyTextReceiver?.LastResult.Caret.ScreenCaretPosition(textReceiverCaretPosition, null).ToPoint();
-        public IKeyTextReceiverContent? WritingContent => currentKeyTextReceiver;
-
+        public WritingSession WritingSession { get; }
         public ShellModes CurrentMode { get; set; }
 
         public TabInputHandler(PageActions pageActions, TabViewport viewport, IList<NotePage> notePages)
         {
-            this.pageActions = pageActions;
             this.viewport = viewport;
             this.notePages = notePages;
+
+            WritingSession = new WritingSession(pageActions);
         }
 
         public IPageContent? HitContent(Point mousePosition)
@@ -78,28 +72,22 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             {
                 IKeyTextReceiverContent? hit = HitContent(mousePosition) as IKeyTextReceiverContent;
 
-                currentKeyTextReceiver = hit;
+                WritingSession.WritingContent = hit;
                 if (hit != null)
                 {
-                    textReceiverCaretPosition = hit.GetMouseCaretPosition(viewport.ToPagePosition(mousePosition).PagePosition);
+                    WritingSession.CaretPosition = hit.GetMouseCaretPosition(viewport.ToPagePosition(mousePosition).PagePosition);
                 }
             }
         }
 
         public void TextInput(PopWindowMouseEventArgs e, char ch)
         {
-            if (currentKeyTextReceiver != null)
-            {
-                textReceiverCaretPosition = currentKeyTextReceiver.InsertChar(ch, textReceiverCaretPosition, pageActions);
-            }
+            WritingSession.InsertChar(ch);
         }
 
         public void KeyInput(PopWindowMouseEventArgs e, Keys key)
         {
-            if (currentKeyTextReceiver != null)
-            {
-                textReceiverCaretPosition = currentKeyTextReceiver.KeyPressed(key, textReceiverCaretPosition, pageActions);
-            }
+            WritingSession.KeyInput(key);
         }
     }
 }

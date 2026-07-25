@@ -32,8 +32,8 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             this.random = new Random();
 
             renderer = new TabRenderer(viewport, notePages);
-            inputHandler = new TabInputHandler(viewport, notePages);
-            transformer = new ContentTransformer(notePages, viewport);
+            inputHandler = new TabInputHandler(pageActions, viewport, notePages);
+            transformer = new ContentTransformer(notePages, viewport, pageActions);
         }
 
         public void ModeUpdated(ShellModes mode)
@@ -50,11 +50,10 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             {
                 renderer.RenderTransformerNodes(transformer.TransformedContentPageIndex, transformer.NodePagePositions);
             }
-            else if (currentMode == ShellModes.Writing && inputHandler.WritingContent != null)
+            else if (currentMode == ShellModes.Writing && inputHandler.WritingSession.WritingContent != null)
             {
-                int pageIndex = inputHandler.PageIndexOf(inputHandler.WritingContent);
-                renderer.RenderWritingContentCaretBoundary(inputHandler.WritingContent, pageIndex, 
-                                                           inputHandler.CaretContentPosition!.Value, inputHandler.WritingContentLineSpacing!.Value);
+                int pageIndex = inputHandler.PageIndexOf(inputHandler.WritingSession.WritingContent);
+                renderer.RenderWritingSession(pageIndex, inputHandler.WritingSession);
             }
 
             renderer.RenderWindowTexture(WindowTexture);
