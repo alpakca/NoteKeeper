@@ -19,6 +19,10 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         private readonly TabViewport viewport;
         private readonly IList<NotePage> notePages;
 
+        public int? WritingContentLineSpacing => currentKeyTextReceiver?.LastResult.Data.LineSpacing;
+        public Point? CaretContentPosition => currentKeyTextReceiver?.LastResult.Caret.ScreenCaretPosition(textReceiverCaretPosition, null).ToPoint();
+        public IKeyTextReceiverContent? WritingContent => currentKeyTextReceiver;
+
         public ShellModes CurrentMode { get; set; }
 
         public TabInputHandler(TabViewport viewport, IList<NotePage> notePages)
@@ -54,24 +58,29 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             if (CurrentMode == ShellModes.Writing)
             {
                 IKeyTextReceiverContent? hit = HitContent(mousePosition) as IKeyTextReceiverContent;
-                if (currentKeyTextReceiver != hit)
-                {
-                    currentKeyTextReceiver?.InputEnded();
-                    currentKeyTextReceiver = hit;
-                }
 
-                currentKeyTextReceiver?.MouseSelected(viewport.ToPagePosition(mousePosition).PagePosition);
+                currentKeyTextReceiver = hit;
+                if (hit != null)
+                {
+                    textReceiverCaretPosition = hit.MouseSelected(viewport.ToPagePosition(mousePosition).PagePosition);
+                }
             }
         }
 
         public void TextInput(PopWindowMouseEventArgs e, char ch)
         {
-            currentKeyTextReceiver?.InsertChar(ch);
+            if (currentKeyTextReceiver != null)
+            {
+                textReceiverCaretPosition = currentKeyTextReceiver.InsertChar(ch, textReceiverCaretPosition);
+            }
         }
 
         public void KeyInput(PopWindowMouseEventArgs e, Keys key)
         {
-            currentKeyTextReceiver?.KeyPressed(key);
+            if (currentKeyTextReceiver != null)
+            {
+                textReceiverCaretPosition = currentKeyTextReceiver.KeyPressed(key, textReceiverCaretPosition);
+            }
         }
     }
 }

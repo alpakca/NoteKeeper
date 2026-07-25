@@ -77,7 +77,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             DrawHelper.EndBatch();
         }
 
-        public void RenderWritingContentCaretBoundary(IKeyTextReceiverContent writingContent, int writingContentPagePosition, ITextProcesserResult result, TextPosition caretPosition)
+        public void RenderWritingContentCaretBoundary(IKeyTextReceiverContent writingContent, int writingContentPagePosition, Point caretContentPosition, int lineSpacing)
         {
             Point pageOffset = viewport.FirstPageStartPosition + viewport.MovingDimensionPageStep.Times(viewport.Zoom).Times(writingContentPagePosition);
 
@@ -85,8 +85,8 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             Point contentLocation = pageOffset + transformedLocation.Times(viewport.Zoom);
 
             const int CaretWidth = 2;
-            Point caretScreenPos = result.Caret.ScreenCaretPosition(caretPosition, null).ToPoint().Times(viewport.Zoom);
-            Rectangle caretBounds = new Rectangle(caretScreenPos, new Point(CaretWidth, result.Data.Font.LineSpacing).Times(viewport.Zoom));
+            caretContentPosition = caretContentPosition.Times(viewport.Zoom);
+            Rectangle caretBounds = new Rectangle(caretContentPosition, new Point(CaretWidth, lineSpacing).Times(viewport.Zoom));
 
             int zoomedMargin = (int)(WritingBoundaryOutlineMargin * viewport.Zoom);
             int zoomedThinkness = (int)(WritingBoundaryOutlineThickness * viewport.Zoom);
