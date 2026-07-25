@@ -53,6 +53,20 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             return null;
         }
 
+        public int PageIndexOf(IPageContent item)
+        {
+            for (int i = 0; i < notePages.Count; i++)
+            {
+                foreach (var content in notePages[i].Contents)
+                {
+                    if (item == content)
+                        return i;
+                }
+            }
+
+            return -1;
+        }
+
         public void LeftMouseSelection(Point mousePosition)
         {
             if (CurrentMode == ShellModes.Writing)

@@ -9,11 +9,11 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
 {
     internal interface IKeyTextReceiverContent : IPageContent
     {
+        public ITextProcesserResult LastResult { get; }
+
         public TextPosition InsertText(string text, TextPosition caretPosition);
         public TextPosition InsertChar(char ch, TextPosition caretPosition);
         public TextPosition KeyPressed(Keys key, TextPosition caretPosition);
         public TextPosition MouseSelected(Point pagePosition);
-
-        public Vector2 GetCaretScreenPosition(TextPosition caretPosition);
     }
 }

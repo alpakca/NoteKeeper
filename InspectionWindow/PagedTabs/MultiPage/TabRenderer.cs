@@ -86,7 +86,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
 
             const int CaretWidth = 2;
             caretContentPosition = caretContentPosition.Times(viewport.Zoom);
-            Rectangle caretBounds = new Rectangle(caretContentPosition, new Point(CaretWidth, lineSpacing).Times(viewport.Zoom));
+            Rectangle caretBounds = new Rectangle(contentLocation + caretContentPosition, new Point(CaretWidth, lineSpacing).Times(viewport.Zoom));
 
             int zoomedMargin = (int)(WritingBoundaryOutlineMargin * viewport.Zoom);
             int zoomedThinkness = (int)(WritingBoundaryOutlineThickness * viewport.Zoom);

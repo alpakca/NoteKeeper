@@ -63,7 +63,7 @@ namespace NoteKeeper.Shell
                 return;
             }
 
-            PageTextContent content = ContentGetter.GetTextContent();
+            PageTextContent content = ContentGetter.GetTextContent("Font_ComicSans");
             content.SetSize(new Point(200, 50));
 
             pageContentTab.AddContent(content);

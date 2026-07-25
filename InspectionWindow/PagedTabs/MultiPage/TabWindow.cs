@@ -48,6 +48,12 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             {
                 renderer.RenderTransformerNodes(transformer.TransformedContentPageIndex, transformer.NodePagePositions);
             }
+            else if (currentMode == ShellModes.Writing && inputHandler.WritingContent != null)
+            {
+                int pageIndex = inputHandler.PageIndexOf(inputHandler.WritingContent);
+                renderer.RenderWritingContentCaretBoundary(inputHandler.WritingContent, pageIndex, 
+                                                           inputHandler.CaretContentPosition!.Value, inputHandler.WritingContentLineSpacing!.Value);
+            }
 
             renderer.RenderWindowTexture(WindowTexture);
         }
