@@ -2,11 +2,8 @@
 using NoteKeeper.Shell.ContextMenus;
 using PopUpUI.Input;
 using PopUpUI.Surface;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+#nullable enable
 
 namespace NoteKeeper.InspectionWindow
 {
@@ -15,6 +12,7 @@ namespace NoteKeeper.InspectionWindow
         public string Name { get; set; } = "Unnamed";
 
         public abstract ITabViewport TabViewport { get; }
+        public abstract TabHistory TabHistory { get; }
         public abstract PopWindow Window { get; }
 
         public abstract ContextMenu? GetContextMenu(Point mousePosition);

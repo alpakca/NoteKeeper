@@ -1,12 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using NoteKeeper.Shell.ContextMenus;
 using PopUpUI.Input;
 using PopUpUI.Surface;
-using PopUpUI.Toolkit;
 using System;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
+
+#nullable enable
 
 namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
 {
@@ -16,6 +15,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         private readonly TabWindow window;
 
         public override ITabViewport TabViewport => viewport;
+        public override TabHistory TabHistory { get; }
         public override PopWindow Window => window;
 
         public ObservableCollection<NotePage> NotePages { get; }
@@ -23,11 +23,14 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         public MultiPageTab(Point size)
         {
             NotePages = new ObservableCollection<NotePage>();
+            TabHistory = new TabHistory();
+
+            PageActions actions = new PageActions(TabHistory);
 
             viewport = new TabViewport { UISize = size };
             window = new TabWindow(size, viewport, NotePages);
 
-            NotePages.CollectionChanged += (sender, _) => viewport.PageCount = ((ObservableCollection<NotePage>)sender).Count;
+            NotePages.CollectionChanged += (sender, _) => viewport.PageCount = ((ObservableCollection<NotePage>)sender!).Count;
         }
 
         public override void AddContent(IPageContent content)
