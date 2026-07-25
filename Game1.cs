@@ -4,8 +4,6 @@ using Microsoft.Xna.Framework.Input;
 using PopUpUI.Toolkit;
 using System.Linq;
 using NoteKeeper.Shell;
-using PopUpUI.Text;
-using NoteKeeper.InspectionWindow.PagedTabs.SinglePage;
 using NoteKeeper.InspectionWindow.PagedTabs.MultiPage;
 using NoteKeeper.InspectionWindow.PagedTabs;
 using System.Collections.Generic;
@@ -107,12 +105,8 @@ namespace NoteKeeper
             multi.NotePages.Add(second);
             multi.NotePages.Add(new NotePage());
 
-            SinglePageTab single = new SinglePageTab(page, viewerSize);
-            single.Window.Boundaries = new Rectangle(20, upMargin, viewerSize.X, viewerSize.Y);
-
             ControlPanel panel = new ControlPanel();
             panel.ActiveTabs.Add(multi);
-            panel.ActiveTabs.Add(single);
         }
 
         protected override void Update(GameTime gameTime)
