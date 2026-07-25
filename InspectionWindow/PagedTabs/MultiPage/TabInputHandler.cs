@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using PopUpUI.Input;
+using PopUpUI.Text;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,6 +14,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
     internal class TabInputHandler
     {
         private IKeyTextReceiverContent? currentKeyTextReceiver;
+        private TextPosition textReceiverCaretPosition;
 
         private readonly TabViewport viewport;
         private readonly IList<NotePage> notePages;

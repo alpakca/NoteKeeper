@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using PopUpUI.Text;
 using PopUpUI.Toolkit;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,9 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
 {
     internal class TabRenderer
     {
+        private const int WritingBoundaryOutlineThickness = 2;
+        private const int WritingBoundaryOutlineMargin = 4;
+
         private readonly TabViewport viewport;
         private readonly IList<NotePage> notePages;
         private readonly RenderTarget2D target;
@@ -69,6 +73,40 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
                                                         new Point(ContentTransformer.NodeLength).Times(viewport.Zoom)),
                                           Color.Black);
             }
+
+            DrawHelper.EndBatch();
+        }
+
+        public void RenderWritingContentCaretBoundary(IKeyTextReceiverContent writingContent, int writingContentPagePosition, ITextProcesserResult result, TextPosition caretPosition)
+        {
+            Point pageOffset = viewport.FirstPageStartPosition + viewport.MovingDimensionPageStep.Times(viewport.Zoom).Times(writingContentPagePosition);
+
+            (Point transformedLocation, SpriteEffects _) = PageContentUtil.GetTransformedLocation(writingContent.Location, writingContent.Size);
+            Point contentLocation = pageOffset + transformedLocation.Times(viewport.Zoom);
+
+            const int CaretWidth = 2;
+            Point caretScreenPos = result.Caret.ScreenCaretPosition(caretPosition, null).ToPoint().Times(viewport.Zoom);
+            Rectangle caretBounds = new Rectangle(caretScreenPos, new Point(CaretWidth, result.Data.Font.LineSpacing).Times(viewport.Zoom));
+
+            int zoomedMargin = (int)(WritingBoundaryOutlineMargin * viewport.Zoom);
+            int zoomedThinkness = (int)(WritingBoundaryOutlineThickness * viewport.Zoom);
+            Point absoluteSize = writingContent.Size;
+
+            DrawHelper.SetBeginBatch(target);
+
+            DrawHelper.DrawBackground(caretBounds, Color.Black);
+
+            // top bounds
+            DrawHelper.DrawBackground(new Rectangle(contentLocation.X - zoomedMargin, contentLocation.Y - zoomedMargin, absoluteSize.X + zoomedMargin * 2, zoomedThinkness), Color.Black);
+
+            // bottom bounds
+            DrawHelper.DrawBackground(new Rectangle(contentLocation.X - zoomedMargin, contentLocation.Y + absoluteSize.Y, absoluteSize.X + zoomedMargin * 2, zoomedThinkness), Color.Black);
+
+            // left bounds
+            DrawHelper.DrawBackground(new Rectangle(contentLocation.X - zoomedMargin, contentLocation.Y - zoomedMargin, zoomedThinkness, absoluteSize.Y + zoomedMargin * 2), Color.Black);
+
+            // right bounds
+            DrawHelper.DrawBackground(new Rectangle(contentLocation.X + absoluteSize.X, contentLocation.Y - zoomedMargin, zoomedThinkness, absoluteSize.Y + zoomedMargin * 2), Color.Black);
 
             DrawHelper.EndBatch();
         }

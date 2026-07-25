@@ -9,9 +9,9 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
 {
     internal static class ContentGetter
     {
-        public static PageTextContent GetTextContent()
+        public static PageTextContent GetTextContent(string fontName)
         {
-            return new PageTextContent(new TextProcesser { Font = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans") });
+            return new PageTextContent(fontName);
         }
 
         public static PageImageContent GetImageContent(string imagePath)

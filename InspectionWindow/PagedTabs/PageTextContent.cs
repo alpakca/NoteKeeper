@@ -12,6 +12,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
         private const int OutlineThickness = 2;
         private const int OutlineMargin = 4;
 
+        private readonly string _fontName;
         private readonly BasicProcesser processer;
 
         private Point size;
@@ -25,9 +26,10 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
         public Point Location { get; set; }
         public Point Size => size;
 
-        public PageTextContent(BasicProcesser processer)
+        public PageTextContent(string fontName)
         {
-            this.processer = processer;
+            _fontName = fontName;
+            processer = new TextProcesser { Font = ContentAssistant.FromLoaded<SpriteFont>(fontName) };
         }
 
         public void ResizeUpdate(Point change)
