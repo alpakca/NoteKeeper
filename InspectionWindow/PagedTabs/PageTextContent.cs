@@ -9,6 +9,9 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
 {
     internal class PageTextContent : IPageContent, IKeyTextReceiverContent
     {
+        private const int OutlineThickness = 2;
+        private const int OutlineMargin = 4;
+
         private readonly BasicProcesser processer;
 
         private Point size;
@@ -50,7 +53,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
             }
 
             renderTarget?.Dispose();
-            renderTarget = DrawHelper.CreateRenderTarget(absSize.X, absSize.Y);
+            renderTarget = DrawHelper.CreateRenderTarget(absSize.X + OutlineMargin * 2, absSize.Y + OutlineMargin * 2);
         }
 
         public void RenderUpdate()
@@ -66,14 +69,11 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
 
                 // draw outline indicating the boundary of content
 
-                const int OutlineThickness = 2;
-                const int OutlineMargin = 4;
+                DrawHelper.DrawBackground(new Rectangle(new Point(), new Point(absSize.X + 2 * OutlineMargin, OutlineThickness)), Color.Black);
+                DrawHelper.DrawBackground(new Rectangle(new Point(0, 2 * OutlineMargin) + new Point(0, absSize.Y - OutlineThickness), new Point(absSize.X + 2 * OutlineMargin, OutlineThickness)), Color.Black);
 
-                DrawHelper.DrawBackground(new Rectangle(new Point(-OutlineMargin), new Point(absSize.X + 2 * OutlineMargin, OutlineThickness)), Color.Black);
-                DrawHelper.DrawBackground(new Rectangle(new Point(-OutlineMargin, OutlineMargin) + new Point(0, absSize.Y - OutlineThickness), new Point(absSize.X + 2 * OutlineMargin, OutlineThickness)), Color.Black);
-
-                DrawHelper.DrawBackground(new Rectangle(new Point(-OutlineMargin), new Point(OutlineThickness, absSize.Y + 2 * OutlineMargin)), Color.Black);
-                DrawHelper.DrawBackground(new Rectangle(new Point(OutlineMargin, -OutlineMargin) + new Point(absSize.X - OutlineThickness, 0), new Point(OutlineThickness, absSize.Y + 2 * OutlineMargin)), Color.Black);
+                DrawHelper.DrawBackground(new Rectangle(new Point(), new Point(OutlineThickness, absSize.Y + 2 * OutlineMargin)), Color.Black);
+                DrawHelper.DrawBackground(new Rectangle(new Point(2 * OutlineMargin, 0) + new Point(absSize.X - OutlineThickness, 0), new Point(OutlineThickness, absSize.Y + 2 * OutlineMargin)), Color.Black);
             }
 
             DrawHelper.EndBatch();
