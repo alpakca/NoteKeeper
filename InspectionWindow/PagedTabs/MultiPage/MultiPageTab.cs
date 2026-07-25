@@ -13,6 +13,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
     {
         private readonly TabViewport viewport;
         private readonly TabWindow window;
+        private readonly PageActions pageActions;
 
         public override ITabViewport TabViewport => viewport;
         public override TabHistory TabHistory { get; }
@@ -25,10 +26,10 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             NotePages = new ObservableCollection<NotePage>();
             TabHistory = new TabHistory();
 
-            PageActions actions = new PageActions(TabHistory);
-
+            pageActions = new PageActions(TabHistory);
             viewport = new TabViewport { UISize = size };
-            window = new TabWindow(size, actions, viewport, NotePages);
+
+            window = new TabWindow(size, pageActions, viewport, NotePages);
 
             NotePages.CollectionChanged += (sender, _) => viewport.PageCount = ((ObservableCollection<NotePage>)sender!).Count;
         }
@@ -45,7 +46,9 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             location.Y = Math.Max(location.Y, 50);
 
             content.Location = location;
-            NotePages[focusedPageIndex].Contents.Add(content);
+            content.SetSize(new Point(200, 50));
+
+            pageActions.AddContent(NotePages[focusedPageIndex], content);
         }
 
         public override Point GetContentScreenLocation(IPageContent content)

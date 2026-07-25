@@ -18,15 +18,15 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         private readonly IList<NotePage> notePages;
         private readonly Random random;
 
-        private readonly PageActions actions;
+        private readonly PageActions pageActions;
         private readonly TabViewport viewport;
         private readonly TabRenderer renderer;
         private readonly TabInputHandler inputHandler;
         private readonly ContentTransformer transformer;
 
-        public TabWindow(Point size, PageActions actions, TabViewport viewport, IList<NotePage> notePages) : base(size)
+        public TabWindow(Point size, PageActions pageActions, TabViewport viewport, IList<NotePage> notePages) : base(size)
         {
-            this.actions = actions;
+            this.pageActions = pageActions;
             this.viewport = viewport;
             this.notePages = notePages;
             this.random = new Random();
@@ -158,9 +158,8 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
                 PageImageContent? content = LoadContent(fileArgs.Files[0]);
                 if (content != null)
                 {
-                    actions.
                     content.Location = pagePosition - content.Size / new Point(2);
-                    notePages[pageIndex].Contents.Add(content);
+                    pageActions.AddContent(notePages[pageIndex], content);
                 }
             }
             else
@@ -178,7 +177,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
                     int dy = random.Next(MaxOffset);
 
                     content.Location = pagePosition - content.Size / new Point(2) + new Point(dx, dy);
-                    notePages[pageIndex].Contents.Add(content);
+                    pageActions.AddContent(notePages[pageIndex], content);
                 }
             }
         }

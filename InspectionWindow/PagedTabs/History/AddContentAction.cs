@@ -9,7 +9,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.History
     {
         private readonly NotePage _notePage;
         private readonly IPageContent _content;
-        private readonly int _contentIndex;
+        private int _contentIndex;
 
         public string UIDescription => throw new NotImplementedException();
 
@@ -17,12 +17,12 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.History
         {
             _notePage = notePage;
             _content = content;
-            _contentIndex = notePage.Contents.IndexOf(content);
         }
 
         public void Run()
         {
-            _notePage.Contents.Insert(_contentIndex, _content);
+            _contentIndex = _notePage.Contents.Count;
+            _notePage.Contents.Add(_content);
         }
 
         public void Undo()

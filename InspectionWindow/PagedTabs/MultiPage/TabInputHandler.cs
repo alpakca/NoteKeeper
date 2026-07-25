@@ -16,6 +16,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         private IKeyTextReceiverContent? currentKeyTextReceiver;
         private TextPosition textReceiverCaretPosition;
 
+        private readonly PageActions pageActions;
         private readonly TabViewport viewport;
         private readonly IList<NotePage> notePages;
 
@@ -25,8 +26,9 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
 
         public ShellModes CurrentMode { get; set; }
 
-        public TabInputHandler(TabViewport viewport, IList<NotePage> notePages)
+        public TabInputHandler(PageActions pageActions, TabViewport viewport, IList<NotePage> notePages)
         {
+            this.pageActions = pageActions;
             this.viewport = viewport;
             this.notePages = notePages;
         }
@@ -79,7 +81,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
                 currentKeyTextReceiver = hit;
                 if (hit != null)
                 {
-                    textReceiverCaretPosition = hit.MouseSelected(viewport.ToPagePosition(mousePosition).PagePosition);
+                    textReceiverCaretPosition = hit.GetMouseCaretPosition(viewport.ToPagePosition(mousePosition).PagePosition);
                 }
             }
         }
@@ -88,7 +90,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         {
             if (currentKeyTextReceiver != null)
             {
-                textReceiverCaretPosition = currentKeyTextReceiver.InsertChar(ch, textReceiverCaretPosition);
+                textReceiverCaretPosition = currentKeyTextReceiver.InsertChar(ch, textReceiverCaretPosition, pageActions);
             }
         }
 
@@ -96,7 +98,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         {
             if (currentKeyTextReceiver != null)
             {
-                textReceiverCaretPosition = currentKeyTextReceiver.KeyPressed(key, textReceiverCaretPosition);
+                textReceiverCaretPosition = currentKeyTextReceiver.KeyPressed(key, textReceiverCaretPosition, pageActions);
             }
         }
     }

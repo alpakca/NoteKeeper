@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using NoteKeeper.InspectionWindow.PagedTabs.MultiPage;
 using PopUpUI.Text;
 using PopUpUI.Toolkit;
 
@@ -71,7 +72,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
                                   null, Color.White, 0, default, effects, 0);
         }
 
-        public TextPosition MouseSelected(Point pagePosition)
+        public TextPosition GetMouseCaretPosition(Point pagePosition)
         {
             Vector2 inContentPosition = (pagePosition - Location).ToVector2();
             if (lastResult.TextSize.Y <= inContentPosition.Y)
@@ -88,7 +89,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
             }
         }
 
-        public TextPosition InsertChar(char ch, TextPosition caretPosition)
+        public TextPosition InsertChar(char ch, TextPosition caretPosition, PageActions pageActions)
         {
             if (ch != '\n' && !processer.Font.Characters.Contains(ch))
             {
@@ -101,15 +102,12 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
             lastResult = processer.GetParseResult();
             caretPosition = lastResult.Caret.Advance(caretPosition, 1);
 
-            if (lastResult.TextSize.Y > absSize.Y)
-            {
-                SetSize(lastResult.TextSize.ToPoint());
-            }
+            ExpandHeightIfNeed(pageActions);
 
             return caretPosition;
         }
 
-        public TextPosition InsertText(string text, TextPosition caretPosition)
+        public TextPosition InsertText(string text, TextPosition caretPosition, PageActions pageActions)
         {
             int indexInText = lastResult.Caret.GetLineFreePosition(caretPosition);
             processer.Text = processer.Text.Insert(indexInText, text);
@@ -117,12 +115,19 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
             lastResult = processer.GetParseResult();
             caretPosition = lastResult.Caret.Advance(caretPosition, text.Length);
 
-            if (lastResult.TextSize.Y > absSize.Y)
-            {
-                SetSize(lastResult.TextSize.ToPoint());
-            }
+            ExpandHeightIfNeed(pageActions);
 
             return caretPosition;
+        }
+
+        private void ExpandHeightIfNeed(PageActions pageActions)
+        {
+            if (lastResult.TextSize.Y > absSize.Y)
+            {
+                // let lastResult's size copy the signs of actual size (so rendered text won't become normal from a upside state)
+                Point transformedSize = new Point((int)lastResult.TextSize.X * int.Sign(size.X), (int)lastResult.TextSize.Y * int.Sign(size.Y));
+                pageActions.ChangeContentProperty(size, transformedSize, this.SetSize);
+            }
         }
 
         public TextPosition Backspace(TextPosition caretPosition)
@@ -139,7 +144,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
             return caretPosition;
         }
 
-        public TextPosition KeyPressed(Keys key, TextPosition caretPosition)
+        public TextPosition KeyPressed(Keys key, TextPosition caretPosition, PageActions pageActions)
         {
             switch (key)
             {
@@ -175,7 +180,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
 
                 case Keys.Enter:
 
-                    return InsertChar('\n', caretPosition);
+                    return InsertChar('\n', caretPosition, pageActions);
 
                 case Keys.Back:
 

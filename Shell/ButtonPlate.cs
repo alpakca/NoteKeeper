@@ -84,8 +84,6 @@ namespace NoteKeeper.Shell
             }
 
             PageTextContent content = ContentGetter.GetTextContent("Font_ComicSans");
-            content.SetSize(new Point(200, 50));
-
             pageContentTab.AddContent(content);
             ActivateWritingMode();
 

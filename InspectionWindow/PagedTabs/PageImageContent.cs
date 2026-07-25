@@ -30,22 +30,9 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
 
         public void RenderToPage(Point offset, float zoomMultiplier)
         {
-            Point location = Location;
-            SpriteEffects effects = SpriteEffects.None;
+            (Point transformedLocation, SpriteEffects effects) = PageContentUtil.GetTransformedLocation(Location, Size);
 
-            if (size.X < 0)
-            {
-                effects |= SpriteEffects.FlipHorizontally;
-                location.X += size.X;
-            }
-
-            if (size.Y < 0)
-            {
-                effects |= SpriteEffects.FlipVertically;
-                location.Y += size.Y;
-            }
-
-            DrawHelper.Batch.Draw(image, new Rectangle(offset + location.Times(zoomMultiplier), size.Times(zoomMultiplier).Abs()), 
+            DrawHelper.Batch.Draw(image, new Rectangle(offset + transformedLocation.Times(zoomMultiplier), size.Times(zoomMultiplier).Abs()), 
                                   null, Color.White, 0, default, effects, 0);
         }
 

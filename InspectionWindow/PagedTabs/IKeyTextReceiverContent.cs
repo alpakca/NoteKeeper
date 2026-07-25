@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using NoteKeeper.InspectionWindow.PagedTabs.MultiPage;
 using PopUpUI.Text;
 using System;
 using System.Collections.Generic;
@@ -11,9 +12,10 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
     {
         public ITextProcesserResult LastResult { get; }
 
-        public TextPosition InsertText(string text, TextPosition caretPosition);
-        public TextPosition InsertChar(char ch, TextPosition caretPosition);
-        public TextPosition KeyPressed(Keys key, TextPosition caretPosition);
-        public TextPosition MouseSelected(Point pagePosition);
+        public TextPosition InsertText(string text, TextPosition caretPosition, PageActions pageActions);
+        public TextPosition InsertChar(char ch, TextPosition caretPosition, PageActions pageActions);
+        public TextPosition KeyPressed(Keys key, TextPosition caretPosition, PageActions pageActions);
+
+        public TextPosition GetMouseCaretPosition(Point pagePosition);
     }
 }

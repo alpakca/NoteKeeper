@@ -18,6 +18,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         private Point cumulativeSizeChange;
 
         private readonly TabViewport _viewport;
+        private readonly PageActions _pageActions;
         private readonly IList<NotePage> _notePages;
 
         private NodePlacement selectedNode;
@@ -44,10 +45,11 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             Right = 16
         }
 
-        public ContentTransformer(IList<NotePage> notePages, TabViewport viewport)
+        public ContentTransformer(IList<NotePage> notePages, TabViewport viewport, PageActions pageActions)
         {
             _notePages = notePages;
             _viewport = viewport;
+            _pageActions = pageActions;
 
             nodePagePositions = new Dictionary<NodePlacement, Point>
             {
@@ -113,13 +115,13 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         {
             selectedNode = NodePlacement.None;
 
-            transformedContent!.SetSize(cumulativeSizeChange);
+            _pageActions.ChangeContentProperty(transformedContent!.Size, cumulativeSizeChange, transformedContent.SetSize);
             cumulativeSizeChange = new Point();
         }
 
         public void MouseMove(int pageIndex, Point pagePosition)
         {
-            if (selectedNode == NodePlacement.None)
+            if (selectedNode == NodePlacement.None || transformedContent == null)
             {
                 return;
             }
@@ -128,18 +130,19 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             {
                 if (transformedContentPageIndex != pageIndex)
                 {
-                    _notePages[transformedContentPageIndex].Contents.Remove(transformedContent);
-                    _notePages[pageIndex].Contents.Add(transformedContent);
+                    _pageActions.MoveContentAcrossPages(_notePages[transformedContentPageIndex], _notePages[pageIndex], transformedContent);
 
                     transformedContentPageIndex = pageIndex;
 
                     // place it as node appears at the middle of content
-                    transformedContent!.Location = pagePosition - transformedContent.Size / new Point(2);
+                    Point newLocation = pagePosition - transformedContent.Size / new Point(2);
+                    _pageActions.ChangeContentProperty(transformedContent.Location, newLocation, value => transformedContent.Location = value);
                 }
                 else
                 {
                     // carry by position change
-                    transformedContent!.Location += pagePosition - lastMousePosition;
+                    Point newLocation = transformedContent.Location + pagePosition - lastMousePosition;
+                    _pageActions.ChangeContentProperty(transformedContent.Location, newLocation, value => transformedContent.Location = value);
                 }
 
                 lastMousePosition = pagePosition;
@@ -175,7 +178,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
                 sizeChange.X += difference.X;
             }
 
-            transformedContent!.Location += locationChange;
+            _pageActions.ChangeContentProperty(transformedContent.Location, transformedContent.Location + locationChange, value => transformedContent.Location = value);
             transformedContent.ResizeUpdate(sizeChange);
 
             cumulativeSizeChange += sizeChange;
