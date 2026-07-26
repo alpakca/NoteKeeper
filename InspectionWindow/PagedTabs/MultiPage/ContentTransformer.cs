@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using NoteKeeper.InspectionWindow.PagedTabs.History;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,6 +16,11 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
 
         private int transformedContentPageIndex;
         private IPageContent? transformedContent;
+
+        private Point transformedContentStartLocation;
+        private Point transformedContentStartSize;
+
+        private Point cumulativeLocationChange;
         private Point cumulativeSizeChange;
 
         private readonly TabViewport _viewport;
@@ -86,6 +92,10 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
 
             if (transformedContent != null)
             {
+                transformedContentStartLocation = transformedContent.Location;
+                transformedContentStartSize = transformedContent.Size;
+
+                cumulativeLocationChange = transformedContent.Location;
                 cumulativeSizeChange = transformedContent.Size;
                 AlignNodePositions();
             }
@@ -108,6 +118,10 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             lastPageIndex = pageIndex;
             lastMousePosition = pagePosition;
 
+            transformedContentStartLocation = transformedContent.Location;
+            transformedContentStartSize = transformedContent.Size;
+
+            cumulativeLocationChange = transformedContent.Location;
             cumulativeSizeChange = transformedContent.Size;
         }
 
@@ -115,7 +129,18 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         {
             selectedNode = NodePlacement.None;
 
-            _pageActions.ChangeContentProperty(transformedContent!.Size, cumulativeSizeChange, transformedContent.SetSize);
+            _pageActions.ChangeContentProperty(new Rectangle(transformedContentStartLocation, transformedContentStartSize), 
+                                               new Rectangle(cumulativeLocationChange, cumulativeSizeChange), transformedContent, 
+                                               (element, value) =>
+            {
+                element!.SetLocation(value.Location);
+                element.SetSize(value.Size);
+            });
+
+            transformedContentStartLocation = new Point();
+            transformedContentStartSize = new Point();
+
+            cumulativeLocationChange = new Point();
             cumulativeSizeChange = new Point();
         }
 
@@ -136,13 +161,17 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
 
                     // place it as node appears at the middle of content
                     Point newLocation = pagePosition - transformedContent.Size / new Point(2);
-                    _pageActions.ChangeContentProperty(transformedContent.Location, newLocation, value => transformedContent.Location = value);
+
+                    transformedContent.RelocationUpdate(newLocation - transformedContent.Location);
+                    cumulativeLocationChange = newLocation;
                 }
                 else
                 {
                     // carry by position change
-                    Point newLocation = transformedContent.Location + pagePosition - lastMousePosition;
-                    _pageActions.ChangeContentProperty(transformedContent.Location, newLocation, value => transformedContent.Location = value);
+                    Point carriedChange = pagePosition - lastMousePosition;
+
+                    transformedContent.RelocationUpdate(carriedChange);
+                    cumulativeLocationChange += carriedChange;
                 }
 
                 lastMousePosition = pagePosition;
@@ -178,9 +207,10 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
                 sizeChange.X += difference.X;
             }
 
-            _pageActions.ChangeContentProperty(transformedContent.Location, transformedContent.Location + locationChange, value => transformedContent.Location = value);
+            transformedContent.RelocationUpdate(locationChange);
             transformedContent.ResizeUpdate(sizeChange);
 
+            cumulativeLocationChange += locationChange;
             cumulativeSizeChange += sizeChange;
             AlignNodePositions();
         }

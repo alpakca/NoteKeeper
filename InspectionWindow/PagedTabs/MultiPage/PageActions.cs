@@ -23,9 +23,9 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             _history.RunAction(action);
         }
 
-        public void ChangeContentProperty<T>(T oldValue, T newValue, Action<T> setAction)
+        public void ChangeContentProperty<U, T>(T oldValue, T newValue, U element, Action<U, T> setAction)
         {
-            _history.RunAction(new PropertyChangeAction<T>(oldValue, newValue, setAction));
+            _history.RunAction(new PropertyChangeAction<U, T>(oldValue, newValue, element, setAction));
         }
 
         public void AddContent(NotePage notePage, IPageContent content)

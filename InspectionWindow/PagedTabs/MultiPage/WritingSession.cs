@@ -59,12 +59,12 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
                 IHistoryAction action;
                 if (newText != oldText && newSize != oldSize)
                 {
-                    action = new CombinedAction(new PropertyChangeAction<string>(oldText, newText, value => WritingContent.Text = value),
-                                                new PropertyChangeAction<Point>(oldSize, newSize, WritingContent.SetSize));
+                    action = new CombinedAction(new PropertyChangeAction<IKeyTextReceiverContent, string>(oldText, newText, WritingContent, (element, value) => element.Text = value),
+                                                new PropertyChangeAction<IKeyTextReceiverContent, Point>(oldSize, newSize, WritingContent, (element, value) => element.SetSize(value)));
                 }
                 else
                 {
-                    action = new PropertyChangeAction<string>(oldText, newText, value => WritingContent.Text = value);
+                    action = new PropertyChangeAction<IKeyTextReceiverContent, string>(oldText, newText, WritingContent, (element, value) => element.Text = value);
                 }
 
                 _pageActions.RunAction(action);

@@ -45,7 +45,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             location.X = Math.Max(location.X, 50);
             location.Y = Math.Max(location.Y, 50);
 
-            content.Location = location;
+            content.SetLocation(location);
             content.SetSize(new Point(200, 50));
 
             pageActions.AddContent(NotePages[focusedPageIndex], content);

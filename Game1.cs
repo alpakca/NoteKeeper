@@ -57,21 +57,15 @@ namespace NoteKeeper
 
             NotePage page = new NotePage();
             page.Contents.AddRange([
-               new PageImageContent(green, new Point(50, 50))
-            {
-                Location = new Point(250, 250)
-            },new PageImageContent(green, new Point(200, 30)) {
-                Location = new Point(50, 50)
-            }]);
+               new PageImageContent(green, new Point(50, 50)).Location(new Point(250, 250)),
+               new PageImageContent(green, new Point(200, 30)).Location(new Point(50, 50))
+            ]);
 
             NotePage page2 = new NotePage();
             page.Contents.AddRange([
-                new PageImageContent(red, new Point(200, 200))
-            {
-                Location = new Point(50, 500)
-            },new PageImageContent(green, new Point(200, 200)) {
-                Location = new Point(50, 50)
-            }]);
+                new PageImageContent(red, new Point(200, 200)).Location(new Point(50, 500)),
+                new PageImageContent(green, new Point(200, 200)).Location(new Point(50, 50))
+            ]);
 
             int leftMargin = 20;
             int upMargin = 200;
@@ -82,23 +76,14 @@ namespace NoteKeeper
             multi.Window.Boundaries = new Rectangle(20, upMargin, viewerSize.X, viewerSize.Y);
 
             NotePage first = new NotePage();
-            first.Contents.AddRange(
-                new PageImageContent(green, new Point(50, 50))
-                {
-                    Location = new Point(50, 50),
-                },
-                new PageImageContent(red, new Point(50, 50))
-                {
-                    Location = new Point(100, 100)
-                }
-            );
+            first.Contents.AddRange([
+                new PageImageContent(green, new Point(50, 50)).Location(new Point(50, 50)),
+                new PageImageContent(red, new Point(50, 50)).Location(new Point(100, 100))
+            ]);
 
             NotePage second = new NotePage();
             second.Contents.Add(
-                new PageImageContent(Util.GetTexture(1, 1, Color.Pink), new Point(50, 50))
-                {
-                    Location = new Point(70, 70)
-                }
+                new PageImageContent(Util.GetTexture(1, 1, Color.Pink), new Point(50, 50)).Location(new Point(70, 70))
             );
 
             multi.NotePages.Add(first);
@@ -136,7 +121,7 @@ namespace NoteKeeper
         }
     }
 
-    public class Util
+    public static class Util
     {
         public static Texture2D GetTexture(int w, int h, Color color)
         {
@@ -144,6 +129,13 @@ namespace NoteKeeper
             tex.SetData(Enumerable.Repeat(color, w * h).ToArray());
 
             return tex;
+        }
+
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        internal static PageImageContent Location(this PageImageContent content, Point location)
+        {
+            content.SetLocation(location);
+            return content;
         }
     }
 }

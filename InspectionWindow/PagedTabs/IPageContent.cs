@@ -7,7 +7,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
 {
     internal interface IPageContent
     {
-        public Point Location { get; set; }
+        public Point Location { get; }
         public Point Size { get; }
 
         /// <summary>An update method that can be used to pre-render into textures inside content.</summary>
@@ -19,5 +19,8 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
 
         public void ResizeUpdate(Point change);
         public void SetSize(Point value);
+
+        public void RelocationUpdate(Point change);
+        public void SetLocation(Point value);
     }
 }

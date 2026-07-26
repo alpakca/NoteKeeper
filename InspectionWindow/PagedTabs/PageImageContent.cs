@@ -6,10 +6,11 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
 {
     internal class PageImageContent : IPageContent
     {
+        private Point location;
         private Point size;
         private readonly Texture2D image;
 
-        public Point Location { get; set; }
+        public Point Location => location;
         public Point Size => size;
 
         public PageImageContent(Texture2D image)
@@ -44,6 +45,16 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
         public void SetSize(Point value)
         {
             size = value;
+        }
+
+        public void RelocationUpdate(Point change)
+        {
+            location += change;
+        }
+
+        public void SetLocation(Point value)
+        {
+            location = value;
         }
     }
 }

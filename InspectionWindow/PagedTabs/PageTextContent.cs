@@ -12,13 +12,14 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
         private readonly string _fontName;
         private readonly TextProcesser processer;
 
+        private Point location;
         private Point size;
         private Point absSize;
 
         private ITextProcesserResult lastResult;
         private RenderTarget2D renderTarget;
 
-        public Point Location { get; set; }
+        public Point Location => location;
         public Point Size => size;
 
         public string Text
@@ -62,6 +63,16 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
 
             renderTarget?.Dispose();
             renderTarget = DrawHelper.CreateRenderTarget(absSize.X, absSize.Y);
+        }
+
+        public void RelocationUpdate(Point change)
+        {
+            location += change;
+        }
+
+        public void SetLocation(Point value)
+        {
+            location = value;
         }
 
         public void RenderUpdate()

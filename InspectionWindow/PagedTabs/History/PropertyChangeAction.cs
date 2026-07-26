@@ -4,29 +4,31 @@ using System.Text;
 
 namespace NoteKeeper.InspectionWindow.PagedTabs.History
 {
-    internal class PropertyChangeAction<T> : IHistoryAction
+    internal class PropertyChangeAction<U, T> : IHistoryAction
     {
-        private readonly Action<T> _setAction;
+        private readonly Action<U, T> _setAction;
+        private readonly U _element;
         private readonly T _oldValue;
         private readonly T _newValue;
 
         public string UIDescription => throw new NotImplementedException();
 
-        public PropertyChangeAction(T oldValue, T newValue, Action<T> setAction)
+        public PropertyChangeAction(T oldValue, T newValue, U element, Action<U, T> setAction)
         {
             _oldValue = oldValue;
             _newValue = newValue;
+            _element = element;
             _setAction = setAction;
         }
 
         public void Run()
         {
-            _setAction(_newValue);
+            _setAction(_element, _newValue);
         }
 
         public void Undo()
         {
-            _setAction(_oldValue);
+            _setAction(_element, _oldValue);
         }
     }
 }

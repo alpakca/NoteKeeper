@@ -157,7 +157,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
                 PageImageContent? content = LoadContent(fileArgs.Files[0]);
                 if (content != null)
                 {
-                    content.Location = pagePosition - content.Size / new Point(2);
+                    content.SetLocation(pagePosition - content.Size / new Point(2));
                     pageActions.AddContent(notePages[pageIndex], content);
                 }
             }
@@ -175,7 +175,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
                     int dx = random.Next(MaxOffset);
                     int dy = random.Next(MaxOffset);
 
-                    content.Location = pagePosition - content.Size / new Point(2) + new Point(dx, dy);
+                    content.SetLocation(pagePosition - content.Size / new Point(2) + new Point(dx, dy));
                     pageActions.AddContent(notePages[pageIndex], content);
                 }
             }
