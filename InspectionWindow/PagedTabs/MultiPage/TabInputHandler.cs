@@ -43,8 +43,11 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             for (int i = notePages[pageIndex].Contents.Count - 1; i >= 0; i--)
             {
                 IPageContent content = notePages[pageIndex].Contents[i];
-                if (content.Location.X <= pagePosition.X && pagePosition.X < content.Location.X + content.Size.X &&
-                    content.Location.Y <= pagePosition.Y && pagePosition.Y < content.Location.Y + content.Size.Y)
+                Point transformedLocation = PageContentUtil.GetTransformedLocation(content.Location, content.Size).TransformedLocation;
+                Point absoluteSize = content.Size.Abs();
+
+                if (transformedLocation.X <= pagePosition.X && pagePosition.X < transformedLocation.X + absoluteSize.X &&
+                    transformedLocation.Y <= pagePosition.Y && pagePosition.Y < transformedLocation.Y + absoluteSize.Y)
                 {
                     return content;
                 }
