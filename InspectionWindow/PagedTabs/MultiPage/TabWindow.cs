@@ -73,6 +73,12 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
 
         protected override void OnMouseButtonStateChange(PopWindowMouseEventArgs e)
         {
+            if (e.MousePosition.X < 0 || e.MousePosition.X >= this.Boundaries.Width ||
+                e.MousePosition.Y < 0 || e.MousePosition.Y >= this.Boundaries.Height)
+            {
+                return;
+            }
+                
             if (currentMode == ShellModes.Transform)
             {
                 HandleTransformer(e);
