@@ -39,7 +39,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
             processer = new TextProcesser { Font = ContentAssistant.FromLoaded<SpriteFont>(fontName) };
         }
 
-        public void ResizeUpdate(Point change)
+        public void ResizeUpdate(Point value)
         {
         }
 
@@ -65,9 +65,9 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
             renderTarget = DrawHelper.CreateRenderTarget(absSize.X, absSize.Y);
         }
 
-        public void RelocationUpdate(Point change)
+        public void RelocationUpdate(Point value)
         {
-            location += change;
+            location = value;
         }
 
         public void SetLocation(Point value)

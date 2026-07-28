@@ -24,7 +24,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.History
         public void Undo()
         {
             for (int i = _actions.Length - 1; i >= 0; i--)
-                _actions[i].Run();
+                _actions[i].Undo();
         }
     }
 }

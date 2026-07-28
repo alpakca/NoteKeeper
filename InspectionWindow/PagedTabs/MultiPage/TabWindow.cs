@@ -22,7 +22,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         private readonly TabViewport viewport;
         private readonly TabRenderer renderer;
         private readonly TabInputHandler inputHandler;
-        private readonly ContentTransformer transformer;
+        private readonly TransformSession transformSession;
 
         public TabWindow(Point size, PageActions pageActions, TabViewport viewport, IList<NotePage> notePages) : base(size)
         {
@@ -33,7 +33,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
 
             renderer = new TabRenderer(viewport, notePages);
             inputHandler = new TabInputHandler(pageActions, viewport, notePages);
-            transformer = new ContentTransformer(notePages, viewport, pageActions);
+            transformSession = new TransformSession(pageActions, viewport, notePages);
         }
 
         public void ModeUpdated(ShellModes mode)
@@ -46,9 +46,9 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         {
             renderer.RenderPageBackgrounds();
 
-            if (currentMode == ShellModes.Transform && transformer.IsTransforming)
+            if (currentMode == ShellModes.Transform && transformSession.NotIdle)
             {
-                renderer.RenderTransformerNodes(transformer.TransformedContentPageIndex, transformer.NodePagePositions);
+                renderer.RenderTransformerNodes(transformSession.ContentsPageIndex, transformSession.NodePagePositions, transformSession.NodeHitRadius);
             }
             else if (currentMode == ShellModes.Writing && inputHandler.WritingSession.WritingContent != null)
             {
@@ -61,14 +61,10 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
 
         protected override void OnMousePositionChange(PopWindowMouseEventArgs e)
         {
-            if (currentMode == ShellModes.Transform && transformer.AnyNodeSelected)
+            if (currentMode == ShellModes.Transform)
             {
-                (int pageIndex, Point pagePosition) = viewport.ToPagePosition(e.MousePosition);
-
-                if (pageIndex != -1)
-                {
-                    transformer.MouseMove(pageIndex, pagePosition);
-                }
+                var pos = viewport.ToPagePosition(e.MousePosition);
+                transformSession.HoldUpdate(new NotePagePosition(pos.PageIndex, pos.PagePosition));
             }
         }
 
@@ -99,22 +95,13 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
                 return;
             }
 
-            if (!transformer.HitAnyNode(pageIndex, pagePosition))
+            if (e.FirstTimeButtons.HasLeft)
             {
-                IPageContent? hitContent = inputHandler.HitContent(e.MousePosition);
-                if (transformer.TransformedContent != hitContent && e.FirstTimeButtons.HasLeft)
-                {
-                    transformer.SetTransformedContent(hitContent, pageIndex);
-                }
+                transformSession.HoldStart(new NotePagePosition(pageIndex, pagePosition));
             }
-
-            if (!transformer.AnyNodeSelected && e.FirstTimeButtons.HasLeft)
+            else if (e.ReleasedButtons.HasLeft)
             {
-                transformer.MouseHoldStart(pageIndex, pagePosition);
-            }
-            else if (transformer.AnyNodeSelected && !e.CurrentButtons.HasLeft)
-            {
-                transformer.MouseHoldEnd();
+                transformSession.HoldEnded(new NotePagePosition(pageIndex, pagePosition));
             }
         }
 

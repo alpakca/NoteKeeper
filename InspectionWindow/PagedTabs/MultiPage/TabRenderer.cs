@@ -59,18 +59,19 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             DrawHelper.EndBatch();
         }
 
-        public void RenderTransformerNodes(int transformerContentPageIndex, IEnumerable<Point> nodePagePositions)
+        public void RenderTransformerNodes(int transformerContentPageIndex, IEnumerable<Point> nodePagePositions, int hitRadius)
         {
             // corner position of page that transformed content is in
             Point pageOffset = viewport.FirstPageStartPosition + viewport.MovingDimensionPageStep.Times(viewport.Zoom).Times(transformerContentPageIndex);
+            Point hitRadiusOffset = new Point(-hitRadius);
 
             DrawHelper.SetBeginBatch(target);
 
             foreach (var position in nodePagePositions)
             {
                 // replace with actual image
-                DrawHelper.DrawBackground(new Rectangle(pageOffset + position.Times(viewport.Zoom),
-                                                        new Point(ContentTransformer.NodeLength).Times(viewport.Zoom)),
+                DrawHelper.DrawBackground(new Rectangle(pageOffset + (position + hitRadiusOffset).Times(viewport.Zoom),
+                                                        new Point(hitRadius * 2).Times(viewport.Zoom)),
                                           Color.Black);
             }
 

@@ -37,9 +37,9 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
                                   null, Color.White, 0, default, effects, 0);
         }
 
-        public void ResizeUpdate(Point change)
+        public void ResizeUpdate(Point value)
         {
-            size += change;
+            size = value;
         }
 
         public void SetSize(Point value)
@@ -47,9 +47,9 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
             size = value;
         }
 
-        public void RelocationUpdate(Point change)
+        public void RelocationUpdate(Point value)
         {
-            location += change;
+            location = value;
         }
 
         public void SetLocation(Point value)

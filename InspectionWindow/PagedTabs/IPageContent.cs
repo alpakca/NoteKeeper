@@ -17,10 +17,10 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
         /// <param name="zoomMultiplier">A zoom mutliplier of viewport of rendering page, to apply to <see cref="Size"/> and <see cref="Location"/> of content.</param>
         public void RenderToPage(Point offset, float zoomMultiplier);
 
-        public void ResizeUpdate(Point change);
+        public void ResizeUpdate(Point value);
         public void SetSize(Point value);
 
-        public void RelocationUpdate(Point change);
+        public void RelocationUpdate(Point value);
         public void SetLocation(Point value);
     }
 }

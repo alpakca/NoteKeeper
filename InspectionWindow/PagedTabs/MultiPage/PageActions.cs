@@ -23,6 +23,11 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             _history.RunAction(action);
         }
 
+        public void CombinedAction(params IHistoryAction[] actions)
+        {
+            _history.RunAction(new CombinedAction(actions));
+        }
+
         public void ChangeContentProperty<U, T>(T oldValue, T newValue, U element, Action<U, T> setAction)
         {
             _history.RunAction(new PropertyChangeAction<U, T>(oldValue, newValue, element, setAction));

@@ -39,5 +39,22 @@ namespace NoteKeeper.InspectionWindow
 
             return (location, effects);
         }
+
+        public static Rectangle Normalized(this Rectangle rect)
+        {
+            if (rect.Width < 0)
+            {
+                rect.X += rect.Width;
+                rect.Width = -rect.Width;
+            }
+
+            if (rect.Height < 0)
+            {
+                rect.Y += rect.Height;
+                rect.Height = -rect.Height;
+            }
+
+            return rect;
+        }
     }
 }
