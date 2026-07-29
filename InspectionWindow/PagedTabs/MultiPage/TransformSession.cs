@@ -27,6 +27,8 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         private readonly IList<NotePage> _notePages;
         private readonly Dictionary<TransformNode, Point> _nodePagePositions;
 
+        private readonly Dictionary<IHistoryAction, (IPageContent[] Contents, int MarqueePageIndex)> _snapshotSelectedContents;
+
         private enum State
         {
             Idle,
@@ -75,6 +77,21 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             _pageActions = pageActions;
             _viewport = viewport;
             _notePages = notePages;
+
+            _snapshotSelectedContents = new Dictionary<IHistoryAction, (IPageContent[] Contents, int MarqueePageIndex)>();
+            _pageActions.CommandApplied += PageActions_CommandApplied;
+        }
+
+        private void PageActions_CommandApplied(IHistoryAction appliedCommand, bool isUndo)
+        {
+            if (_snapshotSelectedContents.TryGetValue(appliedCommand, out var snapshot))
+            {
+                Rectangle contentsBoundary = GetContentsBoundary(snapshot.Contents);
+
+                _marqueePageIndex = snapshot.MarqueePageIndex;
+                SelectionBoundary = contentsBoundary;
+                BuildNodePositions(contentsBoundary);
+            }
         }
 
         public void HoldStart(NotePagePosition position)
@@ -244,7 +261,9 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
                 }
             }
 
-            _pageActions.CombinedAction(contentActions);
+            CombinedAction action = new CombinedAction(contentActions);
+            _snapshotSelectedContents.Add(action, (_selectedContents.ToArray(), _marqueePageIndex));
+            _pageActions.RunAction(action);
 
             // display the marquee & initial bounds to as they appear in new page index
             // done here because we get the new boundary from contents
@@ -361,7 +380,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             return false;
         }
 
-        private Rectangle GetContentsBoundary(List<IPageContent> contents)
+        private Rectangle GetContentsBoundary(IEnumerable<IPageContent> contents)
         {
             int minX = int.MaxValue; int minY = int.MaxValue;
             int maxX = int.MinValue; int maxY = int.MinValue;

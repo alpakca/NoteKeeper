@@ -38,7 +38,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.History
 
         public void Undo()
         {
-            _newPage.Contents.RemoveRange(_newPage.Contents.Count - 1, _contents.Length);
+            _newPage.Contents.RemoveRange(_newPage.Contents.Count - _contents.Length, _contents.Length);
             for (int i = 0; i < _contentsPageIndeces.Count; i++)
             {
                 _oldPage.Contents.Insert(_contentsPageIndeces.GetKeyAtIndex(i), _contentsPageIndeces.GetValueAtIndex(i));
