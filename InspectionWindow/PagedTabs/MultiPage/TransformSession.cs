@@ -207,11 +207,9 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             // may only happen using TransformNode.Carry, which does not effect size
             if (position.PageIndex != _marqueePageIndex)
             {
-                contentActions = new IHistoryAction[_relativeContents.Count * 2];
+                contentActions = new IHistoryAction[_relativeContents.Count + 1];
 
                 Point pageIndexOffset = (_marqueePageIndex - position.PageIndex) * _viewport.MovingDimensionPageStep;
-                NotePage oldPage = _notePages[_marqueePageIndex];
-                NotePage newPage = _notePages[position.PageIndex];
 
                 foreach (var relative in _relativeContents)
                 {
@@ -219,8 +217,9 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
                     Point newLocation = ComputeAbsoluteLocation(relative.RelX, relative.RelY, newBoundary) + pageIndexOffset;
 
                     contentActions[index++] = new PropertyChangeAction<IPageContent, Point>(oldLocation, newLocation, relative.Content, (e, v) => e.SetLocation(v));
-                    contentActions[index++] = new MoveContentAcrossPageAction(oldPage, newPage, relative.Content);
                 }
+
+                contentActions[index] = new MoveContentsAcrossPagesAction(_notePages[_marqueePageIndex], _notePages[position.PageIndex], _selectedContents.ToArray());
             }
             else
             {

@@ -6,15 +6,11 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
 {
     internal class NotePage
     {
-        private readonly List<IPageContent> contents;
-
-        public int Width { get; set; }
-        public int Height { get; set; }
-        public List<IPageContent> Contents => contents;
+        public List<IPageContent> Contents { get; }
 
         public NotePage()
         {
-            contents = new List<IPageContent>();
+            Contents = new List<IPageContent>();
         }
     }
 }

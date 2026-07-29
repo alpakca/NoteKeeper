@@ -42,10 +42,5 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         {
             _history.RunAction(new DeleteContentAction(notePage, content));
         }
-
-        public void MoveContentAcrossPages(NotePage oldPage, NotePage newPage, IPageContent content)
-        {
-            _history.RunAction(new MoveContentAcrossPageAction(oldPage, newPage, content));
-        }
     }
 }
