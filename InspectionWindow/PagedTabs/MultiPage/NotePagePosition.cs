@@ -15,5 +15,11 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             PageIndex = pageIndex;
             PagePosition = pagePosition;
         }
+
+        public void Deconstruct(out int pageIndex, out Point pagePosition)
+        {
+            pageIndex = PageIndex;
+            pagePosition = PagePosition;
+        }
     }
 }

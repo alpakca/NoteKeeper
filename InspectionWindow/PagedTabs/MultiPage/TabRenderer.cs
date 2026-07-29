@@ -59,30 +59,32 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             DrawHelper.EndBatch();
         }
 
-        public void RenderTransformerNodes(int transformerContentPageIndex, IEnumerable<Point> nodePagePositions, int hitRadius)
+        public void RenderTransformerNodes(TransformSession transformerSession)
         {
             // corner position of page that transformed content is in
-            Point pageOffset = viewport.FirstPageStartPosition + viewport.MovingDimensionPageStep.Times(viewport.Zoom).Times(transformerContentPageIndex);
-            Point hitRadiusOffset = new Point(-hitRadius);
+            Point pageOffset = viewport.FirstPageStartPosition + viewport.MovingDimensionPageStep.Times(viewport.Zoom).Times(transformerSession.ContentsPageIndex);
+            Point hitRadiusOffset = new Point(-transformerSession.NodeHitRadius);
+
+            Point nodeZoomedSize = new Point(transformerSession.NodeHitRadius * 2).Times(viewport.Zoom);
 
             DrawHelper.SetBeginBatch(target);
 
-            foreach (var position in nodePagePositions)
+            foreach (var position in transformerSession.NodePagePositions)
             {
                 // replace with actual image
                 DrawHelper.DrawBackground(new Rectangle(pageOffset + (position + hitRadiusOffset).Times(viewport.Zoom),
-                                                        new Point(hitRadius * 2).Times(viewport.Zoom)),
+                                                        nodeZoomedSize),
                                           Color.Black);
             }
 
             DrawHelper.EndBatch();
         }
 
-        public void RenderWritingSession(int writingContentPagePosition, WritingSession writingSession)
+        public void RenderWritingSession(int writingContentPageIndex, WritingSession writingSession)
         {
-            Point pageOffset = viewport.FirstPageStartPosition + viewport.MovingDimensionPageStep.Times(viewport.Zoom).Times(writingContentPagePosition);
+            Point pageOffset = viewport.FirstPageStartPosition + viewport.MovingDimensionPageStep.Times(viewport.Zoom).Times(writingContentPageIndex);
 
-            (Point transformedLocation, SpriteEffects _) = PageContentUtil.GetTransformedLocation(writingSession.WritingContent.Location, writingSession.WritingContent.Size);
+            (Point transformedLocation, _) = PageContentUtil.GetTransformedLocation(writingSession.WritingContent.Location, writingSession.WritingContent.Size);
             Point contentLocation = pageOffset + transformedLocation.Times(viewport.Zoom);
 
             const int CaretWidth = 2;

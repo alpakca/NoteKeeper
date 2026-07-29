@@ -16,6 +16,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         private readonly TabViewport viewport;
         private readonly IList<NotePage> notePages;
 
+        public TransformSession TransformSession { get; }
         public WritingSession WritingSession { get; }
         public ShellModes CurrentMode { get; set; }
 
@@ -24,6 +25,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             this.viewport = viewport;
             this.notePages = notePages;
 
+            TransformSession = new TransformSession(pageActions, viewport, notePages);
             WritingSession = new WritingSession(pageActions);
         }
 
@@ -66,17 +68,49 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             return -1;
         }
 
-        public void LeftMouseSelection(Point mousePosition)
+        public void LeftMouseSelection(PopWindowMouseEventArgs e)
         {
             if (CurrentMode == ShellModes.Writing)
             {
-                IKeyTextReceiverContent? hit = HitContent(mousePosition) as IKeyTextReceiverContent;
+                IKeyTextReceiverContent? hit = HitContent(e.MousePosition) as IKeyTextReceiverContent;
 
                 WritingSession.WritingContent = hit;
                 if (hit != null)
                 {
-                    WritingSession.CaretPosition = hit.GetMouseCaretPosition(viewport.ToPagePosition(mousePosition).PagePosition);
+                    WritingSession.CaretPosition = hit.GetMouseCaretPosition(viewport.ToPagePosition(e.MousePosition).PagePosition);
                 }
+            }
+            else if (CurrentMode == ShellModes.Transform)
+            {
+                HandleTransformer(e);
+            }
+        }
+
+        public void MouseMove(PopWindowMouseEventArgs e)
+        {
+            if (CurrentMode == ShellModes.Transform)
+            {
+                var pos = viewport.ToPagePosition(e.MousePosition);
+                TransformSession.HoldUpdate(new NotePagePosition(pos.PageIndex, pos.PagePosition));
+            }
+        }
+
+        private void HandleTransformer(PopWindowMouseEventArgs e)
+        {
+            NotePagePosition position = viewport.ToPagePosition(e.MousePosition);
+
+            if (position.PageIndex == -1)
+            {
+                return;
+            }
+
+            if (e.FirstTimeButtons.HasLeft)
+            {
+                TransformSession.HoldStart(position);
+            }
+            else if (e.ReleasedButtons.HasLeft)
+            {
+                TransformSession.HoldEnded(position);
             }
         }
 

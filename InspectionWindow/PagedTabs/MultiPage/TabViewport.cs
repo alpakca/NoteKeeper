@@ -78,7 +78,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             }
         }
 
-        public (int PageIndex, Point PagePosition) ToPagePosition(Point mousePosition)
+        public NotePagePosition ToPagePosition(Point mousePosition)
         {
             Point normalizedPagedPosition = (mousePosition - FirstPageStartPosition).Times(1 / Zoom);
 
@@ -87,13 +87,13 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             {
                 if (0 <= movingDimentionPosition && movingDimentionPosition < MovingDimensionPageStepLength)
                 {
-                    return (i, normalizedPagedPosition - MovingDimensionPageStep * i);
+                    return new NotePagePosition(i, normalizedPagedPosition - MovingDimensionPageStep * i);
                 }
 
                 movingDimentionPosition -= MovingDimensionPageStepLength;
             }
 
-            return (-1, normalizedPagedPosition);
+            return new NotePagePosition(-1, normalizedPagedPosition);
         }
 
         public bool PageWithOffsetOverlapsScreen(Point offset)
