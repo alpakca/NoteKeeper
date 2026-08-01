@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using NoteKeeper.InspectionWindow.PagedTabs.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -22,5 +23,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
 
         public void RelocationUpdate(Point value);
         public void SetLocation(Point value);
+
+        public PageContentInfo GetSerializationInfo();
     }
 }

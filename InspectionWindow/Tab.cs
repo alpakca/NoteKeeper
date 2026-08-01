@@ -11,6 +11,7 @@ namespace NoteKeeper.InspectionWindow
     {
         public string Name { get; set; } = "Unnamed";
 
+        public abstract ITabSerializer TabSerializer { get; }
         public abstract ITabViewport TabViewport { get; }
         public abstract TabHistory TabHistory { get; }
         public abstract PopWindow Window { get; }

@@ -1,0 +1,12 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace NoteKeeper.InspectionWindow.PagedTabs.Serialization
+{
+    internal class ContentRegistryEntry
+    {
+        public string TypeName { get; init; }
+        public Func<PageContentInfo, IPageContent> Creator { get; init; }
+    }
+}
