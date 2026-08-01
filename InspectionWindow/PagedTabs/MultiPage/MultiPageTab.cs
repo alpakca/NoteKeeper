@@ -22,18 +22,19 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
 
         public ObservableCollection<NotePage> NotePages { get; }
 
-        public MultiPageTab(Point size)
+        public MultiPageTab(Point size, string sourcePath) : base(sourcePath)
         {
             NotePages = new ObservableCollection<NotePage>();
-            TabSerializer = new TabSerializer(this);
             TabHistory = new TabHistory();
 
             pageActions = new PageActions(TabHistory);
             viewport = new TabViewport { UISize = size };
-
             window = new TabWindow(size, pageActions, viewport, NotePages);
 
             NotePages.CollectionChanged += (sender, _) => viewport.PageCount = ((ObservableCollection<NotePage>)sender!).Count;
+
+            TabSerializer = new TabSerializer(this);
+            TabSerializer.Load();
         }
 
         public override void AddContent(IPageContent content)

@@ -25,9 +25,9 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             _tab = tab;
         }
 
-        public void Load(string filePath)
+        public void Load()
         {
-            TabInfo tabInfo = JsonSerializer.Deserialize<TabInfo>(File.ReadAllText(filePath), _options);
+            TabInfo tabInfo = JsonSerializer.Deserialize<TabInfo>(File.ReadAllText(_tab.SourcePath), _options);
 
             _tab.NotePages.Clear();
             foreach (var pageInfo in tabInfo.NotePages) 
@@ -43,7 +43,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             }
         }
 
-        public void Save(string filePath)
+        public void Save()
         {
             NotePageInfo[] pageInfos = new NotePageInfo[_tab.NotePages.Count];
             for (int i = 0; i < pageInfos.Length; i++)
@@ -60,7 +60,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             };
 
             string json = JsonSerializer.Serialize(tabInfo, _options);
-            File.WriteAllText(filePath, json);
+            File.WriteAllText(_tab.SourcePath, json);
         }
     }
 }

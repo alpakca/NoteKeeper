@@ -8,6 +8,7 @@ using PopUpUI.Input;
 using PopUpUI.PUI;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace NoteKeeper.Shell
 {
@@ -21,6 +22,9 @@ namespace NoteKeeper.Shell
         public VisualClickable UndoButton { get; }
         public VisualClickable RedoButton { get; }
 
+        public VisualClickable SaveCurrentTabButton { get; }
+        public VisualClickable SaveAllTabsButton { get; }
+
         public ButtonPlate(ControlPanel panel)
         {
             this.panel = panel;
@@ -28,6 +32,9 @@ namespace NoteKeeper.Shell
             Buttons = new List<Clickable>();
             UndoButton = new VisualClickable();
             RedoButton = new VisualClickable();
+
+            SaveCurrentTabButton = new VisualClickable();
+            SaveAllTabsButton = new VisualClickable();
 
             InitializeButtons();
         }
@@ -60,7 +67,24 @@ namespace NoteKeeper.Shell
             });
             RedoButton.Enabled = false;
 
-            Buttons.AddRange(writingModeToggle, transformModeToggle, addTextBlock, UndoButton, RedoButton);
+            interpreter.AssignProperties(PUIHelper.VisualClickableAssigner, "Save_Current_Tab", SaveCurrentTabButton);
+            SaveCurrentTabButton.ClickCommand = new ActionCommander<Clickable>(_ =>
+            {
+                panel.DisplayedTab?.TabSerializer.Save();
+            });
+            SaveCurrentTabButton.Enabled = false;
+
+            interpreter.AssignProperties(PUIHelper.VisualClickableAssigner, "Save_All_Tabs", SaveAllTabsButton);
+            SaveAllTabsButton.ClickCommand = new ActionCommander<Clickable>(_ =>
+            {
+                foreach (var tab in panel.ActiveTabs)
+                {
+                    tab.TabSerializer.Save();
+                }
+            });
+            SaveAllTabsButton.Enabled = false;
+
+            Buttons.AddRange(writingModeToggle, transformModeToggle, addTextBlock, UndoButton, RedoButton, SaveCurrentTabButton, SaveAllTabsButton);
 
             ActivateWritingMode();
             transformModeToggle.SetCheckStatus(false); // don't actually need this line; its here in case of broken UI.

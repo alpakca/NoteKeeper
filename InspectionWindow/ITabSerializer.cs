@@ -8,7 +8,7 @@ namespace NoteKeeper.InspectionWindow
     {
         public string FileExtension { get; }
 
-        public void Load(string filePath);
-        public void Save(string filePath);
+        public void Load();
+        public void Save();
     }
 }

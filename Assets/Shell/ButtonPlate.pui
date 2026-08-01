@@ -62,3 +62,29 @@ VisualClickable Redo
 	SelectablePacket = selectablePacket,
 	HoldablePacket = holdablePacket
 }
+
+VisualClickable Save_Current_Tab 
+{
+	Name = "SaveCurrentTab",
+	Boundaries = Rectangle(300, 60, 32, 32),
+	DefaultAnimation = Animation(ShellFolderPath + "SaveCurrentTab.png"),
+	HoverAnimation = Animation(ShellFolderPath + "SaveCurrentTabHovered.png"),
+	HeldAnimation = Animation(ShellFolderPath + "SaveCurrentTabHeld.png"),
+	UnenabledAnimation = Animation(ShellFolderPath + "SaveCurrentTabUnenabled.png"),
+
+	SelectablePacket = selectablePacket,
+	HoldablePacket = holdablePacket
+}
+
+VisualClickable Save_All_Tabs
+{
+	Name = "SaveAllTabs",
+	Boundaries = Rectangle(340, 60, 32, 32),
+	DefaultAnimation = Animation(ShellFolderPath + "SaveAllTabs.png"),
+	HoverAnimation = Animation(ShellFolderPath + "SaveAllTabsHovered.png"),
+	HeldAnimation = Animation(ShellFolderPath + "SaveAllTabsHeld.png"),
+	UnenabledAnimation = Animation(ShellFolderPath + "SaveAllTabsUnenabled.png"),
+
+	SelectablePacket = selectablePacket,
+	HoldablePacket = holdablePacket
+}
