@@ -140,7 +140,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         {
             try
             {
-                return ContentGetter.GetImageContent(filePath);
+                return new PageImageContent(filePath);
             } catch (InvalidOperationException e)
             {
                 Trace.WriteLine(e);

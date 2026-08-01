@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using PopUpUI.Toolkit;
+using System.Diagnostics;
 
 namespace NoteKeeper.InspectionWindow.PagedTabs
 {
@@ -8,20 +9,28 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
     {
         private Point location;
         private Point size;
+        private readonly string _imagePath;
         private readonly Texture2D image;
 
         public Point Location => location;
         public Point Size => size;
 
-        public PageImageContent(Texture2D image)
-        {
-            this.image = image;
-            size = image.Bounds.Size;
-        }
-
+#if DEBUG
         public PageImageContent(Texture2D image, Point size)
         {
             this.image = image;
+            this.size = size;
+        }
+#endif
+
+        public PageImageContent(string imagePath)
+        {
+            _imagePath = imagePath;
+            image = DrawHelper.FromFile(imagePath);
+        }
+
+        public PageImageContent(string imagePath, Point size) : this(imagePath)
+        {
             this.size = size;
         }
 
