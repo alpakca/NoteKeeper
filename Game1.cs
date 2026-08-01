@@ -55,18 +55,6 @@ namespace NoteKeeper
             Texture2D red = Util.GetTexture(200, 200, Color.DarkRed);
             Texture2D green = Util.GetTexture(200, 200, Color.DarkGreen);
 
-            NotePage page = new NotePage();
-            page.Contents.AddRange([
-               new PageImageContent(green, new Point(50, 50)).Location(new Point(250, 250)),
-               new PageImageContent(green, new Point(200, 30)).Location(new Point(50, 50))
-            ]);
-
-            NotePage page2 = new NotePage();
-            page.Contents.AddRange([
-                new PageImageContent(red, new Point(200, 200)).Location(new Point(50, 500)),
-                new PageImageContent(green, new Point(200, 200)).Location(new Point(50, 50))
-            ]);
-
             int leftMargin = 20;
             int upMargin = 200;
             int verticalSize = 700;
@@ -74,21 +62,7 @@ namespace NoteKeeper
 
             MultiPageTab multi = new MultiPageTab(viewerSize);
             multi.Window.Boundaries = new Rectangle(20, upMargin, viewerSize.X, viewerSize.Y);
-
-            NotePage first = new NotePage();
-            first.Contents.AddRange([
-                new PageImageContent(green, new Point(50, 50)).Location(new Point(50, 50)),
-                new PageImageContent(red, new Point(50, 50)).Location(new Point(100, 100))
-            ]);
-
-            NotePage second = new NotePage();
-            second.Contents.Add(
-                new PageImageContent(Util.GetTexture(1, 1, Color.Pink), new Point(50, 50)).Location(new Point(70, 70))
-            );
-
-            multi.NotePages.Add(first);
-            multi.NotePages.Add(second);
-            multi.NotePages.Add(new NotePage());
+            multi.TabSerializer.Load(@"C:\Users\user\Desktop\Test.txt");
 
             ControlPanel panel = new ControlPanel();
             panel.ActiveTabs.Add(multi);

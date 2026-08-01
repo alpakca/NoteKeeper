@@ -15,6 +15,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         private readonly TabWindow window;
         private readonly PageActions pageActions;
 
+        public override ITabSerializer TabSerializer { get; }
         public override ITabViewport TabViewport => viewport;
         public override TabHistory TabHistory { get; }
         public override PopWindow Window => window;
@@ -24,6 +25,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         public MultiPageTab(Point size)
         {
             NotePages = new ObservableCollection<NotePage>();
+            TabSerializer = new TabSerializer(this);
             TabHistory = new TabHistory();
 
             pageActions = new PageActions(TabHistory);
