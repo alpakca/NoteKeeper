@@ -2,9 +2,8 @@
 using NoteKeeper.InspectionWindow.PagedTabs.History;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
+
+#nullable enable
 
 namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
 {
@@ -192,7 +191,20 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             Point size = DifferenceBetweenOrigin(position);
             _marqueeRectangle = new Rectangle(_holdOrigin.PagePosition, size);
 
-            GetContentsInRect(_marqueeRectangle);
+            _selectedContents.Clear();
+            if (size.X == 0 && size.Y == 0) // check if mouse just clicked to a single content instead of selecting
+            {
+                IPageContent? hit = _notePages[_marqueePageIndex].Contents.Find(content => new Rectangle(content.Location, content.Size).Normalized().Contains(position.PagePosition));
+                if (hit != null)
+                {
+                    _selectedContents.Add(hit);
+                }
+            }
+            else // try selecting contents through marquee
+            {
+                GetContentsInRect(_marqueeRectangle);
+            }
+
             if (_selectedContents.Count == 0)
             {
                 DiscardSelection();
@@ -399,8 +411,6 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         private void GetContentsInRect(Rectangle rect)
         {
             rect = rect.Normalized();
-            _selectedContents.Clear();
-
             foreach (var content in _notePages[_marqueePageIndex].Contents)
             {
                 Rectangle intersect = Rectangle.Intersect(new Rectangle(content.Location, content.Size).Normalized(), rect);
