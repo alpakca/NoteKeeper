@@ -36,7 +36,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
 
                 foreach (var contentInfo in pageInfo.ContentInfos)
                 {
-                    page.Contents.Add(ContentRegistry.ResolveInfoByType(contentInfo.GetType()).Creator(contentInfo));
+                    page.Contents.PushFront(ContentRegistry.ResolveInfoByType(contentInfo.GetType()).Creator(contentInfo));
                 }
 
                 _tab.NotePages.Add(page);
@@ -50,7 +50,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             {
                 pageInfos[i] = new NotePageInfo
                 {
-                    ContentInfos = _tab.NotePages[i].Contents.Select(content => content.GetSerializationInfo()).ToArray()
+                    ContentInfos = _tab.NotePages[i].Contents.DrawOrder.Select(content => content.GetSerializationInfo()).ToArray()
                 };
             }
 
