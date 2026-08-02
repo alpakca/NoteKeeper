@@ -47,7 +47,13 @@ namespace NoteKeeper
                                             (absolutePathStart + @"Assets\Shell\WritingModeSelected.png", "Button_WritingMode_Selected"),
                                             (absolutePathStart + @"Assets\Shell\AddTextBlock.png", "Button_AddTextBlock"),
                                             (absolutePathStart + @"Assets\Shell\AddTextBlockHovered.png", "Button_AddTextBlock_Hovered"),
-                                            (absolutePathStart + @"Assets\Shell\AddTextBlockHeld.png", "Button_AddTextBlock_Held"));
+                                            (absolutePathStart + @"Assets\Shell\AddTextBlockHeld.png", "Button_AddTextBlock_Held"),
+                                            (absolutePathStart + @"Assets\Shell\SaveCurrentTab.png", "Button_SaveCurrentTab"),
+                                            (absolutePathStart + @"Assets\Shell\SaveCurrentTabHovered.png", "Button_SaveCurrentTab_Hovered"),
+                                            (absolutePathStart + @"Assets\Shell\SaveCurrentTabHeld.png", "Button_SaveCurrentTab_Held"),
+                                            (absolutePathStart + @"Assets\Shell\SaveAllTabs.png", "Button_SaveAllTabs"),
+                                            (absolutePathStart + @"Assets\Shell\SaveAllTabsHovered.png", "Button_SaveAllTabs_Hovered"),
+                                            (absolutePathStart + @"Assets\Shell\SaveAllTabsHeld.png", "Button_SaveAllTabs_Held"));
 
 
             SpriteFont font = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans");
@@ -60,23 +66,8 @@ namespace NoteKeeper
             int verticalSize = 700;
             Point viewerSize = new Point(WindowOptions.Size.X - leftMargin * 2, verticalSize);
 
-            MultiPageTab multi = new MultiPageTab(viewerSize);
+            MultiPageTab multi = new MultiPageTab(viewerSize, @"C:\Users\user\Desktop\Test.txt");
             multi.Window.Boundaries = new Rectangle(20, upMargin, viewerSize.X, viewerSize.Y);
-
-            NotePage first = new NotePage();
-            first.Contents.PushFrontRange(
-                new PageImageContent(green, new Point(50, 50)).Location(new Point(50, 50)),
-                new PageImageContent(red, new Point(50, 50)).Location(new Point(100, 100))
-            );
-
-            NotePage second = new NotePage();
-            second.Contents.PushFront(
-                new PageImageContent(Util.GetTexture(1, 1, Color.Pink), new Point(50, 50)).Location(new Point(70, 70))
-            );
-
-            multi.NotePages.Add(first);
-            multi.NotePages.Add(second);
-            multi.NotePages.Add(new NotePage());
 
             ControlPanel panel = new ControlPanel();
             panel.ActiveTabs.Add(multi);

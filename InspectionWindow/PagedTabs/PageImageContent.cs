@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using NoteKeeper.InspectionWindow.PagedTabs.Serialization;
 using PopUpUI.Toolkit;
 using System.Diagnostics;
 
@@ -64,6 +65,31 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
         public void SetLocation(Point value)
         {
             location = value;
+        }
+
+        public PageContentInfo GetSerializationInfo()
+        {
+            return new ImageContentInfo
+            {
+                Location = location,
+                Size = size,
+
+                ImagePath = _imagePath
+            };
+        }
+
+        public static PageImageContent Create(PageContentInfo info)
+        {
+            if (info is not ImageContentInfo imageInfo)
+            {
+                throw new System.Exception();
+            }
+
+            PageImageContent content = new PageImageContent(imageInfo.ImagePath);
+            content.SetLocation(imageInfo.Location);
+            content.SetSize(imageInfo.Size);
+
+            return content;
         }
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using NoteKeeper.InspectionWindow.PagedTabs.MultiPage;
+using NoteKeeper.InspectionWindow.PagedTabs.Serialization;
 using PopUpUI.Text;
 using PopUpUI.Toolkit;
 
@@ -204,6 +205,33 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
                     Backspace(writingSession);
                     break;
             }
+        }
+
+        public PageContentInfo GetSerializationInfo()
+        {
+            return new TextContentInfo
+            {
+                Location = location,
+                Size = size,
+
+                Text = this.Text,
+                FontName = _fontName
+            };
+        }
+
+        public static PageTextContent Create(PageContentInfo info)
+        {
+            if (info is not TextContentInfo textInfo)
+            {
+                throw new System.Exception();
+            }
+
+            PageTextContent content = new PageTextContent(textInfo.FontName);
+            content.SetLocation(textInfo.Location);
+            content.SetSize(textInfo.Size);
+            content.Text = textInfo.Text;
+
+            return content;
         }
     }
 }

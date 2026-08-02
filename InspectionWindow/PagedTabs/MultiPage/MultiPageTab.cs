@@ -15,23 +15,26 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         private readonly TabWindow window;
         private readonly PageActions pageActions;
 
+        public override ITabSerializer TabSerializer { get; }
         public override ITabViewport TabViewport => viewport;
         public override TabHistory TabHistory { get; }
         public override PopWindow Window => window;
 
         public ObservableCollection<NotePage> NotePages { get; }
 
-        public MultiPageTab(Point size)
+        public MultiPageTab(Point size, string sourcePath) : base(sourcePath)
         {
             NotePages = new ObservableCollection<NotePage>();
             TabHistory = new TabHistory();
 
             pageActions = new PageActions(TabHistory);
             viewport = new TabViewport { UISize = size };
-
             window = new TabWindow(size, pageActions, viewport, NotePages);
 
             NotePages.CollectionChanged += (sender, _) => viewport.PageCount = ((ObservableCollection<NotePage>)sender!).Count;
+
+            TabSerializer = new TabSerializer(this);
+            TabSerializer.Load();
         }
 
         public override void AddContent(IPageContent content)

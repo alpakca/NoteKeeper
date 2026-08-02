@@ -6,11 +6,13 @@ using Microsoft.Xna.Framework;
 using System.Collections.ObjectModel;
 using NoteKeeper.Shell.ContextMenus;
 
+#nullable enable
+
 namespace NoteKeeper.Shell
 {
     internal class ControlPanel
     {
-        private Tab displayedTab;
+        private Tab? displayedTab;
 
         private readonly ButtonPlate buttonPlate;
         private readonly TabGroup tabGroup;
@@ -27,7 +29,7 @@ namespace NoteKeeper.Shell
                 displayedTab?.ShellModeUpdated(value);
             }
         }
-        public Tab DisplayedTab => displayedTab;
+        public Tab? DisplayedTab => displayedTab;
         public ObservableCollection<Tab> ActiveTabs { get; }
 
         public ControlPanel()
@@ -85,8 +87,13 @@ namespace NoteKeeper.Shell
 
         }
 
-        public void DisplayTab(Tab tab)
+        public void DisplayTab(Tab? tab)
         {
+            if (tab == displayedTab)
+            {
+                return;
+            }
+
             if (displayedTab != null)
             {
                 displayedTab.TabViewport.ZoomChanged -= TabViewport_ZoomChanged;
@@ -97,27 +104,34 @@ namespace NoteKeeper.Shell
                 PopWindowManager.ActiveWindows.Remove(displayedTab.Window);
             }
 
-            displayedTab = tab;
-            tab.ShellModeUpdated(Mode);
-
-            foreach (var receiver in tabUpdateReceivers)
-            {
-                receiver.DisplayedTabChanged(tab);
-            }
-
             if (tab != null)
             {
                 tab.TabViewport.ZoomChanged += TabViewport_ZoomChanged;
                 tab.TabViewport.ScrollChanged += TabViewport_ScrollChanged;
 
-                displayedTab.TabHistory.HistoryUpdated += TabHistory_HistoryUpdated;
-                displayedTab.TabHistory.Clear();
+                tab.TabHistory.HistoryUpdated += TabHistory_HistoryUpdated;
+                tab.TabHistory.Clear();
 
                 PopWindowManager.ActiveWindows.Add(tab.Window);
                 PopWindowManager.ActiveWindows.MoveToBottom(tab.Window);
             }
 
+            DisplayedTabChanged(tab);
             RearrangeUISizes();
+        }
+
+        private void DisplayedTabChanged(Tab? newTab)
+        {
+            displayedTab = newTab;
+            newTab?.ShellModeUpdated(Mode);
+
+            foreach (var receiver in tabUpdateReceivers)
+            {
+                receiver.DisplayedTabChanged(newTab);
+            }
+
+            buttonPlate.SaveCurrentTabButton.Enabled = newTab != null;
+            buttonPlate.SaveAllTabsButton.Enabled = newTab != null;
         }
 
         private void TabHistory_HistoryUpdated(TabHistory history)
