@@ -12,6 +12,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         private NotePagePosition _holdOrigin;
         private Rectangle _initialBounds;
 
+        private bool _holdStarted;
         private State _state;
         private TransformNode _activeNode;
 
@@ -95,7 +96,12 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
 
         public void HoldStart(NotePagePosition position)
         {
+            // don't let hold started re-run before hold ended
+            if (_holdStarted)
+                return;
+
             _holdOrigin = position;
+            _holdStarted = true;
 
             if (_selectedContents.Count > 0 && TryHitNode(position, out TransformNode hit))
             {
@@ -174,6 +180,12 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
 
         public void HoldEnded(NotePagePosition position)
         {
+            // don't let hold ended re-run before hold started
+            if (!_holdStarted)
+                return;
+
+            _holdStarted = false;
+
             if (_state == State.Marqueeing)
             {
                 EndMarquee(position);
@@ -226,15 +238,13 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         private void EndTransforming(NotePagePosition position)
         {
             Rectangle newBoundary = ComputeNewBoundary(position);
-
             SelectionBoundary = newBoundary;
-            BuildNodePositions(newBoundary);
 
             int index = 0;
             IHistoryAction[] contentActions;
 
-            // may only happen using TransformNode.Carry, which does not effect size
-            if (position.PageIndex != _marqueePageIndex)
+            // let content movement across pages only through carry node, which doesn't affect size
+            if (_activeNode == TransformNode.Carry && position.PageIndex != _marqueePageIndex)
             {
                 contentActions = new IHistoryAction[_relativeContents.Count + 1];
 
@@ -277,18 +287,18 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             _snapshotSelectedContents.Add(action, (_selectedContents.ToArray(), _marqueePageIndex));
             _pageActions.RunAction(action);
 
-            // display the marquee & initial bounds to as they appear in new page index
-            // done here because we get the new boundary from contents
+            // Display the marquee & initial bounds to as they appear in new page index.
+            // Done here because we get the new boundary from contents
             // which is applied after pageAction runs the property change
-            if (position.PageIndex != _marqueePageIndex)
+            if (_activeNode == TransformNode.Carry && position.PageIndex != _marqueePageIndex)
             {
                 _marqueePageIndex = position.PageIndex;
 
                 SelectionBoundary = GetContentsBoundary(_selectedContents);
                 _initialBounds = SelectionBoundary;
-                BuildNodePositions(SelectionBoundary);
             }
 
+            BuildNodePositions(SelectionBoundary);
             _activeNode = TransformNode.None;
         }
 
