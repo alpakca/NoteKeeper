@@ -6,11 +6,11 @@ namespace NoteKeeper.InspectionWindow.PagedTabs
 {
     internal class NotePage
     {
-        public List<IPageContent> Contents { get; }
+        public ContentCollection Contents { get; }
 
         public NotePage()
         {
-            Contents = new List<IPageContent>();
+            Contents = new ContentCollection();
         }
     }
 }

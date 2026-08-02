@@ -22,12 +22,12 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.History
         public void Run()
         {
             _contentIndex = _notePage.Contents.Count;
-            _notePage.Contents.Add(_content);
+            _notePage.Contents.PushFront(_content);
         }
 
         public void Undo()
         {
-            _notePage.Contents.RemoveAt(_contentIndex);
+            _notePage.Contents.RemoveContentAt(_contentIndex);
         }
     }
 }

@@ -29,7 +29,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         {
             foreach (var page in notePages)
             {
-                foreach (var content in page.Contents)
+                foreach (var content in page.Contents.DrawOrder)
                 {
                     content.RenderUpdate();
                 }
@@ -48,7 +48,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
                                               Color.White);
                 }
 
-                foreach (var content in page.Contents)
+                foreach (var content in page.Contents.DrawOrder)
                 {
                     content.RenderToPage(pageOffset, viewport.Zoom);
                 }

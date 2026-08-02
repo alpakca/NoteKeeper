@@ -38,9 +38,8 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
                 return null;
             }
 
-            for (int i = notePages[pageIndex].Contents.Count - 1; i >= 0; i--)
+            foreach (var content in notePages[pageIndex].Contents.HitOrder)
             {
-                IPageContent content = notePages[pageIndex].Contents[i];
                 Point transformedLocation = PageContentUtil.GetTransformedLocation(content.Location, content.Size).TransformedLocation;
                 Point absoluteSize = content.Size.Abs();
 
@@ -58,10 +57,9 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         {
             for (int i = 0; i < notePages.Count; i++)
             {
-                foreach (var content in notePages[i].Contents)
+                if (notePages[i].Contents.Contains(item))
                 {
-                    if (item == content)
-                        return i;
+                    return i;
                 }
             }
 

@@ -194,7 +194,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             _selectedContents.Clear();
             if (size.X == 0 && size.Y == 0) // check if mouse just clicked to a single content instead of selecting
             {
-                IPageContent? hit = _notePages[_marqueePageIndex].Contents.Find(content => new Rectangle(content.Location, content.Size).Normalized().Contains(position.PagePosition));
+                IPageContent? hit = GetHitContent(position.PagePosition);
                 if (hit != null)
                 {
                     _selectedContents.Add(hit);
@@ -411,7 +411,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         private void GetContentsInRect(Rectangle rect)
         {
             rect = rect.Normalized();
-            foreach (var content in _notePages[_marqueePageIndex].Contents)
+            foreach (var content in _notePages[_marqueePageIndex].Contents.HitOrder)
             {
                 Rectangle intersect = Rectangle.Intersect(new Rectangle(content.Location, content.Size).Normalized(), rect);
                 float fillPercentage = (float)(intersect.Width * intersect.Height) / (content.Size.X * content.Size.Y) * 100;
@@ -421,6 +421,21 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
                     _selectedContents.Add(content);
                 }
             }
+        }
+
+        private IPageContent? GetHitContent(Point pagePosition)
+        {
+            foreach (var content in _notePages[_marqueePageIndex].Contents.HitOrder)
+            {
+                Rectangle normalized = new Rectangle(content.Location, content.Size).Normalized();
+                if (normalized.X < pagePosition.X && pagePosition.X < normalized.Right &&
+                    normalized.Y < pagePosition.Y && pagePosition.Y < normalized.Bottom)
+                {
+                    return content;
+                }
+            }
+
+            return null;
         }
 
         private void BuildNodePositions(Rectangle boundary)

@@ -22,7 +22,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.History
 
             foreach (var content in _contents)
             {
-                _contentsPageIndeces.Add(_oldPage.Contents.IndexOf(content), content);
+                _contentsPageIndeces.Add(_oldPage.Contents.GetContentIndex(content), content);
             }
         }
 
@@ -31,17 +31,17 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.History
             // remove starting from biggest index
             for (int i = _contentsPageIndeces.Count - 1; i >= 0; i--)
             {
-                _oldPage.Contents.RemoveAt(_contentsPageIndeces.GetKeyAtIndex(i));
-                _newPage.Contents.Add(_contentsPageIndeces.GetValueAtIndex(i));
+                _oldPage.Contents.RemoveContentAt(_contentsPageIndeces.GetKeyAtIndex(i));
+                _newPage.Contents.PushFront(_contentsPageIndeces.GetValueAtIndex(i));
             }
         }
 
         public void Undo()
         {
-            _newPage.Contents.RemoveRange(_newPage.Contents.Count - _contents.Length, _contents.Length);
+            _newPage.Contents.RemoveFromFrontRange(_contents.Length);
             for (int i = 0; i < _contentsPageIndeces.Count; i++)
             {
-                _oldPage.Contents.Insert(_contentsPageIndeces.GetKeyAtIndex(i), _contentsPageIndeces.GetValueAtIndex(i));
+                _oldPage.Contents.InsertContent(_contentsPageIndeces.GetKeyAtIndex(i), _contentsPageIndeces.GetValueAtIndex(i));
             }
         }
     }
