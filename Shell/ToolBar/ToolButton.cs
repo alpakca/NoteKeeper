@@ -11,6 +11,8 @@ namespace NoteKeeper.Shell.ToolBar
         public string ID { get; }
         public Action ClickAction { get; }
 
+        public bool Enabled { get; set; }
+
         public ToolButton(string id, Action clickAction)
         {
             ID = id;

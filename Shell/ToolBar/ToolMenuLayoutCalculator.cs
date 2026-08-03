@@ -8,25 +8,40 @@ namespace NoteKeeper.Shell.ToolBar
     internal class ToolMenuLayoutCalculator
     {
         private const int MarginBetweenBoxes = 2;
-        private const int MovementBoxHeight = 32;
+        private const int MoveBoxHeight = 32;
 
         private readonly Point BoxSize = new Point(32, 32);
 
         private readonly ToolMenuStyleProvider _styleProvider;
 
         public Point ScreenLocation { get; set; }
+        public Point BackgroundSize
+        {
+            get
+            {
+                ToolMenuStyle style = _styleProvider.Style;
+                int rowCount = style.ButtonStyles.Count / style.ColumnCount + (style.ButtonStyles.Count % style.ColumnCount == 0 ? 0 : 1);
+
+                return new Point(GetMenuWidth(style.ColumnCount), MoveBoxHeight + rowCount * (BoxSize.Y + MarginBetweenBoxes) + MarginBetweenBoxes);
+            }
+        }
 
         public ToolMenuLayoutCalculator(ToolMenuStyleProvider styleProvider)
         {
             _styleProvider = styleProvider;
         }
 
-        public Rectangle GetLayout(int row, int column)
+        public Rectangle GetButtonLayout(int row, int column)
         {
             Point location = new Point(ScreenLocation.X + (BoxSize.X + MarginBetweenBoxes) * column + MarginBetweenBoxes,
-                                       ScreenLocation.Y + (BoxSize.Y + MarginBetweenBoxes) * row + MarginBetweenBoxes + MovementBoxHeight);
+                                       ScreenLocation.Y + (BoxSize.Y + MarginBetweenBoxes) * row + MarginBetweenBoxes + MoveBoxHeight);
 
             return new Rectangle(location, BoxSize);
+        }
+
+        public Rectangle GetMoveBoxLayout()
+        {
+            return new Rectangle(ScreenLocation.X, ScreenLocation.Y, GetMenuWidth(_styleProvider.Style.ColumnCount), MoveBoxHeight);
         }
 
         public Rectangle GetCloseButtonLayout()
@@ -35,14 +50,6 @@ namespace NoteKeeper.Shell.ToolBar
             Point location = new Point(ScreenLocation.X + width - BoxSize.X, ScreenLocation.Y);
 
             return new Rectangle(location, BoxSize);
-        }
-
-        public Point BackgroundSize()
-        {
-            ToolMenuStyle style = _styleProvider.Style;
-            int rowCount = style.ButtonStyles.Count / style.ColumnCount + (style.ButtonStyles.Count % style.ColumnCount == 0 ? 0 : 1);
-
-            return new Point(GetMenuWidth(style.ColumnCount), MovementBoxHeight + rowCount * (BoxSize.Y + MarginBetweenBoxes) + MarginBetweenBoxes);
         }
 
         private int GetMenuWidth(int columnCount)

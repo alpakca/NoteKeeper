@@ -9,7 +9,7 @@ using System.Text;
 
 namespace NoteKeeper.Shell.ToolBar
 {
-    internal class ToolsMenuManager
+    internal class ToolMenuManager
     {
         private readonly ToolMenuRenderer renderer;
         private readonly ToolMenuLayoutCalculator layoutCalculator;
@@ -18,7 +18,7 @@ namespace NoteKeeper.Shell.ToolBar
 
         public ToolMenuStyleProvider StyleProvider { get; }
 
-        public ToolsMenuManager()
+        public ToolMenuManager()
         {
             StyleProvider = new ToolMenuStyleProvider();
 
