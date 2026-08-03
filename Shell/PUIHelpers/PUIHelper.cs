@@ -11,9 +11,11 @@ namespace NoteKeeper.Shell.PUIHelpers
     internal static class PUIHelper
     {
         public const string AssetsFolderPath = @"C:\Users\user\Desktop\C#\NoteKeeper\NoteKeeper\Assets\";
+        public const string MultiPageTabAssetsFolderPath = AssetsFolderPath + @"MultiPageTab\";
         public const string ShellAssetsFolderPath = AssetsFolderPath + @"Shell\";
 
-        public static ITupleParser[] TupleParsers { get; } = [new AnimationTupleParser(), new RectangleTupleParser(), new PointTupleParser()];
+        public static ITupleParser[] TupleParsers { get; } = [new AnimationTupleParser(), new TextureTupleParser(),
+                                                              new RectangleTupleParser(), new PointTupleParser()];
 
         public static IPUIVariableCreator[] VariableCreators { get; } = [new AnimationVariableCreator(), new PathVariableCreator(), 
                                                                          new HoldablePacketVariableCreator(), new SelectablePacketVariableCreator()];
@@ -23,6 +25,8 @@ namespace NoteKeeper.Shell.PUIHelpers
 
         public static VisualClickableInstantiator VisualClickableInstantiator { get; } = new VisualClickableInstantiator();
         public static VisualClickableAssigner VisualClickableAssigner { get; } = new VisualClickableAssigner();
+
+        public static ActionToolButtonAssigner ActionToolButtonAssigner { get; } = new ActionToolButtonAssigner();
 
         public static PUIInterpreter GetInterpreter(string puiFilePath)
         {

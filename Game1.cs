@@ -41,9 +41,9 @@ namespace NoteKeeper
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             ContentAssistant.LoadWithContentManager<SpriteFont>(("ComicSans", "Font_ComicSans"));
 
-            string shellAssetsPath = @"C:\Users\user\Desktop\C#\NoteKeeper\NoteKeeper\Assets\Shell";
+            string shellAssetsPath = @"C:\Users\user\Desktop\C#\NoteKeeper\NoteKeeper\Assets";
             ContentAssistant.LoadTexture2Ds(
-                Directory.EnumerateFiles(shellAssetsPath)
+                Directory.EnumerateFiles(shellAssetsPath, "*.png", SearchOption.AllDirectories)
                 .Where(path => Path.GetExtension(path) != ".pui")
                 .Select(path => (path, path))
                 .ToArray()

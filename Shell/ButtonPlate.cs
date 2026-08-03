@@ -54,9 +54,6 @@ namespace NoteKeeper.Shell
             writingModeToggle.ToggleCommand = new OppositeToggleButtonsCommand(transformModeToggle, () => panel.Mode = ShellModes.Writing);
             transformModeToggle.ToggleCommand = new OppositeToggleButtonsCommand(writingModeToggle, () => panel.Mode = ShellModes.Transform);
 
-            VisualClickable addTextBlock = interpreter.CreateFromProperties(PUIHelper.VisualClickableInstantiator, "Add_Text_Block");
-            addTextBlock.ClickCommand = new ActionCommander<Clickable>(AddTextBlockCommander);
-
             interpreter.AssignProperties(PUIHelper.VisualClickableAssigner, "Undo", UndoButton);
             UndoButton.ClickCommand = new ActionCommander<Clickable>(_ =>
             {
@@ -95,7 +92,7 @@ namespace NoteKeeper.Shell
             });
             ToolMenuToggle.Enabled = false;
 
-            Buttons.AddRange(writingModeToggle, transformModeToggle, addTextBlock, UndoButton, RedoButton, SaveCurrentTabButton, SaveAllTabsButton,
+            Buttons.AddRange(writingModeToggle, transformModeToggle, UndoButton, RedoButton, SaveCurrentTabButton, SaveAllTabsButton,
                              ToolMenuToggle);
 
             ActivateWritingMode();
@@ -110,26 +107,6 @@ namespace NoteKeeper.Shell
         public void ActivateTransformMode()
         {
             (Buttons[1] as ToggleButton).Toggle();
-        }
-
-        private void AddTextBlockCommander(Clickable clickable)
-        {
-            if (panel.DisplayedTab is not PageContentTab pageContentTab)
-            {
-                return;
-            }
-
-            PageTextContent content = new PageTextContent("Font_ComicSans");
-            pageContentTab.AddContent(content);
-            ActivateWritingMode();
-
-            // apply margin to Screen Location of content that may appear a little lower due to rounding errors
-            // which shouldn't happen with zoom value of 1f
-            const int RoundingErrorMargin = 3;
-
-            pageContentTab.SimulateMouseButtonStateInput(
-                new PopWindowMouseEventArgs(MouseButtons.Left, MouseButtons.Left, MouseButtons.None,
-                                            pageContentTab.GetContentScreenLocation(content) + new Point(RoundingErrorMargin)));
         }
 
         private class OppositeToggleButtonsCommand : ICommander<ToggleButton>

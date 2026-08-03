@@ -3,6 +3,7 @@ using NoteKeeper.Shell.ContextMenus;
 using NoteKeeper.Shell.ToolBar;
 using PopUpUI.Input;
 using PopUpUI.Surface;
+using System;
 using System.IO;
 
 #nullable enable
@@ -15,6 +16,8 @@ namespace NoteKeeper.InspectionWindow
 
         public string SourcePath => _sourcePath;
         public string Name { get; set; }
+
+        public event Action<ShellModes> ShellModeChangeRequested;
 
         public abstract ITabSerializer TabSerializer { get; }
         public abstract ITabViewport TabViewport { get; }
@@ -37,6 +40,11 @@ namespace NoteKeeper.InspectionWindow
         {
             File.Move(_sourcePath, newPath);
             _sourcePath = newPath;
+        }
+
+        public void RequestShellModeChange(ShellModes mode)
+        {
+            ShellModeChangeRequested?.Invoke(mode);
         }
     }
 }

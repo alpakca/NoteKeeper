@@ -101,6 +101,8 @@ namespace NoteKeeper.Shell
 
             if (displayedTab != null)
             {
+                displayedTab.ShellModeChangeRequested -= Tab_ShellModeChangeRequested;
+
                 displayedTab.TabViewport.ZoomChanged -= TabViewport_ZoomChanged;
                 displayedTab.TabViewport.ScrollChanged -= TabViewport_ScrollChanged;
 
@@ -111,6 +113,8 @@ namespace NoteKeeper.Shell
 
             if (tab != null)
             {
+                tab.ShellModeChangeRequested += Tab_ShellModeChangeRequested;
+
                 tab.TabViewport.ZoomChanged += TabViewport_ZoomChanged;
                 tab.TabViewport.ScrollChanged += TabViewport_ScrollChanged;
 
@@ -123,6 +127,11 @@ namespace NoteKeeper.Shell
 
             DisplayedTabChanged(tab);
             RearrangeUISizes();
+        }
+
+        private void Tab_ShellModeChangeRequested(ShellModes mode)
+        {
+            Mode = mode;
         }
 
         private void DisplayedTabChanged(Tab? newTab)

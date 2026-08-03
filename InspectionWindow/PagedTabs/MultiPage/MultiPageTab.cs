@@ -29,7 +29,6 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         {
             NotePages = new ObservableCollection<NotePage>();
             TabHistory = new TabHistory();
-            ToolMenu = new TabToolMenu();
 
             pageActions = new PageActions(TabHistory);
             viewport = new TabViewport { UISize = size };
@@ -37,6 +36,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
 
             NotePages.CollectionChanged += (sender, _) => viewport.PageCount = ((ObservableCollection<NotePage>)sender!).Count;
 
+            ToolMenu = new TabToolMenu(this);
             TabSerializer = new TabSerializer(this);
             TabSerializer.Load();
         }

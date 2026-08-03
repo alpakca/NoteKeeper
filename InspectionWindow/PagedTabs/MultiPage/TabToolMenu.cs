@@ -1,15 +1,23 @@
 ﻿using Microsoft.Xna.Framework;
+using NoteKeeper.Shell.PUIHelpers;
 using NoteKeeper.Shell.ToolBar;
+using PopUpUI.Elements;
+using PopUpUI.Input;
+using PopUpUI.PUI;
 
 namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
 {
     internal class TabToolMenu : IToolMenu
     {
+        private readonly MultiPageTab _tab;
+
         public ActionToolButton[] Buttons { get; }
         public ToolMenuStyle MenuStyle { get; }
 
-        public TabToolMenu()
+        public TabToolMenu(MultiPageTab tab)
         {
+            _tab = tab;
+
             MenuStyle = new ToolMenuStyle
             {
                 Background = Util.GetTexture(1, 1, Color.Yellow),
@@ -17,11 +25,28 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
                 ColumnCount = 2,
             };
 
-            Buttons = [new ActionToolButton(() => { }) {
-                DefaultTexture = Util.GetTexture(1, 1, Color.Turquoise),
-                HoveredTexture = Util.GetTexture(1, 1, Color.DarkGray * 0.5f),
-                HeldTexture = Util.GetTexture(1, 1, Color.LightGray * 0.5f)
-            }];
+            PUIInterpreter interpreter = PUIHelper.GetInterpreter(PUIHelper.MultiPageTabAssetsFolderPath + "ToolMenu.pui");
+            interpreter.ProcessTokens();
+
+            ActionToolButton addTextBlock = new ActionToolButton(AddTextBlockCommand);
+            interpreter.AssignProperties(PUIHelper.ActionToolButtonAssigner, "Add_Text_Block", addTextBlock);
+
+            Buttons = [addTextBlock];
+        }
+
+        private void AddTextBlockCommand()
+        {
+            PageTextContent content = new PageTextContent("Font_ComicSans");
+            _tab.AddContent(content);
+            _tab.RequestShellModeChange(ShellModes.Writing);
+
+            // apply margin to Screen Location of content that may appear a little lower due to rounding errors
+            // which shouldn't happen with zoom value of 1f
+            const int RoundingErrorMargin = 3;
+
+            _tab.SimulateMouseButtonStateInput(
+                new PopWindowMouseEventArgs(MouseButtons.Left, MouseButtons.None, MouseButtons.None,
+                                            _tab.GetContentScreenLocation(content) + new Point(RoundingErrorMargin)));
         }
     }
 }

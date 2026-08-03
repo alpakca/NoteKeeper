@@ -12,10 +12,10 @@ namespace NoteKeeper.Shell.ToolBar
 
         public bool Enabled { get; set; } = true;
 
-        public Texture2D DefaultTexture { get; init; }
-        public Texture2D UnenabledTexture { get; init; }
-        public Texture2D HoveredTexture { get; init; }
-        public Texture2D HeldTexture { get; init; }
+        public Texture2D DefaultTexture { get; set; }
+        public Texture2D UnenabledTexture { get; set; }
+        public Texture2D HoveredTexture { get; set; }
+        public Texture2D HeldTexture { get; set; }
 
         public ActionToolButton(Action clickAction)
         {
