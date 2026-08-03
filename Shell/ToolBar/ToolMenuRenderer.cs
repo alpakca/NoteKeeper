@@ -18,7 +18,7 @@ namespace NoteKeeper.Shell.ToolBar
             _layoutCalculator = layoutCalculator;
         }
 
-        public void Render(IToolMenu menu, ToolButton hoveredButton, bool isHeld)
+        public void Render(IToolMenu menu, ActionToolButton hoveredButton, bool isHeld)
         {
             int currentRow = 0;
             int currentColumn = 0;
@@ -35,29 +35,8 @@ namespace NoteKeeper.Shell.ToolBar
             foreach (var button in menu.Buttons)
             {
                 Rectangle layout = _layoutCalculator.GetButtonLayout(currentRow, currentColumn);
-                ToolButtonStyle buttonStyle = style.ButtonStyles[button.ID];
-
-                if (!button.Enabled && buttonStyle.UnenabledTexture != null)
-                {
-                    DrawTexture(buttonStyle.UnenabledTexture, layout);
-                }
-                else
-                {
-                    DrawTexture(buttonStyle.DefaultTexture, layout);
-                }
-
-                if (button == hoveredButton)
-                {
-                    if (isHeld && style.ButtonsHeldOverlay != null)
-                    {
-                        DrawTexture(style.ButtonsHeldOverlay, layout);
-                    }
-                    else if (!isHeld && style.ButtonsHoverOverlay != null)
-                    {
-                        DrawTexture(style.ButtonsHoverOverlay, layout);
-                    }
-                }
-
+                DrawTexture(button.GetTexture(hoveredButton == button, hoveredButton == button && isHeld), layout);
+                
                 currentColumn++;
                 if (currentColumn == style.ColumnCount)
                 {

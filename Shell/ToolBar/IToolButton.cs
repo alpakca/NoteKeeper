@@ -5,9 +5,9 @@ using System.Text;
 
 namespace NoteKeeper.Shell.ToolBar
 {
-    internal class ToolButtonStyle
+    internal interface IToolButton
     {
-        public Texture2D DefaultTexture { get; init; }
-        public Texture2D? UnenabledTexture { get; init; }
+        public void Selected();
+        public Texture2D GetTexture(bool isHovered, bool isHeld);
     }
 }

@@ -65,26 +65,6 @@ namespace NoteKeeper.Shell
             };
             contextMenuManager.StyleProvider.ApplyTheme(defaultTheme);
 
-            ToolButtonStyle buttonStyle = new ToolButtonStyle
-            {
-                DefaultTexture = Util.GetTexture(1, 1, Color.Turquoise)
-            };
-
-            ToolMenuStyle toolMenuStyle = new ToolMenuStyle
-            {
-                Background = Util.GetTexture(1, 1, Color.Yellow),
-                ButtonStyles = new Dictionary<string, ToolButtonStyle>
-                {
-                    { "AddTextBlock", buttonStyle }
-                },
-                CloseButtonTexture = Util.GetTexture(1, 1, Color.Red),
-                ColumnCount = 2,
-
-                ButtonsHoverOverlay = Util.GetTexture(1, 1, Color.Gray * 0.5f),
-                ButtonsHeldOverlay = Util.GetTexture(1, 1, Color.LightGray * 0.5f)
-            };
-            toolMenuManager.StyleProvider.ApplyTheme(toolMenuStyle);
-
             Elements.Add(shortcutManager);
             InitializeShortcuts();
         }

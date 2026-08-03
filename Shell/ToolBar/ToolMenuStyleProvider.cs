@@ -15,10 +15,5 @@ namespace NoteKeeper.Shell.ToolBar
         {
             _style = style;
         }
-
-        public ToolButtonStyle GetButtonStyle(string id)
-        {
-            return _style.ButtonStyles[id];
-        }
     }
 }

@@ -9,9 +9,10 @@ namespace NoteKeeper.Shell.ToolBar
     {
         private readonly ToolMenuRenderer renderer;
         private readonly ToolMenuLayoutCalculator layoutCalculator;
+        private readonly ToolMenuStyleProvider styleProvider;
 
         private IToolMenu? _shownMenu;
-        private ToolButton? _hoveredButton;
+        private ActionToolButton? _hoveredButton;
         private bool _isHoveredItemHeld;
 
         public Point ScreenLocation
@@ -20,14 +21,13 @@ namespace NoteKeeper.Shell.ToolBar
             set => layoutCalculator.ScreenLocation = value;
         }
         public bool IsShown => _shownMenu != null;
-        public ToolMenuStyleProvider StyleProvider { get; }
 
         public ToolMenuManager()
         {
-            StyleProvider = new ToolMenuStyleProvider();
+            styleProvider = new ToolMenuStyleProvider();
 
-            layoutCalculator = new ToolMenuLayoutCalculator(StyleProvider);
-            renderer = new ToolMenuRenderer(StyleProvider, layoutCalculator);
+            layoutCalculator = new ToolMenuLayoutCalculator(styleProvider);
+            renderer = new ToolMenuRenderer(styleProvider, layoutCalculator);
         }
 
         public void Show(IToolMenu menu)
@@ -35,6 +35,7 @@ namespace NoteKeeper.Shell.ToolBar
             Hide();
 
             _shownMenu = menu;
+            styleProvider.ApplyTheme(menu.MenuStyle);
         }
 
         public void Hide()
@@ -76,11 +77,11 @@ namespace NoteKeeper.Shell.ToolBar
             }
         }
 
-        private ToolButton? FindButtonOnPosition(Point mousePosition)
+        private ActionToolButton? FindButtonOnPosition(Point mousePosition)
         {
             int currentRow = 0;
             int currentColumn = 0;
-            ToolMenuStyle style = StyleProvider.Style;
+            ToolMenuStyle style = styleProvider.Style;
 
             foreach (var button in _shownMenu!.Buttons)
             {
