@@ -8,7 +8,7 @@ namespace NoteKeeper.Shell.ToolBar
 {
     internal class ToolMenuStyle
     {
-        public int ColumnCount { get; init; }
+        public int ColumnCount { get; init; } = 1;
         public Texture2D Background { get; init; }
         public Texture2D? MoveBoxTexture { get; init; }
         public Texture2D CloseButtonTexture { get; init; }

@@ -54,7 +54,7 @@ namespace NoteKeeper.Shell.ToolBar
 
         private int GetMenuWidth(int columnCount)
         {
-            return columnCount * (BoxSize.X * MarginBetweenBoxes) + MarginBetweenBoxes;
+            return columnCount * (BoxSize.X + MarginBetweenBoxes) + MarginBetweenBoxes;
         }
     }
 }

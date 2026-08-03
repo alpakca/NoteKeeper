@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using NoteKeeper.InspectionWindow;
 using NoteKeeper.Shell.ContextMenus;
+using NoteKeeper.Shell.ToolBar;
 using PopUpUI.Input;
 using PopUpUI.Surface;
 using PopUpUI.Toolkit;
@@ -21,6 +22,7 @@ namespace NoteKeeper.Shell
 
         private readonly ControlPanel panel;
         private readonly ContextMenuManager contextMenuManager;
+        private readonly ToolMenuManager toolMenuManager;
         private readonly KeyboardShortcutManager shortcutManager;
 
         public PanelWindow(ControlPanel panel, Point size) : base(size)
@@ -28,6 +30,7 @@ namespace NoteKeeper.Shell
             this.panel = panel;
 
             contextMenuManager = new ContextMenuManager();
+            toolMenuManager = new ToolMenuManager();
             shortcutManager = new KeyboardShortcutManager();
 
             MenuItemStyle actionButtonStyle = new MenuItemStyle
@@ -62,8 +65,36 @@ namespace NoteKeeper.Shell
             };
             contextMenuManager.StyleProvider.ApplyTheme(defaultTheme);
 
+            ToolButtonStyle buttonStyle = new ToolButtonStyle
+            {
+                DefaultTexture = Util.GetTexture(1, 1, Color.Turquoise)
+            };
+
+            ToolMenuStyle toolMenuStyle = new ToolMenuStyle
+            {
+                Background = Util.GetTexture(1, 1, Color.Yellow),
+                ButtonStyles = new Dictionary<string, ToolButtonStyle>
+                {
+                    { "AddTextBlock", buttonStyle }
+                },
+                CloseButtonTexture = Util.GetTexture(1, 1, Color.Red),
+                ColumnCount = 2,
+
+                ButtonsHoverOverlay = Util.GetTexture(1, 1, Color.Gray * 0.5f),
+                ButtonsHeldOverlay = Util.GetTexture(1, 1, Color.LightGray * 0.5f)
+            };
+            toolMenuManager.StyleProvider.ApplyTheme(toolMenuStyle);
+
+            toolMenuManager.Show(new XXMenu());
+            toolMenuManager.ScreenLocation = new Point(500, 500);
+
             Elements.Add(shortcutManager);
             InitializeShortcuts();
+        }
+
+        private class XXMenu : IToolMenu
+        {
+            public IEnumerable<ToolButton> Buttons { get; } = [new ToolButton("AddTextBlock", () => Trace.WriteLine("yep"))];
         }
 
         private void InitializeShortcuts()
@@ -101,6 +132,10 @@ namespace NoteKeeper.Shell
         {
             base.RenderUpdate();
 
+            DrawHelper.SetBeginBatch(WindowTexture);
+            toolMenuManager.Render();
+            DrawHelper.EndBatch();
+
             // render context menu on top of everything
             contextMenuManager.RenderUpdate(WindowTexture);
         }
@@ -119,12 +154,14 @@ namespace NoteKeeper.Shell
                 }
             }
 
+            toolMenuManager.MouseButtonStateChange(e);
             contextMenuManager.MouseButtonStateUpdate(e);
             base.OnMouseButtonStateChange(e);
         }
 
         protected override void OnMousePositionChange(PopWindowMouseEventArgs e)
         {
+            toolMenuManager.MousePositionChangeUpdate(e);
             contextMenuManager.MousePositionChangeUpdate(e);
             base.OnMousePositionChange(e);
         }

@@ -8,15 +8,20 @@ namespace NoteKeeper.Shell.ToolBar
 {
     internal class ToolButton
     {
-        public string ID { get; }
-        public Action ClickAction { get; }
+        private readonly Action _clickAction;
 
-        public bool Enabled { get; set; }
+        public string ID { get; }
+        public bool Enabled { get; set; } = true;
 
         public ToolButton(string id, Action clickAction)
         {
             ID = id;
-            ClickAction = clickAction;
+            _clickAction = clickAction;
+        }
+
+        public void Selected()
+        {
+            _clickAction.Invoke();
         }
     }
 }
