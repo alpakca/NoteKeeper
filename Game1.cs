@@ -41,19 +41,29 @@ namespace NoteKeeper
             ContentAssistant.LoadWithContentManager<SpriteFont>(("ComicSans", "Font_ComicSans"));
 
             string absolutePathStart = @"C:\Users\user\Desktop\C#\NoteKeeper\NoteKeeper\";
-            ContentAssistant.LoadTexture2Ds((absolutePathStart + @"Assets\Shell\TransformMode.png", "Button_TransformMode"),
-                                            (absolutePathStart + @"Assets\Shell\TransformModeSelected.png", "Button_TransformMode_Selected"),
-                                            (absolutePathStart + @"Assets\Shell\WritingMode.png", "Button_WritingMode"),
-                                            (absolutePathStart + @"Assets\Shell\WritingModeSelected.png", "Button_WritingMode_Selected"),
-                                            (absolutePathStart + @"Assets\Shell\AddTextBlock.png", "Button_AddTextBlock"),
-                                            (absolutePathStart + @"Assets\Shell\AddTextBlockHovered.png", "Button_AddTextBlock_Hovered"),
-                                            (absolutePathStart + @"Assets\Shell\AddTextBlockHeld.png", "Button_AddTextBlock_Held"),
-                                            (absolutePathStart + @"Assets\Shell\SaveCurrentTab.png", "Button_SaveCurrentTab"),
-                                            (absolutePathStart + @"Assets\Shell\SaveCurrentTabHovered.png", "Button_SaveCurrentTab_Hovered"),
-                                            (absolutePathStart + @"Assets\Shell\SaveCurrentTabHeld.png", "Button_SaveCurrentTab_Held"),
-                                            (absolutePathStart + @"Assets\Shell\SaveAllTabs.png", "Button_SaveAllTabs"),
-                                            (absolutePathStart + @"Assets\Shell\SaveAllTabsHovered.png", "Button_SaveAllTabs_Hovered"),
-                                            (absolutePathStart + @"Assets\Shell\SaveAllTabsHeld.png", "Button_SaveAllTabs_Held"));
+            ContentAssistant.LoadTexture2Ds((absolutePathStart + @"Assets\Shell\TransformMode.png", absolutePathStart + @"Assets\Shell\TransformMode.png"),
+                                            (absolutePathStart + @"Assets\Shell\TransformModeSelected.png", absolutePathStart + @"Assets\Shell\TransformModeSelected.png"),
+                                            (absolutePathStart + @"Assets\Shell\WritingMode.png", absolutePathStart + @"Assets\Shell\WritingMode.png"),
+                                            (absolutePathStart + @"Assets\Shell\WritingModeSelected.png", absolutePathStart + @"Assets\Shell\WritingModeSelected.png"),
+                                            (absolutePathStart + @"Assets\Shell\AddTextBlock.png", absolutePathStart + @"Assets\Shell\AddTextBlock.png"),
+                                            (absolutePathStart + @"Assets\Shell\AddTextBlockHovered.png", absolutePathStart + @"Assets\Shell\AddTextBlockHovered.png"),
+                                            (absolutePathStart + @"Assets\Shell\AddTextBlockHeld.png", absolutePathStart + @"Assets\Shell\AddTextBlockHeld.png"),
+                                            (absolutePathStart + @"Assets\Shell\SaveCurrentTab.png", absolutePathStart + @"Assets\Shell\SaveCurrentTab.png"),
+                                            (absolutePathStart + @"Assets\Shell\SaveCurrentTabHovered.png", absolutePathStart + @"Assets\Shell\SaveCurrentTabHovered.png"),
+                                            (absolutePathStart + @"Assets\Shell\SaveCurrentTabHeld.png", absolutePathStart + @"Assets\Shell\SaveCurrentTabHeld.png"),
+                                            (absolutePathStart + @"Assets\Shell\SaveCurrentTabUnenabled.png", absolutePathStart + @"Assets\Shell\SaveCurrentTabUnenabled.png"),
+                                            (absolutePathStart + @"Assets\Shell\SaveAllTabs.png", absolutePathStart + @"Assets\Shell\SaveAllTabs.png"),
+                                            (absolutePathStart + @"Assets\Shell\SaveAllTabsHovered.png", absolutePathStart + @"Assets\Shell\SaveAllTabsHovered.png"),
+                                            (absolutePathStart + @"Assets\Shell\SaveAllTabsHeld.png", absolutePathStart + @"Assets\Shell\SaveAllTabsHeld.png"),
+                                            (absolutePathStart + @"Assets\Shell\SaveAllTabsUnenabled.png", absolutePathStart + @"Assets\Shell\SaveAllTabsUnenabled.png"),
+                                            (absolutePathStart + @"Assets\Shell\Undo.png", absolutePathStart + @"Assets\Shell\Undo.png"),
+                                            (absolutePathStart + @"Assets\Shell\UndoHovered.png", absolutePathStart + @"Assets\Shell\UndoHovered.png"),
+                                            (absolutePathStart + @"Assets\Shell\UndoHeld.png", absolutePathStart + @"Assets\Shell\UndoHeld.png"),
+                                            (absolutePathStart + @"Assets\Shell\UndoUnenabled.png", absolutePathStart + @"Assets\Shell\UndoUnenabled.png"),
+                                            (absolutePathStart + @"Assets\Shell\Redo.png", absolutePathStart + @"Assets\Shell\Redo.png"),
+                                            (absolutePathStart + @"Assets\Shell\RedoHovered.png", absolutePathStart + @"Assets\Shell\RedoHovered.png"),
+                                            (absolutePathStart + @"Assets\Shell\RedoHeld.png", absolutePathStart + @"Assets\Shell\RedoHeld.png"),
+                                            (absolutePathStart + @"Assets\Shell\RedoUnenabled.png", absolutePathStart + @"Assets\Shell\RedoUnenabled.png"));
 
 
             SpriteFont font = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans");

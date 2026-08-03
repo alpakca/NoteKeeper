@@ -1,4 +1,5 @@
-﻿using PopUpUI.PUI;
+﻿using Microsoft.Xna.Framework.Graphics;
+using PopUpUI.PUI;
 using PopUpUI.Surface;
 using PopUpUI.Toolkit;
 using System;
@@ -24,7 +25,7 @@ namespace NoteKeeper.Shell.PUIHelpers
         public override object Value
         {
             get => animation;
-            set => animation = Animation2D.FromTexture(DrawHelper.FromFile(value as string));
+            set => animation = Animation2D.FromTexture(ContentAssistant.FromLoaded<Texture2D>(value as string));
         }
     }
 }
