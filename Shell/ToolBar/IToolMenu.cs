@@ -6,6 +6,6 @@ namespace NoteKeeper.Shell.ToolBar
 {
     internal interface IToolMenu
     {
-        public IEnumerable<ToolButton> Buttons { get; }
+        public ToolButton[] Buttons { get; }
     }
 }

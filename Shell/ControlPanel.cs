@@ -81,6 +81,11 @@ namespace NoteKeeper.Shell
             return null;
         }
 
+        public void SetToolMenuVisibility(bool isVisible)
+        {
+            window.SetToolMenuVisibility(isVisible);
+        }
+
         /// <summary>Rearranges heights of TabGroup, ButtonPlate and DisplayedTab; by chaning DisplayedTab's height and keeping others minimum.</summary>
         public void RearrangeUISizes()
         {
@@ -132,6 +137,7 @@ namespace NoteKeeper.Shell
 
             buttonPlate.SaveCurrentTabButton.Enabled = newTab != null;
             buttonPlate.SaveAllTabsButton.Enabled = newTab != null;
+            buttonPlate.ToolMenuToggle.Enabled = newTab != null;
         }
 
         private void TabHistory_HistoryUpdated(TabHistory history)

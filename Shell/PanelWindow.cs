@@ -30,7 +30,7 @@ namespace NoteKeeper.Shell
             this.panel = panel;
 
             contextMenuManager = new ContextMenuManager();
-            toolMenuManager = new ToolMenuManager();
+            toolMenuManager = new ToolMenuManager() { ScreenLocation = new Point(60, 240) };
             shortcutManager = new KeyboardShortcutManager();
 
             MenuItemStyle actionButtonStyle = new MenuItemStyle
@@ -85,16 +85,8 @@ namespace NoteKeeper.Shell
             };
             toolMenuManager.StyleProvider.ApplyTheme(toolMenuStyle);
 
-            toolMenuManager.Show(new XXMenu());
-            toolMenuManager.ScreenLocation = new Point(500, 500);
-
             Elements.Add(shortcutManager);
             InitializeShortcuts();
-        }
-
-        private class XXMenu : IToolMenu
-        {
-            public IEnumerable<ToolButton> Buttons { get; } = [new ToolButton("AddTextBlock", () => Trace.WriteLine("yep"))];
         }
 
         private void InitializeShortcuts()
@@ -108,9 +100,24 @@ namespace NoteKeeper.Shell
             shortcutManager.AddCombinations(zoomIn, zoomOut);
         }
 
-        public void DisplayedTabChanged(Tab setTab)
+        public void DisplayedTabChanged(Tab? setTab)
         {
             displayedTab = setTab;
+
+            // switched the open tool menu with new tab's tool menu
+            SetToolMenuVisibility(toolMenuManager.IsShown);
+        }
+
+        public void SetToolMenuVisibility(bool isVisible)
+        {
+            if (isVisible && displayedTab?.ToolMenu != null)
+            {
+                toolMenuManager.Show(displayedTab.ToolMenu);
+            }
+            else
+            {
+                toolMenuManager.Hide();
+            }
         }
 
         public void ZoomChanged()

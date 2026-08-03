@@ -19,6 +19,7 @@ namespace NoteKeeper.Shell.ToolBar
             get => layoutCalculator.ScreenLocation;
             set => layoutCalculator.ScreenLocation = value;
         }
+        public bool IsShown => _shownMenu != null;
         public ToolMenuStyleProvider StyleProvider { get; }
 
         public ToolMenuManager()

@@ -25,6 +25,8 @@ namespace NoteKeeper.Shell
         public VisualClickable SaveCurrentTabButton { get; }
         public VisualClickable SaveAllTabsButton { get; }
 
+        public VisualToggleButton ToolMenuToggle { get; }
+
         public ButtonPlate(ControlPanel panel)
         {
             this.panel = panel;
@@ -35,6 +37,8 @@ namespace NoteKeeper.Shell
 
             SaveCurrentTabButton = new VisualClickable();
             SaveAllTabsButton = new VisualClickable();
+
+            ToolMenuToggle = new VisualToggleButton();
 
             InitializeButtons();
         }
@@ -84,7 +88,15 @@ namespace NoteKeeper.Shell
             });
             SaveAllTabsButton.Enabled = false;
 
-            Buttons.AddRange(writingModeToggle, transformModeToggle, addTextBlock, UndoButton, RedoButton, SaveCurrentTabButton, SaveAllTabsButton);
+            interpreter.AssignProperties(PUIHelper.VisualToggleButtonAssigner, "Tool_Menu_Toggle", ToolMenuToggle);
+            ToolMenuToggle.ToggleCommand = new ActionCommander<ToggleButton>(button =>
+            {
+                panel.SetToolMenuVisibility(button.IsChecked);
+            });
+            ToolMenuToggle.Enabled = false;
+
+            Buttons.AddRange(writingModeToggle, transformModeToggle, addTextBlock, UndoButton, RedoButton, SaveCurrentTabButton, SaveAllTabsButton,
+                             ToolMenuToggle);
 
             ActivateWritingMode();
             transformModeToggle.SetCheckStatus(false); // don't actually need this line; its here in case of broken UI.

@@ -24,7 +24,7 @@ namespace NoteKeeper.Shell.ToolBar
             int currentColumn = 0;
             ToolMenuStyle style = _styleProvider.Style;
 
-            DrawTexture(style.Background, new Rectangle(_layoutCalculator.ScreenLocation, _layoutCalculator.BackgroundSize));
+            DrawTexture(style.Background, new Rectangle(_layoutCalculator.ScreenLocation, _layoutCalculator.GetBackgroundSize(menu.Buttons.Length)));
             DrawTexture(style.CloseButtonTexture, _layoutCalculator.GetCloseButtonLayout());
 
             if (style.MoveBoxTexture != null)

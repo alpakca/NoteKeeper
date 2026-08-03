@@ -15,16 +15,6 @@ namespace NoteKeeper.Shell.ToolBar
         private readonly ToolMenuStyleProvider _styleProvider;
 
         public Point ScreenLocation { get; set; }
-        public Point BackgroundSize
-        {
-            get
-            {
-                ToolMenuStyle style = _styleProvider.Style;
-                int rowCount = style.ButtonStyles.Count / style.ColumnCount + (style.ButtonStyles.Count % style.ColumnCount == 0 ? 0 : 1);
-
-                return new Point(GetMenuWidth(style.ColumnCount), MoveBoxHeight + rowCount * (BoxSize.Y + MarginBetweenBoxes) + MarginBetweenBoxes);
-            }
-        }
 
         public ToolMenuLayoutCalculator(ToolMenuStyleProvider styleProvider)
         {
@@ -50,6 +40,14 @@ namespace NoteKeeper.Shell.ToolBar
             Point location = new Point(ScreenLocation.X + width - BoxSize.X, ScreenLocation.Y);
 
             return new Rectangle(location, BoxSize);
+        }
+
+        public Point GetBackgroundSize(int buttonCount)
+        {
+            ToolMenuStyle style = _styleProvider.Style;
+            int rowCount = buttonCount / style.ColumnCount + (buttonCount % style.ColumnCount == 0 ? 0 : 1);
+
+            return new Point(GetMenuWidth(style.ColumnCount), MoveBoxHeight + rowCount * (BoxSize.Y + MarginBetweenBoxes) + MarginBetweenBoxes);
         }
 
         private int GetMenuWidth(int columnCount)

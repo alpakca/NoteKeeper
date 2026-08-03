@@ -19,6 +19,8 @@ namespace NoteKeeper.Shell.PUIHelpers
                                                                          new HoldablePacketVariableCreator(), new SelectablePacketVariableCreator()];
 
         public static VisualToggleButtonInstantiator VisualToggleButtonInstantiator { get; } = new VisualToggleButtonInstantiator();
+        public static VisualToggleButtonAssigner VisualToggleButtonAssigner { get; } = new VisualToggleButtonAssigner();
+
         public static VisualClickableInstantiator VisualClickableInstantiator { get; } = new VisualClickableInstantiator();
         public static VisualClickableAssigner VisualClickableAssigner { get; } = new VisualClickableAssigner();
 

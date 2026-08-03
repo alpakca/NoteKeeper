@@ -88,3 +88,15 @@ VisualClickable Save_All_Tabs
 	SelectablePacket = selectablePacket,
 	HoldablePacket = holdablePacket
 }
+
+VisualToggleButton Tool_Menu_Toggle 
+{
+	Name = "ToolMenuToggle",
+	Boundaries = Rectangle(380, 60, 32, 32),
+	UncheckedAnimation = Animation(ShellFolderPath + "ToolMenu.png"),
+	CheckedAnimation = Animation(ShellFolderPath + "ToolMenuSelected.png"),
+	UnenabledAnimation = Animation(ShellFolderPath + "ToolMenuUnenabled.png"),
+
+	SelectablePacket = selectablePacket,
+	HoldablePacket = holdablePacket
+}

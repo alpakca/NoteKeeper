@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using NoteKeeper.Shell.ContextMenus;
+using NoteKeeper.Shell.ToolBar;
 using PopUpUI.Input;
 using PopUpUI.Surface;
 using System.IO;
@@ -19,6 +20,8 @@ namespace NoteKeeper.InspectionWindow
         public abstract ITabViewport TabViewport { get; }
         public abstract TabHistory TabHistory { get; }
         public abstract PopWindow Window { get; }
+
+        public abstract IToolMenu? ToolMenu { get; }
 
         public abstract ContextMenu? GetContextMenu(Point mousePosition);
         public abstract void ShellModeUpdated(ShellModes mode);

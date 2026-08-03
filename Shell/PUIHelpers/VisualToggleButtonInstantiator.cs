@@ -21,6 +21,7 @@ namespace NoteKeeper.Shell.PUIHelpers
                 Boundaries = desc.GetPropertyOrDefault("Boundaries", Rectangle.Empty),
                 CheckedAnimation = desc.GetPropertyOrDefault<Animation2D>("CheckedAnimation", null),
                 UncheckedAnimation = desc.GetPropertyOrDefault<Animation2D>("UncheckedAnimation", null),
+                UnenabledAnimation = desc.GetPropertyOrDefault<Animation2D>("UnenabledAnimation", null),
 
                 SelectablePacket = desc.GetPropertyOrDefault<SelectablePacket>("SelectablePacket", null),
                 HoldPacket = desc.GetPropertyOrDefault<HoldablePacket>("HoldablePacket", null)

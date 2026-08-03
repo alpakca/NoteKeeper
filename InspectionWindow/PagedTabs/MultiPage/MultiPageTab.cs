@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using NoteKeeper.Shell.ContextMenus;
+using NoteKeeper.Shell.ToolBar;
 using PopUpUI.Input;
 using PopUpUI.Surface;
 using System;
@@ -20,12 +21,15 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
         public override TabHistory TabHistory { get; }
         public override PopWindow Window => window;
 
+        public override IToolMenu? ToolMenu { get; }
+
         public ObservableCollection<NotePage> NotePages { get; }
 
         public MultiPageTab(Point size, string sourcePath) : base(sourcePath)
         {
             NotePages = new ObservableCollection<NotePage>();
             TabHistory = new TabHistory();
+            ToolMenu = new TabToolMenu();
 
             pageActions = new PageActions(TabHistory);
             viewport = new TabViewport { UISize = size };
