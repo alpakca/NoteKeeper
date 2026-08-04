@@ -1,0 +1,8 @@
+﻿#define Path FolderPath = "C:\Users\user\Desktop\C#\NoteKeeper\NoteKeeper\Assets\MultiPageTab\";
+
+ActionToolButton Add_Text_Block
+{
+	DefaultTexture = Texture(FolderPath + "AddTextBlock.png"),
+	HoveredTexture = Texture(FolderPath + "AddTextBlockHovered.png"),
+	HeldTexture = Texture(FolderPath + "AddTextBlockHeld.png"),
+}

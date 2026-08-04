@@ -22,6 +22,21 @@ namespace NoteKeeper.Shell.PUIHelpers
         }
     }
 
+    public class TextureTupleParser : ITupleParser
+    {
+        public string TypeName => "Texture";
+
+        public object Parse(object[] values)
+        {
+            if (values.Length != 1 || values[0] is not string path)
+            {
+                throw new TupleParseException("Texture tuple parser takes single string argument");
+            }
+
+            return ContentAssistant.FromLoaded<Texture2D>(path);
+        }
+    }
+
     public class RectangleTupleParser : ITupleParser
     {
         public string TypeName => "Rectangle";

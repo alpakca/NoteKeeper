@@ -7,6 +7,7 @@ using NoteKeeper.Shell;
 using NoteKeeper.InspectionWindow.PagedTabs.MultiPage;
 using NoteKeeper.InspectionWindow.PagedTabs;
 using System.Collections.Generic;
+using System.IO;
 
 namespace NoteKeeper
 {
@@ -40,31 +41,13 @@ namespace NoteKeeper
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             ContentAssistant.LoadWithContentManager<SpriteFont>(("ComicSans", "Font_ComicSans"));
 
-            string absolutePathStart = @"C:\Users\user\Desktop\C#\NoteKeeper\NoteKeeper\";
-            ContentAssistant.LoadTexture2Ds((absolutePathStart + @"Assets\Shell\TransformMode.png", absolutePathStart + @"Assets\Shell\TransformMode.png"),
-                                            (absolutePathStart + @"Assets\Shell\TransformModeSelected.png", absolutePathStart + @"Assets\Shell\TransformModeSelected.png"),
-                                            (absolutePathStart + @"Assets\Shell\WritingMode.png", absolutePathStart + @"Assets\Shell\WritingMode.png"),
-                                            (absolutePathStart + @"Assets\Shell\WritingModeSelected.png", absolutePathStart + @"Assets\Shell\WritingModeSelected.png"),
-                                            (absolutePathStart + @"Assets\Shell\AddTextBlock.png", absolutePathStart + @"Assets\Shell\AddTextBlock.png"),
-                                            (absolutePathStart + @"Assets\Shell\AddTextBlockHovered.png", absolutePathStart + @"Assets\Shell\AddTextBlockHovered.png"),
-                                            (absolutePathStart + @"Assets\Shell\AddTextBlockHeld.png", absolutePathStart + @"Assets\Shell\AddTextBlockHeld.png"),
-                                            (absolutePathStart + @"Assets\Shell\SaveCurrentTab.png", absolutePathStart + @"Assets\Shell\SaveCurrentTab.png"),
-                                            (absolutePathStart + @"Assets\Shell\SaveCurrentTabHovered.png", absolutePathStart + @"Assets\Shell\SaveCurrentTabHovered.png"),
-                                            (absolutePathStart + @"Assets\Shell\SaveCurrentTabHeld.png", absolutePathStart + @"Assets\Shell\SaveCurrentTabHeld.png"),
-                                            (absolutePathStart + @"Assets\Shell\SaveCurrentTabUnenabled.png", absolutePathStart + @"Assets\Shell\SaveCurrentTabUnenabled.png"),
-                                            (absolutePathStart + @"Assets\Shell\SaveAllTabs.png", absolutePathStart + @"Assets\Shell\SaveAllTabs.png"),
-                                            (absolutePathStart + @"Assets\Shell\SaveAllTabsHovered.png", absolutePathStart + @"Assets\Shell\SaveAllTabsHovered.png"),
-                                            (absolutePathStart + @"Assets\Shell\SaveAllTabsHeld.png", absolutePathStart + @"Assets\Shell\SaveAllTabsHeld.png"),
-                                            (absolutePathStart + @"Assets\Shell\SaveAllTabsUnenabled.png", absolutePathStart + @"Assets\Shell\SaveAllTabsUnenabled.png"),
-                                            (absolutePathStart + @"Assets\Shell\Undo.png", absolutePathStart + @"Assets\Shell\Undo.png"),
-                                            (absolutePathStart + @"Assets\Shell\UndoHovered.png", absolutePathStart + @"Assets\Shell\UndoHovered.png"),
-                                            (absolutePathStart + @"Assets\Shell\UndoHeld.png", absolutePathStart + @"Assets\Shell\UndoHeld.png"),
-                                            (absolutePathStart + @"Assets\Shell\UndoUnenabled.png", absolutePathStart + @"Assets\Shell\UndoUnenabled.png"),
-                                            (absolutePathStart + @"Assets\Shell\Redo.png", absolutePathStart + @"Assets\Shell\Redo.png"),
-                                            (absolutePathStart + @"Assets\Shell\RedoHovered.png", absolutePathStart + @"Assets\Shell\RedoHovered.png"),
-                                            (absolutePathStart + @"Assets\Shell\RedoHeld.png", absolutePathStart + @"Assets\Shell\RedoHeld.png"),
-                                            (absolutePathStart + @"Assets\Shell\RedoUnenabled.png", absolutePathStart + @"Assets\Shell\RedoUnenabled.png"));
-
+            string shellAssetsPath = @"C:\Users\user\Desktop\C#\NoteKeeper\NoteKeeper\Assets";
+            ContentAssistant.LoadTexture2Ds(
+                Directory.EnumerateFiles(shellAssetsPath, "*.png", SearchOption.AllDirectories)
+                .Where(path => Path.GetExtension(path) != ".pui")
+                .Select(path => (path, path))
+                .ToArray()
+            );
 
             SpriteFont font = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans");
 

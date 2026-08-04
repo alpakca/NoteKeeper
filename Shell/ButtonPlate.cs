@@ -1,20 +1,19 @@
-﻿using Microsoft.Xna.Framework;
-using NoteKeeper.InspectionWindow;
-using NoteKeeper.InspectionWindow.PagedTabs;
+﻿using NoteKeeper.InspectionWindow;
 using NoteKeeper.Shell.PUIHelpers;
 using PopUpUI.Elements;
 using PopUpUI.Elements.Visual;
-using PopUpUI.Input;
 using PopUpUI.PUI;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 
 namespace NoteKeeper.Shell
 {
     internal class ButtonPlate
     {
         private readonly ControlPanel panel;
+
+        private readonly VisualToggleButton _writingModeToggle;
+        private readonly VisualToggleButton _transformModeToggle;
 
         public List<Clickable> Buttons { get; }
         public int MinimumVisualHeight { get; }
@@ -25,16 +24,24 @@ namespace NoteKeeper.Shell
         public VisualClickable SaveCurrentTabButton { get; }
         public VisualClickable SaveAllTabsButton { get; }
 
+        public VisualToggleButton ToolMenuToggle { get; }
+
         public ButtonPlate(ControlPanel panel)
         {
             this.panel = panel;
 
             Buttons = new List<Clickable>();
+
+            _writingModeToggle = new VisualToggleButton();
+            _transformModeToggle = new VisualToggleButton();
+
             UndoButton = new VisualClickable();
             RedoButton = new VisualClickable();
 
             SaveCurrentTabButton = new VisualClickable();
             SaveAllTabsButton = new VisualClickable();
+
+            ToolMenuToggle = new VisualToggleButton();
 
             InitializeButtons();
         }
@@ -44,14 +51,12 @@ namespace NoteKeeper.Shell
             PUIInterpreter interpreter = PUIHelper.GetInterpreter(PUIHelper.ShellAssetsFolderPath + "ButtonPlate.pui");
             interpreter.ProcessTokens();
 
-            VisualToggleButton writingModeToggle = interpreter.CreateFromProperties(PUIHelper.VisualToggleButtonInstantiator, "Writing_Mode_Toggle");
-            VisualToggleButton transformModeToggle = interpreter.CreateFromProperties(PUIHelper.VisualToggleButtonInstantiator, "Transform_Mode_Toggle");
+            interpreter.AssignProperties(PUIHelper.VisualToggleButtonAssigner, "Writing_Mode_Toggle", _writingModeToggle);
+            interpreter.AssignProperties(PUIHelper.VisualToggleButtonAssigner, "Transform_Mode_Toggle", _transformModeToggle);
+            IEnumerable<VisualToggleButton> oppositeButtons = [_writingModeToggle, _transformModeToggle];
 
-            writingModeToggle.ToggleCommand = new OppositeToggleButtonsCommand(transformModeToggle, () => panel.Mode = ShellModes.Writing);
-            transformModeToggle.ToggleCommand = new OppositeToggleButtonsCommand(writingModeToggle, () => panel.Mode = ShellModes.Transform);
-
-            VisualClickable addTextBlock = interpreter.CreateFromProperties(PUIHelper.VisualClickableInstantiator, "Add_Text_Block");
-            addTextBlock.ClickCommand = new ActionCommander<Clickable>(AddTextBlockCommander);
+            _writingModeToggle.ToggleCommand = new OppositeButtonCommander(oppositeButtons, () => panel.Mode = ShellModes.Writing);
+            _transformModeToggle.ToggleCommand = new OppositeButtonCommander(oppositeButtons, () => panel.Mode = ShellModes.Transform);
 
             interpreter.AssignProperties(PUIHelper.VisualClickableAssigner, "Undo", UndoButton);
             UndoButton.ClickCommand = new ActionCommander<Clickable>(_ =>
@@ -84,71 +89,59 @@ namespace NoteKeeper.Shell
             });
             SaveAllTabsButton.Enabled = false;
 
-            Buttons.AddRange(writingModeToggle, transformModeToggle, addTextBlock, UndoButton, RedoButton, SaveCurrentTabButton, SaveAllTabsButton);
-
-            ActivateWritingMode();
-            transformModeToggle.SetCheckStatus(false); // don't actually need this line; its here in case of broken UI.
-        }
-
-        public void ActivateWritingMode()
-        {
-            (Buttons[0] as ToggleButton).Toggle();
-        }
-
-        public void ActivateTransformMode()
-        {
-            (Buttons[1] as ToggleButton).Toggle();
-        }
-
-        private void AddTextBlockCommander(Clickable clickable)
-        {
-            if (panel.DisplayedTab is not PageContentTab pageContentTab)
+            interpreter.AssignProperties(PUIHelper.VisualToggleButtonAssigner, "Tool_Menu_Toggle", ToolMenuToggle);
+            ToolMenuToggle.ToggleCommand = new ActionCommander<ToggleButton>(button =>
             {
-                return;
+                panel.SetToolMenuVisibility(button.IsChecked);
+            });
+            ToolMenuToggle.Enabled = false;
+            panel.PanelWindow.ToolMenuManager.MenuVisibilityChanged += ToolMenuToggle.SetStatusWithoutCommander;
+
+
+            Buttons.AddRange(_writingModeToggle, _transformModeToggle, UndoButton, RedoButton, SaveCurrentTabButton, SaveAllTabsButton,
+                             ToolMenuToggle);
+        }
+
+        public void ShellModeUpdated()
+        {
+            if (panel.Mode == ShellModes.Writing && !_writingModeToggle.IsChecked)
+            {
+                _writingModeToggle.SetStatusWithoutCommander(true);
+                _transformModeToggle.SetStatusWithoutCommander(false);
             }
 
-            PageTextContent content = new PageTextContent("Font_ComicSans");
-            pageContentTab.AddContent(content);
-            ActivateWritingMode();
-
-            // apply margin to Screen Location of content that may appear a little lower due to rounding errors
-            // which shouldn't happen with zoom value of 1f
-            const int RoundingErrorMargin = 3;
-
-            pageContentTab.SimulateMouseButtonStateInput(
-                new PopWindowMouseEventArgs(MouseButtons.Left, MouseButtons.Left, MouseButtons.None,
-                                            pageContentTab.GetContentScreenLocation(content) + new Point(RoundingErrorMargin)));
+            if (panel.Mode == ShellModes.Transform && !_transformModeToggle.IsChecked)
+            {
+                _transformModeToggle.SetStatusWithoutCommander(true);
+                _writingModeToggle.SetStatusWithoutCommander(false);
+            }
         }
 
-        private class OppositeToggleButtonsCommand : ICommander<ToggleButton>
+        private class OppositeButtonCommander : ICommander<ToggleButton>
         {
-            private readonly Action action;
-            private readonly ToggleButton oppositeButton;
+            private readonly Action _toggleAction;
+            private readonly IEnumerable<ToggleButton> _allButtons;
 
-            public OppositeToggleButtonsCommand(ToggleButton oppositeButton, Action action)
+            public OppositeButtonCommander(IEnumerable<ToggleButton> allButtons, Action toggleAction)
             {
-                this.action = action;
-                this.oppositeButton = oppositeButton;
+                _toggleAction = toggleAction;
+                _allButtons = allButtons;
             }
 
-            public void Execute(ToggleButton thisButton)
+            public void Execute(ToggleButton element)
             {
-                // This button was toggled even though it was checked
-                if (!oppositeButton.IsChecked && !thisButton.IsChecked)
+                if (element.IsChecked)
                 {
-                    thisButton.Toggle(); // toggle back
-                    return;
-                }
-
-                if (thisButton.IsChecked)
-                {
-                    action();
-
-                    if (oppositeButton.IsChecked)
+                    foreach (var button in _allButtons)
                     {
-                        oppositeButton.Toggle();
+                        button.SetStatusWithoutCommander(false);
                     }
+
+                    _toggleAction();
                 }
+
+                // always set the toggled when clicked on it, no matter it was toggled-untoggled before
+                element.SetStatusWithoutCommander(true);
             }
         }
     }

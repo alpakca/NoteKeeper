@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using NoteKeeper.InspectionWindow;
 using NoteKeeper.Shell.ContextMenus;
+using NoteKeeper.Shell.ToolBar;
 using PopUpUI.Input;
 using PopUpUI.Surface;
 using PopUpUI.Toolkit;
@@ -21,13 +22,17 @@ namespace NoteKeeper.Shell
 
         private readonly ControlPanel panel;
         private readonly ContextMenuManager contextMenuManager;
+        private readonly ToolMenuManager toolMenuManager;
         private readonly KeyboardShortcutManager shortcutManager;
+
+        public ToolMenuManager ToolMenuManager => toolMenuManager;
 
         public PanelWindow(ControlPanel panel, Point size) : base(size)
         {
             this.panel = panel;
 
             contextMenuManager = new ContextMenuManager();
+            toolMenuManager = new ToolMenuManager() { ScreenLocation = new Point(60, 240) };
             shortcutManager = new KeyboardShortcutManager();
 
             MenuItemStyle actionButtonStyle = new MenuItemStyle
@@ -77,9 +82,24 @@ namespace NoteKeeper.Shell
             shortcutManager.AddCombinations(zoomIn, zoomOut);
         }
 
-        public void DisplayedTabChanged(Tab setTab)
+        public void DisplayedTabChanged(Tab? setTab)
         {
             displayedTab = setTab;
+
+            // switched the open tool menu with new tab's tool menu
+            SetToolMenuVisibility(toolMenuManager.IsShown);
+        }
+
+        public void SetToolMenuVisibility(bool isVisible)
+        {
+            if (isVisible && displayedTab?.ToolMenu != null)
+            {
+                toolMenuManager.Show(displayedTab.ToolMenu);
+            }
+            else
+            {
+                toolMenuManager.Hide();
+            }
         }
 
         public void ZoomChanged()
@@ -101,6 +121,10 @@ namespace NoteKeeper.Shell
         {
             base.RenderUpdate();
 
+            DrawHelper.SetBeginBatch(WindowTexture);
+            toolMenuManager.Render();
+            DrawHelper.EndBatch();
+
             // render context menu on top of everything
             contextMenuManager.RenderUpdate(WindowTexture);
         }
@@ -119,12 +143,14 @@ namespace NoteKeeper.Shell
                 }
             }
 
+            toolMenuManager.MouseButtonStateChange(e);
             contextMenuManager.MouseButtonStateUpdate(e);
             base.OnMouseButtonStateChange(e);
         }
 
         protected override void OnMousePositionChange(PopWindowMouseEventArgs e)
         {
+            toolMenuManager.MousePositionChangeUpdate(e);
             contextMenuManager.MousePositionChangeUpdate(e);
             base.OnMousePositionChange(e);
         }

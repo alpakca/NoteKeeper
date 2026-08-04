@@ -27,23 +27,26 @@ namespace NoteKeeper.Shell
             {
                 field = value;
                 displayedTab?.ShellModeUpdated(value);
+                buttonPlate.ShellModeUpdated();
             }
         }
         public Tab? DisplayedTab => displayedTab;
         public ObservableCollection<Tab> ActiveTabs { get; }
+        public PanelWindow PanelWindow => window;
 
         public ControlPanel()
         {
             tabUpdateReceivers = new List<ITabUpdateReceiver>();
             ActiveTabs = new ObservableCollection<Tab>();
 
+            window = new PanelWindow(this, WindowOptions.Size);
             buttonPlate = new ButtonPlate(this);
             tabGroup = new TabGroup(this) { Boundaries = new Rectangle(20, 170, 1720, 30) };
 
-            window = new PanelWindow(this, WindowOptions.Size);
             InitializeWindow();
-
             PopWindowManager.ActiveWindows.Add(window);
+
+            Mode = ShellModes.Transform;
         }
 
         private void InitializeWindow()
@@ -81,6 +84,11 @@ namespace NoteKeeper.Shell
             return null;
         }
 
+        public void SetToolMenuVisibility(bool isVisible)
+        {
+            window.SetToolMenuVisibility(isVisible);
+        }
+
         /// <summary>Rearranges heights of TabGroup, ButtonPlate and DisplayedTab; by chaning DisplayedTab's height and keeping others minimum.</summary>
         public void RearrangeUISizes()
         {
@@ -96,6 +104,8 @@ namespace NoteKeeper.Shell
 
             if (displayedTab != null)
             {
+                displayedTab.ShellModeChangeRequested -= Tab_ShellModeChangeRequested;
+
                 displayedTab.TabViewport.ZoomChanged -= TabViewport_ZoomChanged;
                 displayedTab.TabViewport.ScrollChanged -= TabViewport_ScrollChanged;
 
@@ -106,6 +116,8 @@ namespace NoteKeeper.Shell
 
             if (tab != null)
             {
+                tab.ShellModeChangeRequested += Tab_ShellModeChangeRequested;
+
                 tab.TabViewport.ZoomChanged += TabViewport_ZoomChanged;
                 tab.TabViewport.ScrollChanged += TabViewport_ScrollChanged;
 
@@ -120,6 +132,11 @@ namespace NoteKeeper.Shell
             RearrangeUISizes();
         }
 
+        private void Tab_ShellModeChangeRequested(ShellModes mode)
+        {
+            Mode = mode;
+        }
+
         private void DisplayedTabChanged(Tab? newTab)
         {
             displayedTab = newTab;
@@ -132,6 +149,7 @@ namespace NoteKeeper.Shell
 
             buttonPlate.SaveCurrentTabButton.Enabled = newTab != null;
             buttonPlate.SaveAllTabsButton.Enabled = newTab != null;
+            buttonPlate.ToolMenuToggle.Enabled = newTab?.ToolMenu != null;
         }
 
         private void TabHistory_HistoryUpdated(TabHistory history)
