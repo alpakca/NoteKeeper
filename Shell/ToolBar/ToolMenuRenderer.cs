@@ -18,14 +18,14 @@ namespace NoteKeeper.Shell.ToolBar
             _layoutCalculator = layoutCalculator;
         }
 
-        public void Render(IToolMenu menu, ActionToolButton hoveredButton, bool isHeld)
+        public void Render(IToolMenu menu, IToolButton hoveredButton, IToolButton closeButton, bool isHeld)
         {
             int currentRow = 0;
             int currentColumn = 0;
             ToolMenuStyle style = _styleProvider.Style;
 
             DrawTexture(style.Background, new Rectangle(_layoutCalculator.ScreenLocation, _layoutCalculator.GetBackgroundSize(menu.Buttons.Length)));
-            DrawTexture(style.CloseButtonTexture, _layoutCalculator.GetCloseButtonLayout());
+            DrawTexture(closeButton.GetTexture(hoveredButton == closeButton, hoveredButton == closeButton && isHeld), _layoutCalculator.GetCloseButtonLayout());
 
             if (style.MoveBoxTexture != null)
             {

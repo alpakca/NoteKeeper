@@ -32,16 +32,17 @@ namespace NoteKeeper.Shell
         }
         public Tab? DisplayedTab => displayedTab;
         public ObservableCollection<Tab> ActiveTabs { get; }
+        public PanelWindow PanelWindow => window;
 
         public ControlPanel()
         {
             tabUpdateReceivers = new List<ITabUpdateReceiver>();
             ActiveTabs = new ObservableCollection<Tab>();
 
+            window = new PanelWindow(this, WindowOptions.Size);
             buttonPlate = new ButtonPlate(this);
             tabGroup = new TabGroup(this) { Boundaries = new Rectangle(20, 170, 1720, 30) };
 
-            window = new PanelWindow(this, WindowOptions.Size);
             InitializeWindow();
             PopWindowManager.ActiveWindows.Add(window);
 

@@ -95,6 +95,8 @@ namespace NoteKeeper.Shell
                 panel.SetToolMenuVisibility(button.IsChecked);
             });
             ToolMenuToggle.Enabled = false;
+            panel.PanelWindow.ToolMenuManager.MenuVisibilityChanged += ToolMenuToggle.SetStatusWithoutCommander;
+
 
             Buttons.AddRange(_writingModeToggle, _transformModeToggle, UndoButton, RedoButton, SaveCurrentTabButton, SaveAllTabsButton,
                              ToolMenuToggle);

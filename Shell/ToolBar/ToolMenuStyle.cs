@@ -11,6 +11,9 @@ namespace NoteKeeper.Shell.ToolBar
         public int ColumnCount { get; init; } = 1;
         public Texture2D Background { get; init; }
         public Texture2D? MoveBoxTexture { get; init; }
+
         public Texture2D CloseButtonTexture { get; init; }
+        public Texture2D CloseButtonHoverTexture { get; init; }
+        public Texture2D CloseButtonHeldTexture { get; init; }
     }
 }

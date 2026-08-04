@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using PopUpUI.Input;
+using System;
 
 #nullable enable
 
@@ -11,8 +12,10 @@ namespace NoteKeeper.Shell.ToolBar
         private readonly ToolMenuLayoutCalculator layoutCalculator;
         private readonly ToolMenuStyleProvider styleProvider;
 
+        private readonly ActionToolButton _closeButton;
+
         private IToolMenu? _shownMenu;
-        private ActionToolButton? _hoveredButton;
+        private IToolButton? _hoveredButton;
         private bool _isHoveredItemHeld;
 
         public Point ScreenLocation
@@ -22,12 +25,23 @@ namespace NoteKeeper.Shell.ToolBar
         }
         public bool IsShown => _shownMenu != null;
 
+        public event Action<bool>? MenuVisibilityChanged;
+
         public ToolMenuManager()
         {
             styleProvider = new ToolMenuStyleProvider();
 
             layoutCalculator = new ToolMenuLayoutCalculator(styleProvider);
             renderer = new ToolMenuRenderer(styleProvider, layoutCalculator);
+
+            _closeButton = new ActionToolButton(Hide);
+            styleProvider.ThemeChanged += () =>
+            {
+                ToolMenuStyle style = styleProvider.Style;
+                _closeButton.DefaultTexture = style.CloseButtonTexture;
+                _closeButton.HoveredTexture = style.CloseButtonHoverTexture;
+                _closeButton.HeldTexture = style.CloseButtonHeldTexture;
+            };
         }
 
         public void Show(IToolMenu menu)
@@ -36,6 +50,8 @@ namespace NoteKeeper.Shell.ToolBar
 
             _shownMenu = menu;
             styleProvider.ApplyTheme(menu.MenuStyle);
+
+            MenuVisibilityChanged?.Invoke(true);
         }
 
         public void Hide()
@@ -43,6 +59,8 @@ namespace NoteKeeper.Shell.ToolBar
             _shownMenu = null;
             _hoveredButton = null;
             _isHoveredItemHeld = false;
+
+            MenuVisibilityChanged?.Invoke(false);
         }
 
         public void Render()
@@ -50,7 +68,7 @@ namespace NoteKeeper.Shell.ToolBar
             if (_shownMenu == null)
                 return;
 
-            renderer.Render(_shownMenu, _hoveredButton, _isHoveredItemHeld);
+            renderer.Render(_shownMenu, _hoveredButton, _closeButton, _isHoveredItemHeld);
         }
 
         public void MousePositionChangeUpdate(PopWindowMouseEventArgs e)
@@ -77,7 +95,7 @@ namespace NoteKeeper.Shell.ToolBar
             }
         }
 
-        private ActionToolButton? FindButtonOnPosition(Point mousePosition)
+        private IToolButton? FindButtonOnPosition(Point mousePosition)
         {
             int currentRow = 0;
             int currentColumn = 0;
@@ -96,6 +114,11 @@ namespace NoteKeeper.Shell.ToolBar
                     currentColumn = 0;
                     currentRow++;
                 }
+            }
+
+            if (layoutCalculator.GetCloseButtonLayout().Contains(mousePosition))
+            {
+                return _closeButton;
             }
 
             return null;

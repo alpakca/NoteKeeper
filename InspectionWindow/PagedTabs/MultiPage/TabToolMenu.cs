@@ -11,7 +11,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
     {
         private readonly MultiPageTab _tab;
 
-        public ActionToolButton[] Buttons { get; }
+        public IToolButton[] Buttons { get; }
         public ToolMenuStyle MenuStyle { get; }
 
         public TabToolMenu(MultiPageTab tab)
@@ -22,6 +22,8 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
             {
                 Background = Util.GetTexture(1, 1, Color.Yellow),
                 CloseButtonTexture = Util.GetTexture(1, 1, Color.Red),
+                CloseButtonHoverTexture = Util.GetTexture(1, 1, Color.DarkRed),
+                CloseButtonHeldTexture = Util.GetTexture(1, 1, Color.LightPink),
                 ColumnCount = 2,
             };
 

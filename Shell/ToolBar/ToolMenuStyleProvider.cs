@@ -11,9 +11,13 @@ namespace NoteKeeper.Shell.ToolBar
 
         public ToolMenuStyle Style => _style;
 
+        public event Action ThemeChanged;
+
         public void ApplyTheme(ToolMenuStyle style)
         {
             _style = style;
+
+            ThemeChanged?.Invoke();
         }
     }
 }

@@ -25,6 +25,8 @@ namespace NoteKeeper.Shell
         private readonly ToolMenuManager toolMenuManager;
         private readonly KeyboardShortcutManager shortcutManager;
 
+        public ToolMenuManager ToolMenuManager => toolMenuManager;
+
         public PanelWindow(ControlPanel panel, Point size) : base(size)
         {
             this.panel = panel;

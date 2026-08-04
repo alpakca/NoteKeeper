@@ -6,7 +6,7 @@ namespace NoteKeeper.Shell.ToolBar
 {
     internal interface IToolMenu
     {
-        public ActionToolButton[] Buttons { get; }
+        public IToolButton[] Buttons { get; }
         public ToolMenuStyle MenuStyle { get; }
     }
 }
