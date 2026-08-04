@@ -4,10 +4,9 @@ using Microsoft.Xna.Framework.Input;
 using PopUpUI.Toolkit;
 using System.Linq;
 using NoteKeeper.Shell;
-using NoteKeeper.InspectionWindow.PagedTabs.MultiPage;
-using NoteKeeper.InspectionWindow.PagedTabs;
 using System.Collections.Generic;
 using System.IO;
+using NoteKeeper.InspectionWindow.MultiPage;
 
 namespace NoteKeeper
 {
@@ -30,7 +29,7 @@ namespace NoteKeeper
             WindowOptions.Size = new Point(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width, 
                                            GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height);
             WindowOptions.AllowUserResizing = true;
-
+            
             WindowOptions.Position = new Point(10);
 
             base.Initialize();

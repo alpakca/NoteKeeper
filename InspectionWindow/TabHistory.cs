@@ -1,4 +1,4 @@
-﻿using NoteKeeper.InspectionWindow.PagedTabs.History;
+﻿using NoteKeeper.InspectionWindow.MultiPage.History;
 using System;
 using System.Collections.Generic;
 using System.Text;

@@ -1,0 +1,174 @@
+﻿using Microsoft.Xna.Framework;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Text;
+
+namespace NoteKeeper.InspectionWindow.MultiPage.Components
+{
+    internal class TabViewport : ITabViewport
+    {
+        private const float MaximumZoomValue = 4f;
+        private const float MinimumZoomValue = 0.5f;
+
+        private bool inVerticalMode = true;
+        private Point scrolledDistance;
+
+        public float Zoom
+        {
+            get;
+            set
+            {
+                field = Math.Clamp(value, MinimumZoomValue, MaximumZoomValue);
+                ZoomChanged?.Invoke();
+            }
+        } = 1f;
+
+        public bool InVerticalMode => inVerticalMode;
+        public Point ScrolledDistance => scrolledDistance;
+        public Point UISize { get; set; }
+
+        public int ViewedWidth => (int)(UISize.X / Zoom);
+        public int ViewedHeight => (int)(UISize.Y / Zoom);
+
+        public int TotalContentHeight => InVerticalMode ? GetAllPagesContentLength(EachPageHeight, VerticalMargin) 
+                                                        : GetSinglePageContentLength(EachPageHeight, VerticalMargin);
+        public int TotalContentWidth => InVerticalMode ? GetSinglePageContentLength(EachPageWidth, HorizontalMargin) 
+                                                       : GetAllPagesContentLength(EachPageWidth, HorizontalMargin);
+
+        public event Action ZoomChanged;
+        public event Action ScrollChanged;
+
+        // by pixels
+        public int EachPageHeight { get; set; } = 1000;
+        public int EachPageWidth { get; set; } = 700;
+        public int HorizontalMargin { get; set; } = 20;
+        public int VerticalMargin { get; set; } = 20;
+        public int PageSpacing { get; set; } = 30;
+
+        public int PageCount { get; set; }
+
+        public int MovingDimensionPageStepLength => inVerticalMode ? EachPageHeight + PageSpacing : EachPageWidth + PageSpacing;
+        public int MovingDimensionScroll => inVerticalMode ? scrolledDistance.Y : scrolledDistance.X;
+        public Point MovingDimensionPageStep => inVerticalMode ? new Point(0, EachPageHeight + PageSpacing) : new Point(EachPageWidth + PageSpacing, 0);
+
+        private bool ExceedsUIHeight => ScrollableHeight > 0;
+        private bool ExceedsUIWidth => ScrollableWidth > 0;
+
+        private float ScrollableHeight => TotalContentHeight - ViewedHeight;
+        private float ScrollableWidth => TotalContentWidth - ViewedWidth;
+
+        public Point FirstPageStartPosition
+        {
+            get
+            {
+                Point position = new Point(HorizontalMargin, VerticalMargin) - scrolledDistance;
+
+                if (!ExceedsUIHeight)
+                {
+                    position.Y = (ViewedHeight - TotalContentHeight) / 2;
+                }
+
+                if (!ExceedsUIWidth)
+                {
+                    position.X = (ViewedWidth - TotalContentWidth) / 2;
+                }
+
+                return position.Times(Zoom);
+            }
+        }
+
+        public NotePagePosition ToPagePosition(Point mousePosition)
+        {
+            Point normalizedPagedPosition = (mousePosition - FirstPageStartPosition).Times(1 / Zoom);
+
+            int movingDimentionPosition = inVerticalMode ? normalizedPagedPosition.Y : normalizedPagedPosition.X;
+            for (int i = 0; i < PageCount; i++)
+            {
+                if (0 <= movingDimentionPosition && movingDimentionPosition < MovingDimensionPageStepLength)
+                {
+                    return new NotePagePosition(i, normalizedPagedPosition - MovingDimensionPageStep * i);
+                }
+
+                movingDimentionPosition -= MovingDimensionPageStepLength;
+            }
+
+            return new NotePagePosition(-1, normalizedPagedPosition);
+        }
+
+        public bool PageWithOffsetOverlapsScreen(Point offset)
+        {
+            if (inVerticalMode)
+            {
+                return offset.Y + EachPageHeight * Zoom > 0;
+            }
+            else
+            {
+                return offset.X + EachPageWidth * Zoom > 0;
+            }
+        }
+
+        public Point MoveThroughMovingDimension(Point pos, int amount)
+        {
+            if (inVerticalMode)
+            {
+                return new Point(pos.X, pos.Y + amount);
+            }
+            else
+            {
+                return new Point(pos.X + amount, pos.Y);
+            }
+        }
+
+        public void SetOrientation(bool toVerticalMode)
+        {
+            float verticalScrollPercentage = scrolledDistance.Y / ScrollableHeight;
+            float horizontalScrollPercentage = scrolledDistance.X / ScrollableWidth;
+
+            inVerticalMode = toVerticalMode;
+
+            SetVerticalScroll((int)(ScrollableHeight * verticalScrollPercentage));
+            SetHorizontalScroll((int)(ScrollableWidth * horizontalScrollPercentage));
+        }
+
+        public void ScrollHorizontal(int amount)
+        {
+            SetHorizontalScroll(scrolledDistance.X + amount);
+        }
+
+        public void ScrollVertical(int amount)
+        {
+            SetVerticalScroll(scrolledDistance.Y + amount);
+        }
+
+        public void SetHorizontalScroll(int xOffset)
+        {
+            if (ExceedsUIWidth)
+            {
+                scrolledDistance.X = Math.Clamp(xOffset, 0, (int)ScrollableWidth);
+            }
+
+            ScrollChanged?.Invoke();
+        }
+
+        public void SetVerticalScroll(int yOffset)
+        {
+            if (ExceedsUIHeight)
+            {
+                scrolledDistance.Y = Math.Clamp(yOffset, 0, (int)ScrollableHeight);
+            }
+
+            ScrollChanged?.Invoke();
+        }
+
+        private int GetAllPagesContentLength(int mainLength, int margin)
+        {
+            return PageCount * (mainLength + PageSpacing) - PageSpacing + 2 * margin;
+        }
+
+        private static int GetSinglePageContentLength(int mainLength, int margin)
+        {
+            return mainLength + 2 * margin;
+        }
+    }
+}
