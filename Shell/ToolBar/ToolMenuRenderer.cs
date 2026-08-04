@@ -25,12 +25,11 @@ namespace NoteKeeper.Shell.ToolBar
             ToolMenuStyle style = _styleProvider.Style;
 
             DrawTexture(style.Background, new Rectangle(_layoutCalculator.ScreenLocation, _layoutCalculator.GetBackgroundSize(menu.Buttons.Length)));
-            DrawTexture(closeButton.GetTexture(hoveredButton == closeButton, hoveredButton == closeButton && isHeld), _layoutCalculator.GetCloseButtonLayout());
-
             if (style.MoveBoxTexture != null)
             {
                 DrawTexture(style.MoveBoxTexture, _layoutCalculator.GetMoveBoxLayout());
             }
+            DrawTexture(closeButton.GetTexture(hoveredButton == closeButton, hoveredButton == closeButton && isHeld), _layoutCalculator.GetCloseButtonLayout());
 
             foreach (var button in menu.Buttons)
             {

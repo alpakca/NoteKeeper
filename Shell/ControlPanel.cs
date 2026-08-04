@@ -149,7 +149,7 @@ namespace NoteKeeper.Shell
 
             buttonPlate.SaveCurrentTabButton.Enabled = newTab != null;
             buttonPlate.SaveAllTabsButton.Enabled = newTab != null;
-            buttonPlate.ToolMenuToggle.Enabled = newTab != null;
+            buttonPlate.ToolMenuToggle.Enabled = newTab?.ToolMenu != null;
         }
 
         private void TabHistory_HistoryUpdated(TabHistory history)

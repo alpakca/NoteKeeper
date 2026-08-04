@@ -14,6 +14,9 @@ namespace NoteKeeper.Shell.ToolBar
 
         private readonly ActionToolButton _closeButton;
 
+        private bool _movementBoxActive;
+        private Point _movementBoxHoldOrigin;
+
         private IToolMenu? _shownMenu;
         private IToolButton? _hoveredButton;
         private bool _isHoveredItemHeld;
@@ -77,6 +80,11 @@ namespace NoteKeeper.Shell.ToolBar
                 return;
 
             _hoveredButton = FindButtonOnPosition(e.MousePosition);
+
+            if (_movementBoxActive)
+            {
+                ScreenLocation = e.MousePosition - _movementBoxHoldOrigin;
+            }
         }
 
         public void MouseButtonStateChange(PopWindowMouseEventArgs e)
@@ -92,6 +100,22 @@ namespace NoteKeeper.Shell.ToolBar
             {
                 _isHoveredItemHeld = false;
                 _hoveredButton.Selected();
+            }
+            
+            // if they there any buttons (including close button) that is hovered, don't let movement of menu
+            if (_hoveredButton == null && layoutCalculator.GetMoveBoxLayout().Contains(e.MousePosition))
+            {
+                if (e.FirstTimeButtons.HasLeft)
+                {
+                    _movementBoxHoldOrigin = e.MousePosition - ScreenLocation;
+                    _movementBoxActive = true;
+
+                }
+                else if (e.ReleasedButtons.HasLeft)
+                {
+                    ScreenLocation = e.MousePosition - _movementBoxHoldOrigin;
+                    _movementBoxActive = false;
+                }
             }
         }
 

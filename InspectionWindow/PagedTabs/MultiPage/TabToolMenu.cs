@@ -24,6 +24,7 @@ namespace NoteKeeper.InspectionWindow.PagedTabs.MultiPage
                 CloseButtonTexture = Util.GetTexture(1, 1, Color.Red),
                 CloseButtonHoverTexture = Util.GetTexture(1, 1, Color.DarkRed),
                 CloseButtonHeldTexture = Util.GetTexture(1, 1, Color.LightPink),
+                MoveBoxTexture = Util.GetTexture(1, 1, Color.Turquoise),
                 ColumnCount = 2,
             };
 
