@@ -5,20 +5,28 @@ using NoteKeeper.InspectionWindow;
 using NoteKeeper.Project;
 using NoteKeeper.Shell;
 using PopUpUI.Toolkit;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace NoteKeeper
 {
     public class Game1 : Game
     {
+        [DllImport("SDL2", CallingConvention = CallingConvention.Cdecl)]
+        private static extern void SDL_RaiseWindow(IntPtr window);
+
+        [DllImport("SDL2", CallingConvention = CallingConvention.Cdecl)]
+        private static extern void SDL_RestoreWindow(IntPtr window);
+
         private readonly GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-        private readonly ProjectLoader _projectLoader;
-        private ControlPanel? panel;
+        private readonly string[] _args;
+        private ControlPanel panel;
 
         public Game1(string[] args)
         {
@@ -26,7 +34,23 @@ namespace NoteKeeper
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
 
-            _projectLoader = new ProjectLoader(args);
+            _args = args;
+            SingleInstanceChecker.ArgsReceived += LoadTabs;
+        }
+
+        private void LoadTabs(string[] obj)
+        {
+            Thread loadingProject = new Thread(() =>
+            {
+                List<Tab> loadedTabs = ProjectLoader.Load(obj, panel.ActiveTabs);
+                foreach (var tab in loadedTabs) panel.ActiveTabs.Add(tab);
+
+                SDL_RestoreWindow(this.Window.Handle);
+                SDL_RaiseWindow(this.Window.Handle);
+            });
+
+            loadingProject.IsBackground = true;
+            loadingProject.Start();
         }
 
         protected override void Initialize()
@@ -53,31 +77,20 @@ namespace NoteKeeper
                 .ToArray()
             );
 
-            if (_projectLoader.State != LoadedState.CreatorHub)
+            panel = new ControlPanel();
+            Thread loadingProject = new Thread(() =>
             {
-                panel = new ControlPanel();
-                Thread loadProject = new Thread(() =>
-                {
-                    List<Tab> loadedTabs = _projectLoader.Load();
-                    foreach (var tab in loadedTabs) panel.ActiveTabs.Add(tab);
-                });
+                List<Tab> loadedTabs = ProjectLoader.Load(_args, panel.ActiveTabs);
+                foreach (var tab in loadedTabs) panel.ActiveTabs.Add(tab);
+            });
 
-                loadProject.IsBackground = true;
-                loadProject.Start();
-            }
-            else
-            {
-                // load project-creation hub
-            }
+            loadingProject.IsBackground = true;
+            loadingProject.Start();
         }
 
         protected override void OnExiting(object sender, ExitingEventArgs args)
         {
-            if (_projectLoader.State != LoadedState.CreatorHub)
-            {
-                _projectLoader.Save(panel.ActiveTabs);
-            }
-
+            ProjectLoader.Save(panel.ActiveTabs);
             base.OnExiting(sender, args);
         }
 
