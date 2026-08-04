@@ -23,10 +23,18 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
                 ZoomChanged?.Invoke();
             }
         } = 1f;
+        public Point UISize
+        {
+            get;
+            set
+            {
+                field = value;
+                UISizeChanged?.Invoke();
+            }
+        }
 
         public bool InVerticalMode => inVerticalMode;
         public Point ScrolledDistance => scrolledDistance;
-        public Point UISize { get; set; }
 
         public int ViewedWidth => (int)(UISize.X / Zoom);
         public int ViewedHeight => (int)(UISize.Y / Zoom);
@@ -38,6 +46,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
 
         public event Action ZoomChanged;
         public event Action ScrollChanged;
+        public event Action UISizeChanged;
 
         // by pixels
         public int EachPageHeight { get; set; } = 1000;

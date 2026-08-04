@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using NoteKeeper.InspectionWindow.MultiPage.Components;
+using NoteKeeper.Project;
 using NoteKeeper.Shell.ContextMenus;
 using NoteKeeper.Shell.ToolBar;
 using PopUpUI.Input;
@@ -11,6 +12,7 @@ using System.Collections.ObjectModel;
 
 namespace NoteKeeper.InspectionWindow.MultiPage
 {
+    [TabFileExtension(".mlpage")]
     internal class MultiPageTab : Tab
     {
         private readonly TabViewport viewport;
@@ -26,14 +28,14 @@ namespace NoteKeeper.InspectionWindow.MultiPage
 
         public ObservableCollection<NotePage> NotePages { get; }
 
-        public MultiPageTab(Point size, string sourcePath) : base(sourcePath)
+        public MultiPageTab(string sourcePath) : base(sourcePath)
         {
             NotePages = new ObservableCollection<NotePage>();
             TabHistory = new TabHistory();
 
             pageActions = new PageActions(TabHistory);
-            viewport = new TabViewport { UISize = size };
-            window = new TabWindow(size, pageActions, viewport, NotePages);
+            viewport = new TabViewport();
+            window = new TabWindow(pageActions, viewport, NotePages);
 
             NotePages.CollectionChanged += (sender, _) => viewport.PageCount = ((ObservableCollection<NotePage>)sender!).Count;
 
@@ -92,6 +94,11 @@ namespace NoteKeeper.InspectionWindow.MultiPage
         public override ContextMenu? GetContextMenu(Point mousePosition)
         {
             return new ContextMenu([]);
+        }
+
+        public static MultiPageTab Creator(string path)
+        {
+            return new MultiPageTab(path);
         }
     }
 }

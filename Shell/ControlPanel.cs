@@ -92,7 +92,12 @@ namespace NoteKeeper.Shell
         /// <summary>Rearranges heights of TabGroup, ButtonPlate and DisplayedTab; by chaning DisplayedTab's height and keeping others minimum.</summary>
         public void RearrangeUISizes()
         {
-
+            if (displayedTab != null)
+            {
+                Point uiSize = new Point(WindowOptions.Width - 40, 700);
+                displayedTab.TabViewport.UISize = uiSize;
+                displayedTab.Window.Boundaries = new Rectangle(20, 200, uiSize.X, uiSize.Y);
+            }
         }
 
         public void DisplayTab(Tab? tab)

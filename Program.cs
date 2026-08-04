@@ -1,2 +1,11 @@
-﻿using var game = new NoteKeeper.Game1();
-game.Run();
+﻿namespace NoteKeeper
+{
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            using var game = new Game1(args);
+            game.Run();
+        }
+    }
+}

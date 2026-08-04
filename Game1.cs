@@ -1,12 +1,14 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using PopUpUI.Toolkit;
-using System.Linq;
+using NoteKeeper.InspectionWindow;
+using NoteKeeper.Project;
 using NoteKeeper.Shell;
+using PopUpUI.Toolkit;
 using System.Collections.Generic;
 using System.IO;
-using NoteKeeper.InspectionWindow.MultiPage;
+using System.Linq;
+using System.Threading;
 
 namespace NoteKeeper
 {
@@ -15,22 +17,25 @@ namespace NoteKeeper
         private readonly GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-        public Game1()
-        {   
+        private readonly ProjectLoader _projectLoader;
+        private ControlPanel? panel;
+
+        public Game1(string[] args)
+        {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+
+            _projectLoader = new ProjectLoader(args);
         }
 
         protected override void Initialize()
         {
             PopUpUIManager.Initialize(this, _graphics);
 
-            WindowOptions.Size = new Point(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width, 
+            WindowOptions.Size = new Point(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width,
                                            GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height);
             WindowOptions.AllowUserResizing = true;
-            
-            WindowOptions.Position = new Point(10);
 
             base.Initialize();
         }
@@ -48,21 +53,32 @@ namespace NoteKeeper
                 .ToArray()
             );
 
-            SpriteFont font = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans");
+            if (_projectLoader.State != LoadedState.CreatorHub)
+            {
+                panel = new ControlPanel();
+                Thread loadProject = new Thread(() =>
+                {
+                    List<Tab> loadedTabs = _projectLoader.Load();
+                    foreach (var tab in loadedTabs) panel.ActiveTabs.Add(tab);
+                });
 
-            Texture2D red = Util.GetTexture(200, 200, Color.DarkRed);
-            Texture2D green = Util.GetTexture(200, 200, Color.DarkGreen);
+                loadProject.IsBackground = true;
+                loadProject.Start();
+            }
+            else
+            {
+                // load project-creation hub
+            }
+        }
 
-            int leftMargin = 20;
-            int upMargin = 200;
-            int verticalSize = 700;
-            Point viewerSize = new Point(WindowOptions.Size.X - leftMargin * 2, verticalSize);
+        protected override void OnExiting(object sender, ExitingEventArgs args)
+        {
+            if (_projectLoader.State != LoadedState.CreatorHub)
+            {
+                _projectLoader.Save(panel.ActiveTabs);
+            }
 
-            MultiPageTab multi = new MultiPageTab(viewerSize, @"C:\Users\user\Desktop\Test.txt");
-            multi.Window.Boundaries = new Rectangle(20, upMargin, viewerSize.X, viewerSize.Y);
-
-            ControlPanel panel = new ControlPanel();
-            panel.ActiveTabs.Add(multi);
+            base.OnExiting(sender, args);
         }
 
         protected override void Update(GameTime gameTime)
@@ -100,13 +116,6 @@ namespace NoteKeeper
             tex.SetData(Enumerable.Repeat(color, w * h).ToArray());
 
             return tex;
-        }
-
-        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        internal static PageImageContent Location(this PageImageContent content, Point location)
-        {
-            content.SetLocation(location);
-            return content;
         }
     }
 }

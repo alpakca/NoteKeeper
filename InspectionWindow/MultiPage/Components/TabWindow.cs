@@ -23,7 +23,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
         private readonly TabRenderer renderer;
         private readonly TabInputHandler inputHandler;
 
-        public TabWindow(Point size, PageActions pageActions, TabViewport viewport, IList<NotePage> notePages) : base(size)
+        public TabWindow(PageActions pageActions, TabViewport viewport, IList<NotePage> notePages) : base(new Point(1))
         {
             this.pageActions = pageActions;
             this.viewport = viewport;
@@ -32,6 +32,13 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
 
             renderer = new TabRenderer(viewport, notePages);
             inputHandler = new TabInputHandler(pageActions, viewport, notePages);
+
+            viewport.UISizeChanged += Viewport_UISizeChanged;
+        }
+
+        private void Viewport_UISizeChanged()
+        {
+            this.Boundaries = new Rectangle(this.Boundaries.Size, viewport.UISize);
         }
 
         public void ModeUpdated(ShellModes mode)

@@ -15,13 +15,20 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
 
         private readonly TabViewport viewport;
         private readonly IList<NotePage> notePages;
-        private readonly RenderTarget2D target;
+
+        private RenderTarget2D target;
 
         public TabRenderer(TabViewport viewport, IList<NotePage> notePages)
         {
             this.viewport = viewport;
             this.notePages = notePages;
 
+            viewport.UISizeChanged += Viewport_UISizeChanged;
+        }
+
+        private void Viewport_UISizeChanged()
+        {
+            target?.Dispose();
             target = DrawHelper.CreateRenderTarget(viewport.UISize.X, viewport.UISize.Y);
         }
 
