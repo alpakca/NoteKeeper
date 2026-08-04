@@ -27,6 +27,7 @@ namespace NoteKeeper.Shell
             {
                 field = value;
                 displayedTab?.ShellModeUpdated(value);
+                buttonPlate.ShellModeUpdated();
             }
         }
         public Tab? DisplayedTab => displayedTab;
@@ -42,8 +43,9 @@ namespace NoteKeeper.Shell
 
             window = new PanelWindow(this, WindowOptions.Size);
             InitializeWindow();
-
             PopWindowManager.ActiveWindows.Add(window);
+
+            Mode = ShellModes.Transform;
         }
 
         private void InitializeWindow()
