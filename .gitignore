@@ -1,4 +1,8 @@
-Assets/
+# Only include .pui files in assets
+
+Assets/**
+!Assets/**/
+!Assets/**/*.pui
 
 bin/
 obj/
