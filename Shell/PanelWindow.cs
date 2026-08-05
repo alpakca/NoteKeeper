@@ -10,8 +10,6 @@ using PopUpUI.Surface;
 using PopUpUI.Toolkit;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
 
 #nullable enable
 
@@ -35,9 +33,10 @@ namespace NoteKeeper.Shell
 
             contextMenuManager = new ContextMenuManager();
             toolMenuManager = new ToolMenuManager() { ScreenLocation = new Point(60, 240) };
-            tabOrganizeManager = new TabOrganizeManager() { ScreenBounds = new Rectangle(20, 168, 1880, 32) };
+            tabOrganizeManager = new TabOrganizeManager(panel.ActiveTabs) { ScreenBounds = new Rectangle(20, 168, 1880, 32) };
             shortcutManager = new KeyboardShortcutManager();
 
+            #region Debug Styles
             tabOrganizeManager.StyleProvider.ApplyTheme(new TabsHeaderStyle
             {
                 TabDefaultBackground = Util.GetTexture(1, 1, Color.Gray),
@@ -85,6 +84,9 @@ namespace NoteKeeper.Shell
                 { typeof(ActionContextMenuButton), actionButtonStyle }, { typeof(SubContextMenuButton), subMenuStyle }
             };
             contextMenuManager.StyleProvider.ApplyTheme(defaultTheme);
+            #endregion
+
+            tabOrganizeManager.DisplayedTabChanged += panel.DisplayTab;
 
             Elements.Add(shortcutManager);
             InitializeShortcuts();
@@ -104,6 +106,8 @@ namespace NoteKeeper.Shell
         public void DisplayedTabChanged(Tab? setTab)
         {
             displayedTab = setTab;
+
+            tabOrganizeManager.DisplayedTabUpdated(setTab);
 
             // switched the open tool menu with new tab's tool menu
             SetToolMenuVisibility(toolMenuManager.IsShown);
@@ -167,6 +171,7 @@ namespace NoteKeeper.Shell
 
             toolMenuManager.MouseButtonStateChange(e);
             contextMenuManager.MouseButtonStateUpdate(e);
+            tabOrganizeManager.MouseButtonStateChange(e);
             base.OnMouseButtonStateChange(e);
         }
 
@@ -174,6 +179,7 @@ namespace NoteKeeper.Shell
         {
             toolMenuManager.MousePositionChangeUpdate(e);
             contextMenuManager.MousePositionChangeUpdate(e);
+            tabOrganizeManager.MousePositionChangeUpdate(e);
             base.OnMousePositionChange(e);
         }
     }
