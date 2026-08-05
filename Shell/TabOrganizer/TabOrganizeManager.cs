@@ -14,7 +14,7 @@ namespace NoteKeeper.Shell.TabOrganizer
         private readonly TabsHeaderLayoutCalculator layoutCalculator;
         private readonly TabsHeaderRenderer renderer;
 
-        private readonly IList<Tab> _activeTabs;
+        private readonly TabCollection _activeTabs;
         private int _displayedTabIndex;
         private int _hoveredTabIndex;
 
@@ -31,7 +31,7 @@ namespace NoteKeeper.Shell.TabOrganizer
 
         public event Action<Tab>? DisplayedTabChanged;
 
-        public TabOrganizeManager(IList<Tab> activeTabs)
+        public TabOrganizeManager(TabCollection activeTabs)
         {
             _activeTabs = activeTabs;
             StyleProvider = new TabsHeaderStyleProvider();
@@ -45,9 +45,9 @@ namespace NoteKeeper.Shell.TabOrganizer
             _displayedTabIndex = _activeTabs.IndexOf(newTab!);
         }
 
-        public void Render(IList<Tab> activeTabs, Tab? displayedTab)
+        public void Render()
         {
-            renderer.Render(activeTabs, _displayedTabIndex, _hoveredTabIndex, _closeButtonHovered, _closeButtonHeld);
+            renderer.Render(_activeTabs, _displayedTabIndex, _hoveredTabIndex, _closeButtonHovered, _closeButtonHeld);
         }
 
         public void MousePositionChangeUpdate(PopWindowMouseEventArgs e)

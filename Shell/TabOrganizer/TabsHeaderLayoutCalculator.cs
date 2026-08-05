@@ -21,7 +21,7 @@ namespace NoteKeeper.Shell.TabOrganizer
             _styleProvider = styleProvider;
         }
 
-        public TabLayout GetTabLayout(IList<Tab> activeTabs, int index, int displayedTabIndex)
+        public TabLayout GetTabLayout(TabCollection activeTabs, int index, int displayedTabIndex)
         {
             int xoffset = 0;
             for (int i = 0; i < activeTabs.Count; i++)

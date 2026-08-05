@@ -29,13 +29,14 @@ namespace NoteKeeper.Shell
             }
         }
         public Tab? DisplayedTab => displayedTab;
-        public ObservableCollection<Tab> ActiveTabs { get; }
+        public TabCollection ActiveTabs { get; }
         public PanelWindow PanelWindow => window;
 
         public ControlPanel()
         {
             tabUpdateReceivers = new List<ITabUpdateReceiver>();
-            ActiveTabs = new ObservableCollection<Tab>();
+            ActiveTabs = new TabCollection();
+            ActiveTabs.CollectionChanged += ActiveTabs_CollectionChanged;
 
             window = new PanelWindow(this) { Boundaries = new Rectangle(new Point(), WindowOptions.Size) };
             buttonPlate = new ButtonPlate(this);
@@ -151,6 +152,14 @@ namespace NoteKeeper.Shell
             buttonPlate.SaveCurrentTabButton.Enabled = newTab != null;
             buttonPlate.SaveAllTabsButton.Enabled = newTab != null;
             buttonPlate.ToolMenuToggle.Enabled = newTab?.ToolMenu != null;
+        }
+
+        private void ActiveTabs_CollectionChanged(TabCollection obj)
+        {
+            if (!obj.Contains(displayedTab!))
+            {
+                DisplayTab(null);
+            }
         }
 
         private void TabHistory_HistoryUpdated(TabHistory history)

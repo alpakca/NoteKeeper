@@ -20,7 +20,7 @@ namespace NoteKeeper.Shell.TabOrganizer
             _layoutCalculator = layoutCalculator;
         }
 
-        public void Render(IList<Tab> activeTabs, int displayedTabIndex, int hoveredTabIndex, bool closeButtonHovered, bool closeButtonHeld)
+        public void Render(TabCollection activeTabs, int displayedTabIndex, int hoveredTabIndex, bool closeButtonHovered, bool closeButtonHeld)
         {
             TabsHeaderStyle style = _styleProvider.Style;
             DrawHelper.Batch.Draw(style.HeaderBackground, _layoutCalculator.ScreenBounds, Color.White);

@@ -70,13 +70,7 @@ namespace NoteKeeper
 
         protected override void OnExiting(object sender, ExitingEventArgs args)
         {
-            // display a warning window if there are tabs that not up-to-date, ask for continue
-
-            foreach (var tab in panel.ActiveTabs)
-            {
-                tab.TabSerializer.Save();
-            }
-
+            panel.ActiveTabs.Clear();
             base.OnExiting(sender, args);
         }
 
@@ -124,7 +118,7 @@ namespace NoteKeeper
             Tab? toDisplay = null;
             if (_pendingLoadedTabs.TryTake(out string? result))
             {
-                Tab? sameSource = panel.ActiveTabs.FirstOrDefault(tab => tab.SourcePath == result);
+                Tab? sameSource = panel.ActiveTabs.Find(tab => tab.SourcePath == result);
 
                 // same-sourced tab already exists, display it without adding it to active tabs
                 if (sameSource != null)
