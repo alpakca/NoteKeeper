@@ -16,13 +16,16 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
             Converters = { new PageContentInfoConverter(), new PointConverter() }
         };
 
+        private bool _isModified;
         private readonly MultiPageTab _tab;
 
         public string FileExtension { get; } = "mpt";
+        public bool IsModified => _isModified;
 
-        public TabSerializer(MultiPageTab tab)
+        public TabSerializer(MultiPageTab tab, PageActions pageActions)
         {
             _tab = tab;
+            pageActions.CommandApplied += (_, _) => _isModified = true;
         }
 
         public void Load()
@@ -41,6 +44,8 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
 
                 _tab.NotePages.Add(page);
             }
+
+            _isModified = false;
         }
 
         public void Save()
@@ -61,6 +66,8 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
 
             string json = JsonSerializer.Serialize(tabInfo, _options);
             File.WriteAllText(_tab.SourcePath, json);
+
+            _isModified = false;
         }
     }
 }

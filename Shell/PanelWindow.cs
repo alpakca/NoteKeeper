@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using NoteKeeper.InspectionWindow;
 using NoteKeeper.Shell.ContextMenus;
+using NoteKeeper.Shell.TabOrganizer;
 using NoteKeeper.Shell.ToolBar;
 using PopUpUI.Input;
 using PopUpUI.Surface;
@@ -23,6 +24,7 @@ namespace NoteKeeper.Shell
         private readonly ControlPanel panel;
         private readonly ContextMenuManager contextMenuManager;
         private readonly ToolMenuManager toolMenuManager;
+        private readonly TabOrganizeManager tabOrganizeManager;
         private readonly KeyboardShortcutManager shortcutManager;
 
         public ToolMenuManager ToolMenuManager => toolMenuManager;
@@ -33,7 +35,24 @@ namespace NoteKeeper.Shell
 
             contextMenuManager = new ContextMenuManager();
             toolMenuManager = new ToolMenuManager() { ScreenLocation = new Point(60, 240) };
+            tabOrganizeManager = new TabOrganizeManager() { ScreenBounds = new Rectangle(20, 168, 1880, 32) };
             shortcutManager = new KeyboardShortcutManager();
+
+            tabOrganizeManager.StyleProvider.ApplyTheme(new TabsHeaderStyle
+            {
+                TabDefaultBackground = Util.GetTexture(1, 1, Color.Gray),
+                TabHoveredBackground = Util.GetTexture(1, 1, Color.LightGray),
+                DisplayedTabBackground = Util.GetTexture(1, 1, Color.DarkMagenta),
+
+                DefaultFont = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans"),
+                DisplayedTabFont = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans"),
+
+                TabCloseButtonDefaultBackground = Util.GetTexture(1, 1, Color.Red),
+                TabCloseButtonHoverBackground = Util.GetTexture(1, 1, Color.Salmon),
+                TabCloseButtonHeldBackground = Util.GetTexture(1, 1, Color.DarkRed),
+
+                HeaderBackground = Util.GetTexture(1, 1, Color.Gray)
+            });
 
             MenuItemStyle actionButtonStyle = new MenuItemStyle
             {
@@ -122,7 +141,10 @@ namespace NoteKeeper.Shell
             base.RenderUpdate();
 
             DrawHelper.SetBeginBatch(WindowTexture);
+
             toolMenuManager.Render();
+            tabOrganizeManager.Render(panel.ActiveTabs, panel.DisplayedTab);
+
             DrawHelper.EndBatch();
 
             // render context menu on top of everything

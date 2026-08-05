@@ -15,8 +15,6 @@ namespace NoteKeeper.Shell
         private Tab? displayedTab;
 
         private readonly ButtonPlate buttonPlate;
-        private readonly TabGroup tabGroup;
-
         private readonly PanelWindow window;
         private readonly List<ITabUpdateReceiver> tabUpdateReceivers;
 
@@ -41,7 +39,6 @@ namespace NoteKeeper.Shell
 
             window = new PanelWindow(this) { Boundaries = new Rectangle(new Point(), WindowOptions.Size) };
             buttonPlate = new ButtonPlate(this);
-            tabGroup = new TabGroup(this) { Boundaries = new Rectangle(20, 170, 1720, 30) };
 
             InitializeWindow();
             PopWindowManager.ActiveWindows.Add(window);
@@ -74,7 +71,6 @@ namespace NoteKeeper.Shell
             window.Elements.Add(verticalScroller);
             window.Elements.Add(horizontalScroller);
             window.Elements.AddRange(buttonPlate.Buttons);
-            window.Elements.Add(tabGroup.UIElement);
 
             tabUpdateReceivers.AddRange(verticalScroller, horizontalScroller, window);
         }
