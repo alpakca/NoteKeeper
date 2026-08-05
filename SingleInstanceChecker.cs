@@ -16,6 +16,7 @@ namespace NoteKeeper
 
         private static Mutex? _mutex;
 
+        public static bool IsServer { get; private set; }
         public static event Action<string[]>? ArgsReceived;
 
         public static bool TryStart(string[] args)
@@ -25,11 +26,13 @@ namespace NoteKeeper
             if (createdNew)
             {
                 StartPipeServer();
+                IsServer = true;
                 return true;
             }
             else
             {
                 SendArgsToServer(args);
+                IsServer = false;
                 return false;
             }
         }
@@ -40,29 +43,26 @@ namespace NoteKeeper
             _mutex?.Dispose();
         }
 
-        private static void StartPipeServer()
+        private static async void StartPipeServer()
         {
-            Task.Run(async () =>
+            while (true)
             {
-                while (true)
+                try
                 {
-                    try
-                    {
-                        using NamedPipeServerStream server = new NamedPipeServerStream(PipeName, PipeDirection.In);
+                    using NamedPipeServerStream server = new NamedPipeServerStream(PipeName, PipeDirection.In);
 
-                        await server.WaitForConnectionAsync();
+                    await server.WaitForConnectionAsync();
 
-                        using StreamReader reader = new StreamReader(server);
-                        string? data = await reader.ReadToEndAsync();
+                    using StreamReader reader = new StreamReader(server);
+                    string? data = await reader.ReadToEndAsync();
 
-                        string[] args = string.IsNullOrEmpty(data) ? [] : data.Split('\0');
-                        ArgsReceived?.Invoke(args);
-                    }
-                    catch
-                    {
-                    }
+                    string[] args = string.IsNullOrEmpty(data) ? [] : data.Split('\0');
+                    ArgsReceived?.Invoke(args);
                 }
-            });
+                catch
+                {
+                }
+            }
         }
 
         private static void SendArgsToServer(string[] args)
@@ -81,8 +81,8 @@ namespace NoteKeeper
             }
             catch (TimeoutException)
             {
-
             }
+
         }
     }
 }

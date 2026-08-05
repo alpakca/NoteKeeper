@@ -27,7 +27,7 @@ namespace NoteKeeper.Shell
 
         public ToolMenuManager ToolMenuManager => toolMenuManager;
 
-        public PanelWindow(ControlPanel panel, Point size) : base(size)
+        public PanelWindow(ControlPanel panel)
         {
             this.panel = panel;
 

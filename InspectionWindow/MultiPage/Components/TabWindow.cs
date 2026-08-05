@@ -23,7 +23,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
         private readonly TabRenderer renderer;
         private readonly TabInputHandler inputHandler;
 
-        public TabWindow(PageActions pageActions, TabViewport viewport, IList<NotePage> notePages) : base(new Point(1))
+        public TabWindow(PageActions pageActions, TabViewport viewport, IList<NotePage> notePages)
         {
             this.pageActions = pageActions;
             this.viewport = viewport;

@@ -6,26 +6,20 @@ using NoteKeeper.Project;
 using NoteKeeper.Shell;
 using PopUpUI.Toolkit;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading;
 
 namespace NoteKeeper
 {
     public class Game1 : Game
     {
-        [DllImport("SDL2", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void SDL_RaiseWindow(IntPtr window);
-
-        [DllImport("SDL2", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void SDL_RestoreWindow(IntPtr window);
-
         private readonly GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-        private readonly string[] _args;
+        private readonly ConcurrentBag<string> _pendingLoadedTabs;
         private ControlPanel panel;
 
         public Game1(string[] args)
@@ -34,23 +28,17 @@ namespace NoteKeeper
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
 
-            _args = args;
+            _pendingLoadedTabs = [.. args];
+
             SingleInstanceChecker.ArgsReceived += LoadTabs;
         }
 
         private void LoadTabs(string[] obj)
         {
-            Thread loadingProject = new Thread(() =>
+            foreach (var file in obj)
             {
-                List<Tab> loadedTabs = ProjectLoader.Load(obj, panel.ActiveTabs);
-                foreach (var tab in loadedTabs) panel.ActiveTabs.Add(tab);
-
-                SDL_RestoreWindow(this.Window.Handle);
-                SDL_RaiseWindow(this.Window.Handle);
-            });
-
-            loadingProject.IsBackground = true;
-            loadingProject.Start();
+                _pendingLoadedTabs.Add(file);
+            }
         }
 
         protected override void Initialize()
@@ -78,19 +66,17 @@ namespace NoteKeeper
             );
 
             panel = new ControlPanel();
-            Thread loadingProject = new Thread(() =>
-            {
-                List<Tab> loadedTabs = ProjectLoader.Load(_args, panel.ActiveTabs);
-                foreach (var tab in loadedTabs) panel.ActiveTabs.Add(tab);
-            });
-
-            loadingProject.IsBackground = true;
-            loadingProject.Start();
         }
 
         protected override void OnExiting(object sender, ExitingEventArgs args)
         {
-            ProjectLoader.Save(panel.ActiveTabs);
+            // display a warning window if there are tabs that not up-to-date, ask for continue
+
+            foreach (var tab in panel.ActiveTabs)
+            {
+                tab.TabSerializer.Save();
+            }
+
             base.OnExiting(sender, args);
         }
 
@@ -98,6 +84,11 @@ namespace NoteKeeper
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
+
+            while (!_pendingLoadedTabs.IsEmpty)
+            {
+                LoadPendingFiles();
+            }
 
             PopUpUIManager.Update(gameTime);
 
@@ -119,7 +110,49 @@ namespace NoteKeeper
 
             base.Draw(gameTime);
         }
+
+#nullable enable
+
+        [DllImport("SDL2", CallingConvention = CallingConvention.Cdecl)]
+        private static extern void SDL_RaiseWindow(IntPtr window);
+
+        [DllImport("SDL2", CallingConvention = CallingConvention.Cdecl)]
+        private static extern void SDL_RestoreWindow(IntPtr window);
+
+        private void LoadPendingFiles()
+        {
+            Tab? toDisplay = null;
+            if (_pendingLoadedTabs.TryTake(out string? result))
+            {
+                Tab? sameSource = panel.ActiveTabs.FirstOrDefault(tab => tab.SourcePath == result);
+
+                // same-sourced tab already exists, display it without adding it to active tabs
+                if (sameSource != null)
+                {
+                    toDisplay = sameSource;
+                }
+                else
+                {
+                    Tab? created = TabRegistry.Create(result);
+                    if (created != null)
+                    {
+                        panel.ActiveTabs.Add(created);
+                        toDisplay = created;
+                    }
+                }
+            }
+
+            if (toDisplay != null)
+            {
+                panel.DisplayTab(toDisplay);
+
+                SDL_RestoreWindow(this.Window.Handle);
+                SDL_RaiseWindow(this.Window.Handle);
+            }
+        }
     }
+
+#nullable disable
 
     public static class Util
     {

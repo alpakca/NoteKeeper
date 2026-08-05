@@ -39,7 +39,7 @@ namespace NoteKeeper.Shell
             tabUpdateReceivers = new List<ITabUpdateReceiver>();
             ActiveTabs = new ObservableCollection<Tab>();
 
-            window = new PanelWindow(this, WindowOptions.Size);
+            window = new PanelWindow(this) { Boundaries = new Rectangle(new Point(), WindowOptions.Size) };
             buttonPlate = new ButtonPlate(this);
             tabGroup = new TabGroup(this) { Boundaries = new Rectangle(20, 170, 1720, 30) };
 
@@ -133,8 +133,9 @@ namespace NoteKeeper.Shell
                 PopWindowManager.ActiveWindows.MoveToBottom(tab.Window);
             }
 
-            DisplayedTabChanged(tab);
+            displayedTab = tab;
             RearrangeUISizes();
+            DisplayedTabChanged(tab);
         }
 
         private void Tab_ShellModeChangeRequested(ShellModes mode)
@@ -144,7 +145,6 @@ namespace NoteKeeper.Shell
 
         private void DisplayedTabChanged(Tab? newTab)
         {
-            displayedTab = newTab;
             newTab?.ShellModeUpdated(Mode);
 
             foreach (var receiver in tabUpdateReceivers)
