@@ -15,8 +15,6 @@ namespace NoteKeeper.Shell.TabOrganizer
         private readonly TabsHeaderRenderer renderer;
 
         private readonly IList<Tab> _activeTabs;
-        private Tab? _displayedTab;
-        private Tab? _hoveredTab;
         private int _displayedTabIndex;
         private int _hoveredTabIndex;
 
@@ -44,18 +42,17 @@ namespace NoteKeeper.Shell.TabOrganizer
 
         public void DisplayedTabUpdated(Tab? newTab)
         {
-            _displayedTab = newTab;
             _displayedTabIndex = _activeTabs.IndexOf(newTab!);
         }
 
         public void Render(IList<Tab> activeTabs, Tab? displayedTab)
         {
-            renderer.Render(activeTabs, displayedTab, null, false, false);
+            renderer.Render(activeTabs, _displayedTabIndex, _hoveredTabIndex, _closeButtonHovered, _closeButtonHeld);
         }
 
         public void MousePositionChangeUpdate(PopWindowMouseEventArgs e)
         {
-            (_hoveredTab, _hoveredTabIndex) = FindHoveredTab(e.MousePosition);
+            _hoveredTabIndex = FindHoveredTabIndex(e.MousePosition);
 
             if (_hoveredTabIndex == -1)
             {
@@ -69,7 +66,7 @@ namespace NoteKeeper.Shell.TabOrganizer
 
         public void MouseButtonStateChange(PopWindowMouseEventArgs e)
         {
-            if (_hoveredTab == null)
+            if (_hoveredTabIndex == -1)
             {
                 return;
             }
@@ -82,13 +79,12 @@ namespace NoteKeeper.Shell.TabOrganizer
                 {
                     _closeButtonHeld = true;
                 }
-                else if (hoveredTabLayout.BoxBounds.Contains(e.MousePosition) && _hoveredTab != _displayedTab)
+                else if (hoveredTabLayout.BoxBounds.Contains(e.MousePosition) && _hoveredTabIndex != _displayedTabIndex)
                 {
-                    _displayedTab = _hoveredTab;
                     _displayedTabIndex = _hoveredTabIndex;
                     _closeButtonHovered = hoveredTabLayout.CloseButtonBounds.Contains(e.MousePosition);
 
-                    DisplayedTabChanged?.Invoke(_hoveredTab);
+                    DisplayedTabChanged?.Invoke(_activeTabs[_hoveredTabIndex]);
                 }
             }
             else if (e.ReleasedButtons.HasLeft)
@@ -96,13 +92,13 @@ namespace NoteKeeper.Shell.TabOrganizer
                 if (_closeButtonHeld && hoveredTabLayout.CloseButtonBounds.Contains(e.MousePosition))
                 {
                     _closeButtonHeld = false;
-                    _activeTabs.Remove(_hoveredTab);
+                    _activeTabs.Remove(_activeTabs[_hoveredTabIndex]);
                     MousePositionChangeUpdate(e); // update hovered tab for new layout
                 }
             }
         }
 
-        private (Tab? HoveredTab, int HoveredTabIndex) FindHoveredTab(Point mousePosition)
+        private int FindHoveredTabIndex(Point mousePosition)
         {
             for (int i = 0; i < _activeTabs.Count; i++)
             {
@@ -110,11 +106,11 @@ namespace NoteKeeper.Shell.TabOrganizer
 
                 if (layout.BoxBounds.Contains(mousePosition))
                 {
-                    return (_activeTabs[i], i);
+                    return i;
                 }
             }
 
-            return (null, -1);
+            return -1;
         }
     }
 }

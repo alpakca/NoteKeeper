@@ -4,7 +4,6 @@ using NoteKeeper.InspectionWindow;
 using PopUpUI.Toolkit;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 #nullable enable
 
@@ -21,34 +20,43 @@ namespace NoteKeeper.Shell.TabOrganizer
             _layoutCalculator = layoutCalculator;
         }
 
-        public void Render(IList<Tab> activeTabs, Tab? displayedTab, Tab? hoveredTab, bool closeButtonHovered, bool closeButtonHeld)
+        public void Render(IList<Tab> activeTabs, int displayedTabIndex, int hoveredTabIndex, bool closeButtonHovered, bool closeButtonHeld)
         {
             TabsHeaderStyle style = _styleProvider.Style;
-
             DrawHelper.Batch.Draw(style.HeaderBackground, _layoutCalculator.ScreenBounds, Color.White);
-
-            int displayedTabIndex = activeTabs.IndexOf(displayedTab!);
-
-            // there can't be situation no displayed tab exist / is not inside active tabs
-            // it means no tabs are active at all, in that case just return
-            if (displayedTabIndex == -1)
-            {
-                return;
-            }
 
             int currentXOffset = 0;
             for (int i = 0; i < activeTabs.Count; i++)
             {
                 TabLayout layout = _layoutCalculator.GetTabLayout(activeTabs, i, displayedTabIndex);
-
                 if (currentXOffset + layout.BoxBounds.X > _layoutCalculator.ScreenBounds.Width)
                 {
                     break;
                 }
 
-                Tab tab = activeTabs[i];
-                var textureSet = GetTextureSet(tab == displayedTab, tab == hoveredTab, closeButtonHovered, closeButtonHeld);
-                DrawTabBox(tab, layout, textureSet.Background, textureSet.Font, textureSet.CloseButtonTexture);
+                Texture2D? closeButtonTexture;
+                if (i != displayedTabIndex && i != hoveredTabIndex)
+                {
+                    closeButtonTexture = null;
+                }
+                else
+                {
+                    closeButtonTexture = closeButtonHeld ? style.TabCloseButtonHeldBackground
+                                                         : closeButtonHovered ? style.TabCloseButtonHoverBackground
+                                                                              : style.TabCloseButtonDefaultBackground;
+                    if (i != hoveredTabIndex)
+                    {
+                        closeButtonTexture = style.TabCloseButtonDefaultBackground;
+                    }
+                }
+
+                Texture2D background = i == displayedTabIndex ? style.DisplayedTabBackground
+                                                              : i == hoveredTabIndex ? style.TabHoveredBackground
+                                                                                     : style.TabDefaultBackground;
+
+                SpriteFont font = i == displayedTabIndex ? style.DisplayedTabFont : style.DefaultFont;
+
+                DrawTabBox(activeTabs[i], layout, background, font, closeButtonTexture);
             }
         }
 
@@ -61,33 +69,6 @@ namespace NoteKeeper.Shell.TabOrganizer
             if (closeButtonTexture != null)
             {
                 DrawHelper.Batch.Draw(closeButtonTexture, layout.CloseButtonBounds, Color.White);
-            }
-        }
-
-        private (Texture2D Background, SpriteFont Font, Texture2D? CloseButtonTexture) GetTextureSet(bool isTabDisplayed, bool isTabHovered, 
-                                                                                                    bool isCloseButtonHovered, bool isCloseButtonHeld)
-        {
-            TabsHeaderStyle style = _styleProvider.Style;
-            if (!isTabDisplayed && !isTabHovered)
-            {
-                return (style.TabDefaultBackground, style.DefaultFont, null);
-            }
-
-            // tab is either hovered or held, close button appears
-            Texture2D closeButtonTexture = isCloseButtonHeld ? style.TabCloseButtonHeldBackground 
-                                                             : (isCloseButtonHovered ? style.TabCloseButtonHoverBackground 
-                                                                                     : style.TabCloseButtonDefaultBackground);
-            if (isTabDisplayed)
-            {
-                return (style.DisplayedTabBackground, style.DisplayedTabFont, closeButtonTexture);
-            }
-            else if (isTabHovered)
-            {
-                return (style.TabHoveredBackground, style.DefaultFont, closeButtonTexture);
-            }
-            else
-            {
-                return (style.TabDefaultBackground, style.DefaultFont, closeButtonTexture);
             }
         }
     }
