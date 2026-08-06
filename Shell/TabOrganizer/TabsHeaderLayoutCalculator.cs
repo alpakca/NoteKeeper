@@ -23,6 +23,11 @@ namespace NoteKeeper.Shell.TabOrganizer
 
         public TabLayout GetTabLayout(TabCollection activeTabs, int index, int displayedTabIndex)
         {
+            if (index == -1)
+            {
+                return new TabLayout();
+            }
+
             int xoffset = 0;
             for (int i = 0; i < activeTabs.Count; i++)
             {

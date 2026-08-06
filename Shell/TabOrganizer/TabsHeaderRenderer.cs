@@ -25,29 +25,12 @@ namespace NoteKeeper.Shell.TabOrganizer
             TabsHeaderStyle style = _styleProvider.Style;
             DrawHelper.Batch.Draw(style.HeaderBackground, _layoutCalculator.ScreenBounds, Color.White);
 
-            int currentXOffset = 0;
             for (int i = 0; i < activeTabs.Count; i++)
             {
                 TabLayout layout = _layoutCalculator.GetTabLayout(activeTabs, i, displayedTabIndex);
-                if (currentXOffset + layout.BoxBounds.X > _layoutCalculator.ScreenBounds.Width)
+                if (layout.BoxBounds.Right > _layoutCalculator.ScreenBounds.Right)
                 {
                     break;
-                }
-
-                Texture2D? closeButtonTexture;
-                if (i != displayedTabIndex && i != hoveredTabIndex)
-                {
-                    closeButtonTexture = null;
-                }
-                else
-                {
-                    closeButtonTexture = closeButtonHeld ? style.TabCloseButtonHeldBackground
-                                                         : closeButtonHovered ? style.TabCloseButtonHoverBackground
-                                                                              : style.TabCloseButtonDefaultBackground;
-                    if (i != hoveredTabIndex)
-                    {
-                        closeButtonTexture = style.TabCloseButtonDefaultBackground;
-                    }
                 }
 
                 Texture2D background = i == displayedTabIndex ? style.DisplayedTabBackground
@@ -55,8 +38,20 @@ namespace NoteKeeper.Shell.TabOrganizer
                                                                                      : style.TabDefaultBackground;
 
                 SpriteFont font = i == displayedTabIndex ? style.DisplayedTabFont : style.DefaultFont;
+                Texture2D? closeButtonTexture = i != displayedTabIndex && i != hoveredTabIndex ? null : style.TabCloseButtonIcon;
 
                 DrawTabBox(activeTabs[i], layout, background, font, closeButtonTexture);
+                if (i == hoveredTabIndex)
+                {
+                    if (closeButtonHeld)
+                    {
+                        DrawHelper.Batch.Draw(style.ButtonHeldOverlay, layout.CloseButtonBounds, Color.White);
+                    }
+                    else if (closeButtonHovered)
+                    {
+                        DrawHelper.Batch.Draw(style.ButtonHoverOverlay, layout.CloseButtonBounds, Color.White);
+                    }
+                }
             }
         }
 

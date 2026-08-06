@@ -46,9 +46,9 @@ namespace NoteKeeper.Shell
                 DefaultFont = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans"),
                 DisplayedTabFont = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans"),
 
-                TabCloseButtonDefaultBackground = Util.GetTexture(1, 1, Color.Red),
-                TabCloseButtonHoverBackground = Util.GetTexture(1, 1, Color.Salmon),
-                TabCloseButtonHeldBackground = Util.GetTexture(1, 1, Color.DarkRed),
+                TabCloseButtonIcon = Util.GetTexture(1, 1, Color.Red),
+                ButtonHoverOverlay = Util.GetTexture(1, 1, Color.Gray * 0.5f),
+                ButtonHeldOverlay = Util.GetTexture(1, 1, Color.LightGray * 0.5f),
 
                 HeaderBackground = Util.GetTexture(1, 1, Color.Gray)
             });

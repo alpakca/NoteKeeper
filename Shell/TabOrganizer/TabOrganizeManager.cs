@@ -71,12 +71,7 @@ namespace NoteKeeper.Shell.TabOrganizer
 
         public void MouseButtonStateChange(PopWindowMouseEventArgs e)
         {
-            if (_hoveredTab == null)
-            {
-                return;
-            }
-
-            int hoveredTabIndex = _activeTabs.IndexOf(_hoveredTab);
+            int hoveredTabIndex = _activeTabs.IndexOf(_hoveredTab!);
             int displayedTabIndex = _activeTabs.IndexOf(_displayedTab!);
             TabLayout hoveredTabLayout = layoutCalculator.GetTabLayout(_activeTabs, hoveredTabIndex, displayedTabIndex);
             
@@ -97,12 +92,12 @@ namespace NoteKeeper.Shell.TabOrganizer
             {
                 if (_closeButtonHeld && hoveredTabLayout.CloseButtonBounds.Contains(e.MousePosition))
                 {
-                    _closeButtonHeld = false;
                     _activeTabs.RemoveWithAskingSave(_hoveredTab);
 
                     MousePositionChangeUpdate(e); // update hovered statues after remove
                 }
 
+                _closeButtonHeld = false;
                 ResetSwitchRect();
             }
         }
