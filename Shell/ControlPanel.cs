@@ -36,7 +36,7 @@ namespace NoteKeeper.Shell
         {
             tabUpdateReceivers = new List<ITabUpdateReceiver>();
             ActiveTabs = new TabCollection();
-            ActiveTabs.CollectionChanged += ActiveTabs_CollectionChanged;
+            ActiveTabs.TabCountChanged += ActiveTabs_CollectionChanged;
 
             window = new PanelWindow(this) { Boundaries = new Rectangle(new Point(), WindowOptions.Size) };
             buttonPlate = new ButtonPlate(this);

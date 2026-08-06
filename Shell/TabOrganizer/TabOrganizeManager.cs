@@ -2,8 +2,6 @@
 using NoteKeeper.InspectionWindow;
 using PopUpUI.Input;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 #nullable enable
 
@@ -17,6 +15,8 @@ namespace NoteKeeper.Shell.TabOrganizer
         private readonly TabCollection _activeTabs;
         private int _displayedTabIndex;
         private int _hoveredTabIndex;
+
+        private Rectangle _switchedTabsUnion;
 
         // belongs to hovered tab's close button
         private bool _closeButtonHovered;
@@ -62,6 +62,11 @@ namespace NoteKeeper.Shell.TabOrganizer
 
             TabLayout hoveredTabLayout = layoutCalculator.GetTabLayout(_activeTabs, _hoveredTabIndex, _displayedTabIndex);
             _closeButtonHovered = hoveredTabLayout.CloseButtonBounds.Contains(e.MousePosition);
+
+            if (e.CurrentButtons.HasLeft)
+            {
+                HandleTabSwitching(e.MousePosition);
+            }
         }
 
         public void MouseButtonStateChange(PopWindowMouseEventArgs e)
@@ -92,10 +97,46 @@ namespace NoteKeeper.Shell.TabOrganizer
                 if (_closeButtonHeld && hoveredTabLayout.CloseButtonBounds.Contains(e.MousePosition))
                 {
                     _closeButtonHeld = false;
-                    _activeTabs.Remove(_activeTabs[_hoveredTabIndex]);
-                    MousePositionChangeUpdate(e); // update hovered tab for new layout
+                    _activeTabs.RemoveWithAskingSave(_activeTabs[_hoveredTabIndex]);
                 }
+
+                ResetSwitchRect();
             }
+        }
+
+        private void HandleTabSwitching(Point mousePosition)
+        {
+            if (_displayedTabIndex == -1 || _hoveredTabIndex == _displayedTabIndex)
+            {
+                ResetSwitchRect();
+                return;
+            }
+
+            if (_switchedTabsUnion.Contains(mousePosition))
+            {
+                return;
+            }
+
+            if (_hoveredTabIndex != -1)
+            {
+                Rectangle hoveredTabBox = layoutCalculator.GetTabLayout(_activeTabs, _hoveredTabIndex, _displayedTabIndex).BoxBounds;
+                Rectangle displayedTabBox = layoutCalculator.GetTabLayout(_activeTabs, _displayedTabIndex, _displayedTabIndex).BoxBounds;
+
+                int hoverDisplayWidthDiff = hoveredTabBox.Width - displayedTabBox.Width;
+                if (hoverDisplayWidthDiff > 0)
+                {
+                    int switchBoxX = _displayedTabIndex < _hoveredTabIndex ? displayedTabBox.Right : hoveredTabBox.Right - hoverDisplayWidthDiff;
+                    _switchedTabsUnion = new Rectangle(switchBoxX, hoveredTabBox.Y, hoverDisplayWidthDiff, hoveredTabBox.Height);
+                }
+
+                _activeTabs.Swap(_hoveredTabIndex, _displayedTabIndex);
+                (_hoveredTabIndex, _displayedTabIndex) = (_displayedTabIndex, _hoveredTabIndex);
+            }
+        }
+
+        private void ResetSwitchRect()
+        {
+            _switchedTabsUnion = new Rectangle(0, 0, -1, -1);
         }
 
         private int FindHoveredTabIndex(Point mousePosition)

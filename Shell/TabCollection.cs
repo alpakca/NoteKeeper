@@ -14,7 +14,7 @@ namespace NoteKeeper.Shell
 
         public int Count => _tabs.Count;
 
-        public event Action<TabCollection>? CollectionChanged;
+        public event Action<TabCollection>? TabCountChanged;
 
         public TabCollection()
         {
@@ -29,10 +29,10 @@ namespace NoteKeeper.Shell
         public void Add(Tab tab)
         {
             _tabs.Add(tab);
-            CollectionChanged?.Invoke(this);
+            TabCountChanged?.Invoke(this);
         }
 
-        public void Remove(Tab tab)
+        public void RemoveWithAskingSave(Tab tab)
         {
             bool closeApproved = true;
             if (tab.TabSerializer.IsModified)
@@ -43,11 +43,11 @@ namespace NoteKeeper.Shell
             if (closeApproved)
             {
                 _tabs.Remove(tab);
-                CollectionChanged?.Invoke(this);
+                TabCountChanged?.Invoke(this);
             }
         }
 
-        public void RemoveAll(IEnumerable<Tab> toRemove)
+        public void RemoveAllWithAskingSave(IEnumerable<Tab> toRemove)
         {
             List<Tab> modifiedTabs = new List<Tab>();
             foreach (var tab in toRemove)
@@ -67,11 +67,11 @@ namespace NoteKeeper.Shell
             if (closeApproved)
             {
                 foreach (var tab in toRemove) _tabs.Remove(tab);
-                CollectionChanged?.Invoke(this);
+                TabCountChanged?.Invoke(this);
             }
         }
 
-        public void Clear()
+        public void ClearWithAskingSave()
         {
             List<Tab> modifiedTabs = new List<Tab>();
             foreach (var tab in _tabs)
@@ -91,8 +91,13 @@ namespace NoteKeeper.Shell
             if (closeApproved)
             {
                 _tabs.Clear();
-                CollectionChanged?.Invoke(this);
+                TabCountChanged?.Invoke(this);
             }
+        }
+
+        public void Swap(int firstTabIndex, int secondTabIndex)
+        {
+            (_tabs[firstTabIndex], _tabs[secondTabIndex]) = (_tabs[secondTabIndex], _tabs[firstTabIndex]);
         }
 
         public int IndexOf(Tab tab)

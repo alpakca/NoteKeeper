@@ -70,7 +70,7 @@ namespace NoteKeeper
 
         protected override void OnExiting(object sender, ExitingEventArgs args)
         {
-            panel.ActiveTabs.Clear();
+            panel.ActiveTabs.ClearWithAskingSave();
             base.OnExiting(sender, args);
         }
 
