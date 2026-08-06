@@ -4,16 +4,18 @@ using PopUpUI.Elements.Visual;
 using PopUpUI.Surface;
 using System.Collections.Generic;
 
+#nullable enable
+
 namespace NoteKeeper.Shell
 {
     internal class HorizontalScroller : VisualHorizontalSlider, ITabUpdateReceiver
     {
         private bool slidedWithViewport = false;
-        private ITabViewport displayedTabViewport;
+        private ITabViewport? displayedTabViewport;
 
-        public void DisplayedTabChanged(Tab setTab)
+        public void DisplayedTabChanged(Tab? setTab)
         {
-            displayedTabViewport = setTab.TabViewport;
+            displayedTabViewport = setTab?.TabViewport;
             AdjustSliderHeight();
         }
 

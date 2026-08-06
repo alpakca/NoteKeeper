@@ -15,6 +15,10 @@ namespace NoteKeeper
                     + "\n\n" + SingleInstanceChecker.IsServer);
             };
 
+#if DEBUG
+            args = [@"C:\Users\user\Desktop\XXTest.mlpage", @"C:\Users\user\Desktop\MultiPageTest.mlpage"];
+#endif
+
             using var game = new Game1(args);
 
             if (!SingleInstanceChecker.TryStart(args))

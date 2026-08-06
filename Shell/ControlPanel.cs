@@ -15,8 +15,6 @@ namespace NoteKeeper.Shell
         private Tab? displayedTab;
 
         private readonly ButtonPlate buttonPlate;
-        private readonly TabGroup tabGroup;
-
         private readonly PanelWindow window;
         private readonly List<ITabUpdateReceiver> tabUpdateReceivers;
 
@@ -31,17 +29,17 @@ namespace NoteKeeper.Shell
             }
         }
         public Tab? DisplayedTab => displayedTab;
-        public ObservableCollection<Tab> ActiveTabs { get; }
+        public TabCollection ActiveTabs { get; }
         public PanelWindow PanelWindow => window;
 
         public ControlPanel()
         {
             tabUpdateReceivers = new List<ITabUpdateReceiver>();
-            ActiveTabs = new ObservableCollection<Tab>();
+            ActiveTabs = new TabCollection();
+            ActiveTabs.TabCountChanged += ActiveTabs_CollectionChanged;
 
             window = new PanelWindow(this) { Boundaries = new Rectangle(new Point(), WindowOptions.Size) };
             buttonPlate = new ButtonPlate(this);
-            tabGroup = new TabGroup(this) { Boundaries = new Rectangle(20, 170, 1720, 30) };
 
             InitializeWindow();
             PopWindowManager.ActiveWindows.Add(window);
@@ -74,7 +72,6 @@ namespace NoteKeeper.Shell
             window.Elements.Add(verticalScroller);
             window.Elements.Add(horizontalScroller);
             window.Elements.AddRange(buttonPlate.Buttons);
-            window.Elements.Add(tabGroup.UIElement);
 
             tabUpdateReceivers.AddRange(verticalScroller, horizontalScroller, window);
         }
@@ -155,6 +152,14 @@ namespace NoteKeeper.Shell
             buttonPlate.SaveCurrentTabButton.Enabled = newTab != null;
             buttonPlate.SaveAllTabsButton.Enabled = newTab != null;
             buttonPlate.ToolMenuToggle.Enabled = newTab?.ToolMenu != null;
+        }
+
+        private void ActiveTabs_CollectionChanged(TabCollection obj)
+        {
+            if (!obj.Contains(displayedTab!))
+            {
+                DisplayTab(null);
+            }
         }
 
         private void TabHistory_HistoryUpdated(TabHistory history)

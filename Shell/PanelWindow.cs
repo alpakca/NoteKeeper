@@ -3,14 +3,13 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using NoteKeeper.InspectionWindow;
 using NoteKeeper.Shell.ContextMenus;
+using NoteKeeper.Shell.TabOrganizer;
 using NoteKeeper.Shell.ToolBar;
 using PopUpUI.Input;
 using PopUpUI.Surface;
 using PopUpUI.Toolkit;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
 
 #nullable enable
 
@@ -23,6 +22,7 @@ namespace NoteKeeper.Shell
         private readonly ControlPanel panel;
         private readonly ContextMenuManager contextMenuManager;
         private readonly ToolMenuManager toolMenuManager;
+        private readonly TabOrganizeManager tabOrganizeManager;
         private readonly KeyboardShortcutManager shortcutManager;
 
         public ToolMenuManager ToolMenuManager => toolMenuManager;
@@ -33,7 +33,25 @@ namespace NoteKeeper.Shell
 
             contextMenuManager = new ContextMenuManager();
             toolMenuManager = new ToolMenuManager() { ScreenLocation = new Point(60, 240) };
+            tabOrganizeManager = new TabOrganizeManager(panel.ActiveTabs) { ScreenBounds = new Rectangle(20, 168, 1880, 32) };
             shortcutManager = new KeyboardShortcutManager();
+
+            #region Debug Styles
+            tabOrganizeManager.StyleProvider.ApplyTheme(new TabsHeaderStyle
+            {
+                TabDefaultBackground = Util.GetTexture(1, 1, Color.Gray),
+                TabHoveredBackground = Util.GetTexture(1, 1, Color.LightGray),
+                DisplayedTabBackground = Util.GetTexture(1, 1, Color.DarkMagenta),
+
+                DefaultFont = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans"),
+                DisplayedTabFont = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans"),
+
+                TabCloseButtonDefaultBackground = Util.GetTexture(1, 1, Color.Red),
+                TabCloseButtonHoverBackground = Util.GetTexture(1, 1, Color.Salmon),
+                TabCloseButtonHeldBackground = Util.GetTexture(1, 1, Color.DarkRed),
+
+                HeaderBackground = Util.GetTexture(1, 1, Color.Gray)
+            });
 
             MenuItemStyle actionButtonStyle = new MenuItemStyle
             {
@@ -66,6 +84,9 @@ namespace NoteKeeper.Shell
                 { typeof(ActionContextMenuButton), actionButtonStyle }, { typeof(SubContextMenuButton), subMenuStyle }
             };
             contextMenuManager.StyleProvider.ApplyTheme(defaultTheme);
+            #endregion
+
+            tabOrganizeManager.DisplayedTabChanged += panel.DisplayTab;
 
             Elements.Add(shortcutManager);
             InitializeShortcuts();
@@ -85,6 +106,8 @@ namespace NoteKeeper.Shell
         public void DisplayedTabChanged(Tab? setTab)
         {
             displayedTab = setTab;
+
+            tabOrganizeManager.DisplayedTabUpdated(setTab);
 
             // switched the open tool menu with new tab's tool menu
             SetToolMenuVisibility(toolMenuManager.IsShown);
@@ -122,7 +145,10 @@ namespace NoteKeeper.Shell
             base.RenderUpdate();
 
             DrawHelper.SetBeginBatch(WindowTexture);
+
             toolMenuManager.Render();
+            tabOrganizeManager.Render();
+
             DrawHelper.EndBatch();
 
             // render context menu on top of everything
@@ -145,6 +171,7 @@ namespace NoteKeeper.Shell
 
             toolMenuManager.MouseButtonStateChange(e);
             contextMenuManager.MouseButtonStateUpdate(e);
+            tabOrganizeManager.MouseButtonStateChange(e);
             base.OnMouseButtonStateChange(e);
         }
 
@@ -152,6 +179,7 @@ namespace NoteKeeper.Shell
         {
             toolMenuManager.MousePositionChangeUpdate(e);
             contextMenuManager.MousePositionChangeUpdate(e);
+            tabOrganizeManager.MousePositionChangeUpdate(e);
             base.OnMousePositionChange(e);
         }
     }
