@@ -20,8 +20,7 @@ namespace NoteKeeper.Shell.TabOrganizer
         private State _state;
         private Rectangle _switchedTabsUnion;
 
-        // belongs to hovered tab's close button
-        private bool _closeButtonHovered;
+        private Rectangle _hoveredButtonBounds;
 
         public TabsHeaderStyleProvider StyleProvider { get; }
         public Rectangle ScreenBounds
@@ -57,9 +56,17 @@ namespace NoteKeeper.Shell.TabOrganizer
 
         public void Render()
         {
-            renderer.Render(_activeTabs, _activeTabs.IndexOf(_displayedTab!), _activeTabs.IndexOf(_hoveredTab!), _closeButtonHovered, _state == State.SelectingButton);
+            renderer.Render(_activeTabs, _activeTabs.IndexOf(_displayedTab!), _activeTabs.IndexOf(_hoveredTab!));
 
-            if (_state == State.TabListOpen)
+            if (_state == State.Idle)
+            {
+                renderer.DrawHoveredButtonOverlay(_hoveredButtonBounds, false);
+            }
+            else if (_state == State.SelectingButton)
+            {
+                renderer.DrawHoveredButtonOverlay(_hoveredButtonBounds, true);
+            }
+            else if (_state == State.TabListOpen)
             {
                 renderer.DrawTabList(_activeTabs, tabList, _activeTabs.IndexOf(_displayedTab!));
             }
@@ -69,16 +76,7 @@ namespace NoteKeeper.Shell.TabOrganizer
         {
             if (_state == State.Idle)
             {
-                _hoveredTab = FindHoveredTab(e.MousePosition);
-
-                if (_hoveredTab == null)
-                {
-                    _closeButtonHovered = false;
-                    return;
-                }
-
-                TabLayout hoveredTabLayout = layoutCalculator.GetTabLayout(_activeTabs.IndexOf(_hoveredTab), _activeTabs.IndexOf(_displayedTab!));
-                _closeButtonHovered = hoveredTabLayout.CloseButtonBounds.Contains(e.MousePosition);
+                UpdateHoveredTab(e.MousePosition);
             }
             else if (_state == State.SwitchingTabs)
             {
@@ -104,12 +102,14 @@ namespace NoteKeeper.Shell.TabOrganizer
                     {
                         _state = State.SelectingButton;
                     }
+                    else if (hoveredTabIndex == displayedTabIndex)
+                    {
+                        _state = State.SwitchingTabs;
+                    }
                     else if (hoveredTabLayout.BoxBounds.Contains(e.MousePosition))
                     {
-                        _closeButtonHovered = hoveredTabLayout.CloseButtonBounds.Contains(e.MousePosition);
                         DisplayedTabChanged?.Invoke(_hoveredTab!);
-
-                        _state = State.SwitchingTabs;
+                        UpdateHoveredTab(e.MousePosition);
                     }
                 }
             }
@@ -120,6 +120,8 @@ namespace NoteKeeper.Shell.TabOrganizer
                     if (hoveredTabLayout.CloseButtonBounds.Contains(e.MousePosition))
                     {
                         _activeTabs.RemoveWithAskingSave(_hoveredTab!);
+                        UpdateHoveredTab(e.MousePosition);
+
                         _state = State.Idle;
 
                     }
@@ -150,6 +152,7 @@ namespace NoteKeeper.Shell.TabOrganizer
                             DisplayedTabChanged?.Invoke(selectedTab);
                     }
 
+                    UpdateHoveredTab(e.MousePosition);
                     _state = State.Idle; // close tab list whether it clicked a button or not
                 }
             }
@@ -157,6 +160,30 @@ namespace NoteKeeper.Shell.TabOrganizer
             {
                 _state = State.Idle;
                 ResetSwitchRect();
+            }
+        }
+
+        private void UpdateHoveredTab(Point mousePosition)
+        {
+            _hoveredTab = FindHoveredTab(mousePosition);
+
+            if (_hoveredTab != null)
+            {
+                TabLayout hoveredTabLayout = layoutCalculator.GetTabLayout(_activeTabs.IndexOf(_hoveredTab), _activeTabs.IndexOf(_displayedTab!));
+                if (hoveredTabLayout.CloseButtonBounds.Contains(mousePosition))
+                {
+                    _hoveredButtonBounds = hoveredTabLayout.CloseButtonBounds;
+                    return;
+                }
+            }
+            
+            if (layoutCalculator.TabListButtonBounds.Contains(mousePosition))
+            {
+                _hoveredButtonBounds = layoutCalculator.TabListButtonBounds;
+            }
+            else
+            {
+                _hoveredButtonBounds = Rectangle.Empty;
             }
         }
 

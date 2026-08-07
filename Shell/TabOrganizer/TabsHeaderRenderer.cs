@@ -20,7 +20,7 @@ namespace NoteKeeper.Shell.TabOrganizer
             _layoutCalculator = layoutCalculator;
         }
 
-        public void Render(TabCollection activeTabs, int displayedTabIndex, int hoveredTabIndex, bool closeButtonHovered, bool closeButtonHeld)
+        public void Render(TabCollection activeTabs, int displayedTabIndex, int hoveredTabIndex)
         {
             TabsHeaderStyle style = _styleProvider.Style;
             DrawHelper.Batch.Draw(style.HeaderBackground, _layoutCalculator.ScreenBounds, Color.White);
@@ -42,18 +42,14 @@ namespace NoteKeeper.Shell.TabOrganizer
                 Texture2D? closeButtonTexture = i != displayedTabIndex && i != hoveredTabIndex ? null : style.TabCloseButtonIcon;
 
                 DrawTabBox(activeTabs[i], layout, background, font, closeButtonTexture);
-                if (i == hoveredTabIndex)
-                {
-                    if (closeButtonHeld)
-                    {
-                        DrawHelper.Batch.Draw(style.ButtonHeldOverlay, layout.CloseButtonBounds, Color.White);
-                    }
-                    else if (closeButtonHovered)
-                    {
-                        DrawHelper.Batch.Draw(style.ButtonHoverOverlay, layout.CloseButtonBounds, Color.White);
-                    }
-                }
             }
+        }
+
+        public void DrawHoveredButtonOverlay(Rectangle hoveredButtonBounds, bool isButtonHeld)
+        {
+            TabsHeaderStyle style = _styleProvider.Style;
+
+            DrawHelper.Batch.Draw(isButtonHeld ? style.ButtonHeldOverlay : style.ButtonHoverOverlay, hoveredButtonBounds, Color.White);
         }
 
         public void DrawTabList(TabCollection activeTabs, TabListButton button, int displayedTabIndex)
@@ -61,7 +57,8 @@ namespace NoteKeeper.Shell.TabOrganizer
             TabsHeaderStyle style = _styleProvider.Style;
             Rectangle tabListMenuBounds = _layoutCalculator.GetTabListMenuBounds(displayedTabIndex);
 
-            DrawHelper.Batch.Draw(style.ButtonHoverOverlay, tabListMenuBounds, Color.White);
+            DrawHelper.Batch.Draw(style.HeaderBackground, tabListMenuBounds, Color.White);
+            DrawHelper.Batch.Draw(style.ButtonHoverOverlay, _layoutCalculator.TabListButtonBounds, Color.White);
 
             int hoveredTabIndex = activeTabs.IndexOf(button.HoveredTab!);
             for (int i = 0; i < activeTabs.Count; i++)

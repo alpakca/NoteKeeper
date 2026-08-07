@@ -148,7 +148,11 @@ namespace NoteKeeper.Shell
             DrawHelper.SetBeginBatch(WindowTexture);
 
             toolMenuManager.Render();
-            tabOrganizeManager.Render();
+
+            if (panel.ActiveTabs.Count != 0)
+            {
+                tabOrganizeManager.Render();
+            }
 
             DrawHelper.EndBatch();
 
