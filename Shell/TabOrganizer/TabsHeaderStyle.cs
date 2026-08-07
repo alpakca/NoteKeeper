@@ -17,6 +17,8 @@ namespace NoteKeeper.Shell.TabOrganizer
         public SpriteFont DisplayedTabFont { get; init; }
 
         public Texture2D TabCloseButtonIcon { get; init; }
+        public Texture2D TabListButtonIcon { get; init; }
+
         public Texture2D ButtonHoverOverlay { get; init; }
         public Texture2D ButtonHeldOverlay { get; init; }
     }
