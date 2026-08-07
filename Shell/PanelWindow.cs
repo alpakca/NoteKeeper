@@ -47,6 +47,7 @@ namespace NoteKeeper.Shell
                 DisplayedTabFont = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans"),
 
                 TabCloseButtonIcon = Util.GetTexture(1, 1, Color.Red),
+                TabListButtonIcon = Util.GetTexture(1, 1, Color.Aqua),
                 ButtonHoverOverlay = Util.GetTexture(1, 1, Color.Gray * 0.5f),
                 ButtonHeldOverlay = Util.GetTexture(1, 1, Color.LightGray * 0.5f),
 
@@ -147,7 +148,11 @@ namespace NoteKeeper.Shell
             DrawHelper.SetBeginBatch(WindowTexture);
 
             toolMenuManager.Render();
-            tabOrganizeManager.Render();
+
+            if (panel.ActiveTabs.Count != 0)
+            {
+                tabOrganizeManager.Render();
+            }
 
             DrawHelper.EndBatch();
 

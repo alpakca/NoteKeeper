@@ -20,14 +20,15 @@ namespace NoteKeeper.Shell.TabOrganizer
             _layoutCalculator = layoutCalculator;
         }
 
-        public void Render(TabCollection activeTabs, int displayedTabIndex, int hoveredTabIndex, bool closeButtonHovered, bool closeButtonHeld)
+        public void Render(TabCollection activeTabs, int displayedTabIndex, int hoveredTabIndex)
         {
             TabsHeaderStyle style = _styleProvider.Style;
             DrawHelper.Batch.Draw(style.HeaderBackground, _layoutCalculator.ScreenBounds, Color.White);
+            DrawHelper.Batch.Draw(style.TabListButtonIcon, _layoutCalculator.TabListButtonBounds, Color.White);
 
             for (int i = 0; i < activeTabs.Count; i++)
             {
-                TabLayout layout = _layoutCalculator.GetTabLayout(activeTabs, i, displayedTabIndex);
+                TabLayout layout = _layoutCalculator.GetTabLayout(i, displayedTabIndex);
                 if (layout.BoxBounds.Right > _layoutCalculator.ScreenBounds.Right)
                 {
                     break;
@@ -41,15 +42,45 @@ namespace NoteKeeper.Shell.TabOrganizer
                 Texture2D? closeButtonTexture = i != displayedTabIndex && i != hoveredTabIndex ? null : style.TabCloseButtonIcon;
 
                 DrawTabBox(activeTabs[i], layout, background, font, closeButtonTexture);
+            }
+        }
+
+        public void DrawHoveredButtonOverlay(Rectangle hoveredButtonBounds, bool isButtonHeld)
+        {
+            TabsHeaderStyle style = _styleProvider.Style;
+
+            DrawHelper.Batch.Draw(isButtonHeld ? style.ButtonHeldOverlay : style.ButtonHoverOverlay, hoveredButtonBounds, Color.White);
+        }
+
+        public void DrawTabList(TabCollection activeTabs, TabListButton button, int displayedTabIndex)
+        {
+            TabsHeaderStyle style = _styleProvider.Style;
+            Rectangle tabListMenuBounds = _layoutCalculator.GetTabListMenuBounds(displayedTabIndex);
+
+            DrawHelper.Batch.Draw(style.HeaderBackground, tabListMenuBounds, Color.White);
+            DrawHelper.Batch.Draw(style.ButtonHoverOverlay, _layoutCalculator.TabListButtonBounds, Color.White);
+
+            int hoveredTabIndex = activeTabs.IndexOf(button.HoveredTab!);
+            for (int i = 0; i < activeTabs.Count; i++)
+            {
+                TabLayout optionLayout = _layoutCalculator.GetTabListOptionLayout(tabListMenuBounds, i, displayedTabIndex);
+
+                Texture2D background = i == displayedTabIndex ? style.DisplayedTabBackground
+                                              : i == hoveredTabIndex ? style.TabHoveredBackground
+                                                                     : style.TabDefaultBackground;
+
+                SpriteFont font = i == displayedTabIndex ? style.DisplayedTabFont : style.DefaultFont;
+                Texture2D? closeButtonTexture = i != displayedTabIndex && i != hoveredTabIndex ? null : style.TabCloseButtonIcon;
+
+                DrawTabBox(activeTabs[i], optionLayout, background, font, closeButtonTexture);
+
                 if (i == hoveredTabIndex)
                 {
-                    if (closeButtonHeld)
+                    DrawHelper.Batch.Draw(button.HoveredTabIsHeld ? style.ButtonHeldOverlay : style.ButtonHoverOverlay, optionLayout.BoxBounds, Color.White);
+
+                    if (button.CloseButtonHovered)
                     {
-                        DrawHelper.Batch.Draw(style.ButtonHeldOverlay, layout.CloseButtonBounds, Color.White);
-                    }
-                    else if (closeButtonHovered)
-                    {
-                        DrawHelper.Batch.Draw(style.ButtonHoverOverlay, layout.CloseButtonBounds, Color.White);
+                        DrawHelper.Batch.Draw(button.CloseButtonHeld ? style.ButtonHeldOverlay : style.ButtonHoverOverlay, optionLayout.CloseButtonBounds, Color.White);
                     }
                 }
             }
