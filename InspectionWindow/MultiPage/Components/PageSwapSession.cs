@@ -41,7 +41,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
 
             if (position.PageIndex != _currentPageIndex)
             {
-                (_notePages[position.PageIndex], _notePages[_currentPageIndex]) = (_notePages[_currentPageIndex], _notePages[position.PageIndex]);
+                Swap(position.PageIndex, _currentPageIndex);
                 _currentPageIndex = position.PageIndex;
             }
         }
@@ -56,9 +56,16 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
                 return;
             }
 
-            _isSwapping = false;
+            // undo swapping done in HoldUpdate since running page actions will swap two pages again when Run() called
+            Swap(position.PageIndex, _initialSwapPageIndex);
 
-            // _pageActions.SwappedPages();
+            _pageActions.SwapPages(position.PageIndex, _initialSwapPageIndex, _notePages);
+            _isSwapping = false;
+        }
+
+        private void Swap(int firstIndex, int secondIndex)
+        {
+            (_notePages[firstIndex], _notePages[secondIndex]) = (_notePages[secondIndex], _notePages[firstIndex]);
         }
     }
 }

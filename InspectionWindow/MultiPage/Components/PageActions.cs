@@ -1,5 +1,6 @@
 ﻿using NoteKeeper.InspectionWindow.MultiPage.History;
 using System;
+using System.Collections.Generic;
 
 namespace NoteKeeper.InspectionWindow.MultiPage.Components
 {
@@ -38,6 +39,11 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
         public void DeleteContent(NotePage notePage, IPageContent content)
         {
             _history.RunAction(new DeleteContentAction(notePage, content));
+        }
+
+        public void SwapPages(int firstPageIndex, int secondPageIndex, IList<NotePage> notePages)
+        {
+            _history.RunAction(new PagesSwappedAction(firstPageIndex, secondPageIndex, notePages));
         }
     }
 }
