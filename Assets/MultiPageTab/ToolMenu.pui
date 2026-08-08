@@ -6,3 +6,10 @@ ActionToolButton Add_Text_Block
 	HoveredTexture = Texture(FolderPath + "AddTextBlockHovered.png"),
 	HeldTexture = Texture(FolderPath + "AddTextBlockHeld.png"),
 }
+
+ToggleToolButton Swap_Pages
+{
+	CheckedTexture = Texture(FolderPath + "SwapPagesChecked.png"),
+	UncheckedTexture = Texture(FolderPath + "SwapPagesUnchecked.png"),
+	UnenabledTexture = Texture(FolderPath + "SwapPagesUnenabled.png"),
+}

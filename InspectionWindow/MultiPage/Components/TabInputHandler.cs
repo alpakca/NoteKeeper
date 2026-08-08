@@ -16,17 +16,20 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
         private readonly TabViewport viewport;
         private readonly IList<NotePage> notePages;
 
-        public TransformSession TransformSession { get; }
         public WritingSession WritingSession { get; }
-        public ShellModes CurrentMode { get; set; }
+        public TransformSession TransformSession { get; }
+        public PageSwapSession PageSwapSession { get; }
+
+        public WindowInputState InputState { get; set; }
 
         public TabInputHandler(PageActions pageActions, TabViewport viewport, IList<NotePage> notePages)
         {
             this.viewport = viewport;
             this.notePages = notePages;
 
-            TransformSession = new TransformSession(pageActions, viewport, notePages);
             WritingSession = new WritingSession(pageActions);
+            TransformSession = new TransformSession(pageActions, viewport, notePages);
+            PageSwapSession = new PageSwapSession(pageActions, notePages);
         }
 
         public IPageContent? HitContent(Point mousePosition)
@@ -68,7 +71,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
 
         public void LeftMouseSelection(PopWindowMouseEventArgs e)
         {
-            if (CurrentMode == ShellModes.Writing)
+            if (InputState == WindowInputState.Writing)
             {
                 IKeyTextReceiverContent? hit = HitContent(e.MousePosition) as IKeyTextReceiverContent;
 
@@ -78,18 +81,31 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
                     WritingSession.CaretPosition = hit.GetMouseCaretPosition(viewport.ToPagePosition(e.MousePosition).PagePosition);
                 }
             }
-            else if (CurrentMode == ShellModes.Transform)
+            else if (InputState == WindowInputState.Transform)
             {
                 HandleTransformer(e);
+            }
+            else if (InputState == WindowInputState.SwappingPages)
+            {
+                HandleSwapper(e);
             }
         }
 
         public void MouseMove(PopWindowMouseEventArgs e)
         {
-            if (CurrentMode == ShellModes.Transform)
+            NotePagePosition position = viewport.ToPagePosition(e.MousePosition);
+            if (position.PageIndex == -1)
             {
-                var pos = viewport.ToPagePosition(e.MousePosition);
-                TransformSession.HoldUpdate(new NotePagePosition(pos.PageIndex, pos.PagePosition));
+                return;
+            }
+
+            if (InputState == WindowInputState.Transform)
+            {
+                TransformSession.HoldUpdate(position);
+            }
+            else if (InputState == WindowInputState.SwappingPages)
+            {
+                PageSwapSession.HoldUpdate(position);
             }
         }
 
@@ -109,6 +125,25 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
             else if (e.ReleasedButtons.HasLeft)
             {
                 TransformSession.HoldEnded(position);
+            }
+        }
+
+        private void HandleSwapper(PopWindowMouseEventArgs e)
+        {
+            NotePagePosition position = viewport.ToPagePosition(e.MousePosition);
+
+            if (position.PageIndex == -1)
+            {
+                return;
+            }
+
+            if (e.FirstTimeButtons.HasLeft)
+            {
+                PageSwapSession.HoldStart(position);
+            }
+            else if (e.ReleasedButtons.HasLeft)
+            {
+                PageSwapSession.HoldEnded(position);
             }
         }
 

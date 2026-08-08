@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using NoteKeeper.Shell.PUIHelpers;
 using NoteKeeper.Shell.ToolBar;
-using PopUpUI.Elements;
 using PopUpUI.Input;
 using PopUpUI.PUI;
 
@@ -32,9 +31,12 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
             interpreter.ProcessTokens();
 
             ActionToolButton addTextBlock = new ActionToolButton(AddTextBlockCommand);
-            interpreter.AssignProperties(PUIHelper.ActionToolButtonAssigner, "Add_Text_Block", addTextBlock);
+            interpreter.AssignProperties(PUIHelper.ToolButtonAssigner, "Add_Text_Block", addTextBlock);
 
-            Buttons = [addTextBlock];
+            ToggleToolButton swapPages = new ToggleToolButton(SwapNotePagesToggled);
+            interpreter.AssignProperties(PUIHelper.ToolButtonAssigner, "Swap_Pages", swapPages);
+
+            Buttons = [addTextBlock, swapPages];
         }
 
         private void AddTextBlockCommand()
@@ -50,6 +52,11 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
             _tab.SimulateMouseButtonStateInput(
                 new PopWindowMouseEventArgs(MouseButtons.Left, MouseButtons.None, MouseButtons.None,
                                             _tab.GetContentScreenLocation(content) + new Point(RoundingErrorMargin)));
+        }
+
+        private void SwapNotePagesToggled(ToggleToolButton button)
+        {
+            ((TabWindow)_tab.Window).WindowInputStateUpdated(button.IsChecked ? WindowInputState.SwappingPages : WindowInputState.Default);
         }
     }
 }

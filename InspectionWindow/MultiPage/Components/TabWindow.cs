@@ -14,7 +14,9 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
 {
     internal class TabWindow : PopWindow
     {
-        private ShellModes currentMode;
+        private WindowInputState lastShellMode;
+        private WindowInputState inputState;
+
         private readonly IList<NotePage> notePages;
         private readonly Random random;
 
@@ -43,19 +45,37 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
 
         public void ModeUpdated(ShellModes mode)
         {
-            currentMode = mode;
-            inputHandler.CurrentMode = mode;
+            lastShellMode = mode switch
+            {
+                ShellModes.Writing => WindowInputState.Writing,
+                ShellModes.Transform => WindowInputState.Transform
+            };
+
+            inputState = lastShellMode;
+            inputHandler.InputState = inputState;
+        }
+
+        public void WindowInputStateUpdated(WindowInputState state)
+        {
+            inputState = state;
+            inputHandler.InputState = state;
+
+            if (state == WindowInputState.Default)
+            {
+                inputState = lastShellMode;
+                inputHandler.InputState = lastShellMode;
+            }
         }
 
         protected override void RenderUpdate()
         {
             renderer.RenderPageBackgrounds();
 
-            if (currentMode == ShellModes.Transform && inputHandler.TransformSession.NotIdle)
+            if (inputState == WindowInputState.Transform && inputHandler.TransformSession.NotIdle)
             {
                 renderer.RenderTransformerNodes(inputHandler.TransformSession);
             }
-            else if (currentMode == ShellModes.Writing && inputHandler.WritingSession.WritingContent != null)
+            else if (inputState == WindowInputState.Writing && inputHandler.WritingSession.WritingContent != null)
             {
                 int pageIndex = inputHandler.PageIndexOf(inputHandler.WritingSession.WritingContent);
                 renderer.RenderWritingSession(pageIndex, inputHandler.WritingSession);

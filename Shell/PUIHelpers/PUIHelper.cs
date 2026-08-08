@@ -26,7 +26,7 @@ namespace NoteKeeper.Shell.PUIHelpers
         public static VisualClickableInstantiator VisualClickableInstantiator { get; } = new VisualClickableInstantiator();
         public static VisualClickableAssigner VisualClickableAssigner { get; } = new VisualClickableAssigner();
 
-        public static ActionToolButtonAssigner ActionToolButtonAssigner { get; } = new ActionToolButtonAssigner();
+        public static ToolButtonAssigner ToolButtonAssigner { get; } = new ToolButtonAssigner();
 
         public static PUIInterpreter GetInterpreter(string puiFilePath)
         {
