@@ -4,6 +4,8 @@ Assets/**
 !Assets/**/
 !Assets/**/*.pui
 
+Content/*/
+
 bin/
 obj/
 

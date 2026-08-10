@@ -13,6 +13,13 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin ComicSans_24.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Color
+/build:ComicSans_24.spritefont
+
 #begin ComicSans.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
