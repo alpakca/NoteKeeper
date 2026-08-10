@@ -56,6 +56,7 @@ namespace NoteKeeper
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             ContentAssistant.LoadWithContentManager<SpriteFont>(("ComicSans", "Font_ComicSans"));
+            ContentAssistant.LoadWithContentManager<SpriteFont>(("ComicSans_24", "Font_ComicSans_24"));
 
             string shellAssetsPath = @"C:\Users\user\Desktop\C#\NoteKeeper\NoteKeeper\Assets";
             ContentAssistant.LoadTexture2Ds(
@@ -66,19 +67,22 @@ namespace NoteKeeper
             );
 
             panel = new ControlPanel();
+            panel.ExitApp += Exit;
         }
 
         protected override void OnExiting(object sender, ExitingEventArgs args)
         {
-            panel.ActiveTabs.ClearWithAskingSave();
+            if (!panel.TryExitApp())
+            {
+                args.Cancel = true;
+                return;
+            }
+
             base.OnExiting(sender, args);
         }
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
-
             while (!_pendingLoadedTabs.IsEmpty)
             {
                 LoadPendingFiles();

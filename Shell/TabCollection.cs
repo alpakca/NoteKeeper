@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 #nullable enable
@@ -13,8 +14,10 @@ namespace NoteKeeper.Shell
         private readonly List<Tab> _tabs;
 
         public int Count => _tabs.Count;
+        public bool HasModifiedTabs => _tabs.Any(tab => tab.TabHistory.IsModified);
 
         public event Action<TabCollection>? TabCountChanged;
+        public event Action<IEnumerable<Tab>>? TabRemovalRequested;
 
         public TabCollection()
         {
@@ -34,13 +37,11 @@ namespace NoteKeeper.Shell
 
         public void RemoveWithAskingSave(Tab tab)
         {
-            bool closeApproved = true;
-            if (tab.TabSerializer.IsModified)
+            if (tab.TabHistory.IsModified)
             {
-                closeApproved = true; // replace with window call for asking to save changes / discard changes
+                TabRemovalRequested?.Invoke([tab]);
             }
-
-            if (closeApproved)
+            else
             {
                 _tabs.Remove(tab);
                 TabCountChanged?.Invoke(this);
@@ -52,22 +53,19 @@ namespace NoteKeeper.Shell
             List<Tab> modifiedTabs = new List<Tab>();
             foreach (var tab in toRemove)
             {
-                if (_tabs.Contains(tab) && tab.TabSerializer.IsModified)
+                if (_tabs.Contains(tab) && tab.TabHistory.IsModified)
                 {
                     modifiedTabs.Add(tab);
                 }
             }
 
-            bool closeApproved = true;
             if (modifiedTabs.Count != 0)
             {
-                closeApproved = true; // replace with a window call that asks if save changes then close tabs
+                TabRemovalRequested?.Invoke(modifiedTabs);
             }
-
-            if (closeApproved)
+            else
             {
-                foreach (var tab in toRemove) _tabs.Remove(tab);
-                TabCountChanged?.Invoke(this);
+                RemoveTabs(toRemove);
             }
         }
 
@@ -76,23 +74,31 @@ namespace NoteKeeper.Shell
             List<Tab> modifiedTabs = new List<Tab>();
             foreach (var tab in _tabs)
             {
-                if (tab.TabSerializer.IsModified)
+                if (tab.TabHistory.IsModified)
                 {
                     modifiedTabs.Add(tab);
                 }
             }
 
-            bool closeApproved = true;
             if (modifiedTabs.Count != 0)
             {
-                closeApproved = true; // replace with window call
+                TabRemovalRequested?.Invoke(modifiedTabs);
             }
-
-            if (closeApproved)
+            else
             {
                 _tabs.Clear();
                 TabCountChanged?.Invoke(this);
             }
+        }
+
+        public void RemoveTabs(IEnumerable<Tab> source)
+        {
+            foreach (var tab in source)
+            {
+                _tabs.Remove(tab);
+            }
+
+            TabCountChanged?.Invoke(this);
         }
 
         public void Swap(int firstTabIndex, int secondTabIndex)

@@ -3,8 +3,9 @@ using PopUpUI.Surface;
 using PopUpUI.Toolkit;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
-using System.Collections.ObjectModel;
 using NoteKeeper.Shell.ContextMenus;
+using NoteKeeper.Shell.UnsavedTabsWindow;
+using System;
 
 #nullable enable
 
@@ -13,9 +14,11 @@ namespace NoteKeeper.Shell
     internal class ControlPanel
     {
         private Tab? displayedTab;
+        private bool exitAppWasRequested = false;
 
         private readonly ButtonPlate buttonPlate;
-        private readonly PanelWindow window;
+        private readonly PanelWindow panelWindow;
+        private readonly CloseTabsWindow closeTabsWindow;
         private readonly List<ITabUpdateReceiver> tabUpdateReceivers;
 
         public ShellModes Mode
@@ -30,19 +33,26 @@ namespace NoteKeeper.Shell
         }
         public Tab? DisplayedTab => displayedTab;
         public TabCollection ActiveTabs { get; }
-        public PanelWindow PanelWindow => window;
+        public PanelWindow PanelWindow => panelWindow;
+
+        public event Action? ExitApp;
 
         public ControlPanel()
         {
             tabUpdateReceivers = new List<ITabUpdateReceiver>();
-            ActiveTabs = new TabCollection();
-            ActiveTabs.TabCountChanged += ActiveTabs_CollectionChanged;
 
-            window = new PanelWindow(this) { Boundaries = new Rectangle(new Point(), WindowOptions.Size) };
+            ActiveTabs = new TabCollection();
+            ActiveTabs.TabRemovalRequested += ActiveTabs_TabRemovalRequested;
+            ActiveTabs.TabCountChanged += ActiveTabs_TabCountChanged;
+
+            closeTabsWindow = new CloseTabsWindow();
+            closeTabsWindow.WindowClosed += CloseTabsWindow_WindowClosed;
+
+            panelWindow = new PanelWindow(this) { Boundaries = new Rectangle(new Point(), WindowOptions.Size) };
             buttonPlate = new ButtonPlate(this);
 
             InitializeWindow();
-            PopWindowManager.ActiveWindows.Add(window);
+            PopWindowManager.ActiveWindows.Add(panelWindow);
 
             Mode = ShellModes.Transform;
         }
@@ -69,11 +79,11 @@ namespace NoteKeeper.Shell
                 SelectablePacket = new PopUpUI.Input.SelectablePacket()
             };
 
-            window.Elements.Add(verticalScroller);
-            window.Elements.Add(horizontalScroller);
-            window.Elements.AddRange(buttonPlate.Buttons);
+            panelWindow.Elements.Add(verticalScroller);
+            panelWindow.Elements.Add(horizontalScroller);
+            panelWindow.Elements.AddRange(buttonPlate.Buttons);
 
-            tabUpdateReceivers.AddRange(verticalScroller, horizontalScroller, window);
+            tabUpdateReceivers.AddRange(verticalScroller, horizontalScroller, panelWindow);
         }
 
         public ContextMenu? GetContextMenu(Point mousePosition)
@@ -83,7 +93,7 @@ namespace NoteKeeper.Shell
 
         public void SetToolMenuVisibility(bool isVisible)
         {
-            window.SetToolMenuVisibility(isVisible);
+            panelWindow.SetToolMenuVisibility(isVisible);
         }
 
         /// <summary>Rearranges heights of TabGroup, ButtonPlate and DisplayedTab; by chaning DisplayedTab's height and keeping others minimum.</summary>
@@ -135,11 +145,6 @@ namespace NoteKeeper.Shell
             DisplayedTabChanged(tab);
         }
 
-        private void Tab_ShellModeChangeRequested(ShellModes mode)
-        {
-            Mode = mode;
-        }
-
         private void DisplayedTabChanged(Tab? newTab)
         {
             newTab?.ShellModeUpdated(Mode);
@@ -154,9 +159,63 @@ namespace NoteKeeper.Shell
             buttonPlate.ToolMenuToggle.Enabled = newTab?.ToolMenu != null;
         }
 
-        private void ActiveTabs_CollectionChanged(TabCollection obj)
+        private void Tab_ShellModeChangeRequested(ShellModes mode)
         {
-            if (!obj.Contains(displayedTab!))
+            Mode = mode;
+        }
+
+        public bool TryExitApp()
+        {
+            if (ActiveTabs.HasModifiedTabs)
+            {
+                exitAppWasRequested = true;
+                ActiveTabs.ClearWithAskingSave();
+
+                return false;
+            }
+
+            return true;
+        }
+
+        private void ActiveTabs_TabRemovalRequested(IEnumerable<Tab> closingTabs)
+        {
+            panelWindow.Frozen = true;
+            displayedTab?.Window.Frozen = true;
+
+            PopWindowManager.ActiveWindows.Add(closeTabsWindow);
+            closeTabsWindow.SetNew(closingTabs);
+        }
+
+        private void CloseTabsWindow_WindowClosed(CloseTabsResult result)
+        {
+            panelWindow.Frozen = false;
+            displayedTab?.Window.Frozen = false;
+            PopWindowManager.ActiveWindows.Remove(closeTabsWindow);
+
+            if (result == CloseTabsResult.Canceled)
+            {
+                exitAppWasRequested = false;
+                return;
+            }
+
+            if (result == CloseTabsResult.Save)
+            {
+                foreach (var tab in closeTabsWindow.ClosingTabs)
+                {
+                    tab.TabSerializer.Save();
+                }
+            }
+
+            ActiveTabs.RemoveTabs(closeTabsWindow.ClosingTabs);
+            if (exitAppWasRequested)
+            {
+                ExitApp?.Invoke();
+            }
+        }
+
+        private void ActiveTabs_TabCountChanged(TabCollection collection)
+        {
+            if (!collection.Contains(displayedTab!))
             {
                 DisplayTab(null);
             }
