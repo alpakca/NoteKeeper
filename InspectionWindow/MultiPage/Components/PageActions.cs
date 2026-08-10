@@ -45,5 +45,15 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
         {
             _history.RunAction(new PagesSwappedAction(firstPageIndex, secondPageIndex, notePages));
         }
+
+        public void AddPage(NotePage page, IList<NotePage> notePages)
+        {
+            _history.RunAction(new AddPageAction(page, notePages));
+        }
+
+        public void DeletePage(NotePage page, IList<NotePage> notePages)
+        {
+            _history.RunAction(new DeletePageAction(page, notePages));
+        }
     }
 }

@@ -9,13 +9,15 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
     internal class TabToolMenu : IToolMenu
     {
         private readonly MultiPageTab _tab;
+        private readonly PageActions _pageActions;
 
         public IToolButton[] Buttons { get; }
         public ToolMenuStyle MenuStyle { get; }
 
-        public TabToolMenu(MultiPageTab tab)
+        public TabToolMenu(MultiPageTab tab, PageActions pageActions)
         {
             _tab = tab;
+            _pageActions = pageActions;
 
             MenuStyle = new ToolMenuStyle
             {
@@ -30,16 +32,19 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
             PUIInterpreter interpreter = PUIHelper.GetInterpreter(PUIHelper.MultiPageTabAssetsFolderPath + "ToolMenu.pui");
             interpreter.ProcessTokens();
 
-            ActionToolButton addTextBlock = new ActionToolButton(AddTextBlockCommand);
+            ActionToolButton addTextBlock = new ActionToolButton(AddTextBlock);
             interpreter.AssignProperties(PUIHelper.ToolButtonAssigner, "Add_Text_Block", addTextBlock);
 
             ToggleToolButton swapPages = new ToggleToolButton(SwapNotePagesToggled);
             interpreter.AssignProperties(PUIHelper.ToolButtonAssigner, "Swap_Pages", swapPages);
 
-            Buttons = [addTextBlock, swapPages];
+            ActionToolButton appendPage = new ActionToolButton(AppendPage);
+            interpreter.AssignProperties(PUIHelper.ToolButtonAssigner, "Append_Page", appendPage);
+
+            Buttons = [addTextBlock, swapPages, appendPage];
         }
 
-        private void AddTextBlockCommand()
+        private void AddTextBlock()
         {
             PageTextContent content = new PageTextContent("Font_ComicSans");
             _tab.AddContent(content);
@@ -50,13 +55,32 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
             const int RoundingErrorMargin = 3;
 
             _tab.SimulateMouseButtonStateInput(
-                new PopWindowMouseEventArgs(MouseButtons.Left, MouseButtons.None, MouseButtons.None,
+                new PopWindowMouseEventArgs(MouseButtons.Left, MouseButtons.Left, MouseButtons.None,
                                             _tab.GetContentScreenLocation(content) + new Point(RoundingErrorMargin)));
         }
 
         private void SwapNotePagesToggled(ToggleToolButton button)
         {
             ((TabWindow)_tab.Window).WindowInputStateUpdated(button.IsChecked ? WindowInputState.SwappingPages : WindowInputState.Default);
+        }
+
+        private void AppendPage()
+        {
+            _pageActions.AddPage(new NotePage(), _tab.NotePages);
+
+            TabViewport viewport = (TabViewport)_tab.TabViewport;
+
+            // substract page spacing so two pages can be seen when scrolled
+            int scrollOffset = (viewport.PageCount - 1) * viewport.MovingDimensionPageStepLength - viewport.PageSpacing;
+
+            if (viewport.InVerticalMode)
+            {
+                viewport.SetVerticalScroll(scrollOffset);
+            }
+            else
+            {
+                viewport.SetHorizontalScroll(scrollOffset);
+            }
         }
     }
 }

@@ -39,8 +39,9 @@ namespace NoteKeeper.InspectionWindow.MultiPage
 
             NotePages.CollectionChanged += (sender, _) => viewport.PageCount = ((ObservableCollection<NotePage>)sender!).Count;
 
-            ToolMenu = new TabToolMenu(this);
+            ToolMenu = new TabToolMenu(this, pageActions);
             TabSerializer = new TabSerializer(this);
+
             TabSerializer.Load();
         }
 

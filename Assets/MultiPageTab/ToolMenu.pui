@@ -13,3 +13,10 @@ ToggleToolButton Swap_Pages
 	UncheckedTexture = Texture(FolderPath + "SwapPagesUnchecked.png"),
 	UnenabledTexture = Texture(FolderPath + "SwapPagesUnenabled.png"),
 }
+
+ActionToolButton Append_Page
+{
+	DefaultTexture = Texture(FolderPath + "AppendPage.png"),
+	HoveredTexture = Texture(FolderPath + "AppendPageHovered.png"),
+	HeldTexture = Texture(FolderPath + "AppendPageHeld.png"),
+}
