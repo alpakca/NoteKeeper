@@ -53,6 +53,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
 
             if (position.PageIndex == _initialSwapPageIndex)
             {
+                _isSwapping = false;
                 return;
             }
 
