@@ -89,7 +89,7 @@ namespace NoteKeeper.Shell.TabOrganizer
         private static void DrawTabBox(Tab tab, TabLayout layout, Texture2D background, SpriteFont font, Texture2D? closeButtonTexture)
         {
             DrawHelper.Batch.Draw(background, layout.BoxBounds, Color.White);
-            DrawHelper.Batch.DrawString(font, (tab.TabSerializer.IsModified ? tab.Name + "*" : tab.Name), 
+            DrawHelper.Batch.DrawString(font, (tab.TabHistory.IsModified ? tab.Name + "*" : tab.Name), 
                                         (layout.BoxBounds.Location + layout.TextOffset).ToVector2(), Color.White);
 
             if (closeButtonTexture != null)

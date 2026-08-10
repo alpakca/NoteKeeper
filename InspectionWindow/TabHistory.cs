@@ -9,6 +9,8 @@ namespace NoteKeeper.InspectionWindow
 
     internal class TabHistory
     {
+        private IHistoryAction _savedMarker;
+
         private readonly Stack<IHistoryAction> _undoStack;
         private readonly Stack<IHistoryAction> _redoStack;
 
@@ -17,6 +19,8 @@ namespace NoteKeeper.InspectionWindow
 
         public IEnumerable<IHistoryAction> UndoableActions => _undoStack;
         public IEnumerable<IHistoryAction> RedoableActions => _redoStack;
+
+        public bool IsModified => _savedMarker != (CanUndo ? _undoStack.Peek() : null);
 
         public event Action<TabHistory> HistoryUpdated;
         public event TabHistoryCommandApplied CommandApplied;
@@ -70,6 +74,17 @@ namespace NoteKeeper.InspectionWindow
             _redoStack.Clear();
 
             HistoryUpdated?.Invoke(this);
+        }
+
+        public void MarkLoaded()
+        {
+            _savedMarker = null;
+            Clear();
+        }
+
+        public void MarkSaved()
+        {
+            _savedMarker = CanUndo ? _undoStack.Peek() : null;
         }
     }
 }

@@ -87,7 +87,7 @@ namespace NoteKeeper.Shell.TabOrganizer
             TabsHeaderStyle style = _styleProvider.Style;
             SpriteFont fontToUse = isDisplayed ? style.DisplayedTabFont : style.DefaultFont;
 
-            return (int)(BoxHorizontalMargin * 2 + fontToUse.MeasureString(tab.Name).X + (tab.TabSerializer.IsModified ? fontToUse.MeasureString("*").X : 0)
+            return (int)(BoxHorizontalMargin * 2 + fontToUse.MeasureString(tab.Name).X + (tab.TabHistory.IsModified ? fontToUse.MeasureString("*").X : 0)
                        + CloseButtonLength);
         }
     }
