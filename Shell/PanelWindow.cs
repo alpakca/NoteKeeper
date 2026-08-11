@@ -6,6 +6,7 @@ using NoteKeeper.Shell.ContextMenus;
 using NoteKeeper.Shell.PropertyExplorer;
 using NoteKeeper.Shell.TabOrganizer;
 using NoteKeeper.Shell.ToolBar;
+using NoteKeeper.Shell.UndoRedo;
 using PopUpUI.Input;
 using PopUpUI.Surface;
 using PopUpUI.Toolkit;
@@ -25,10 +26,12 @@ namespace NoteKeeper.Shell
         private readonly ToolMenuManager toolMenuManager;
         private readonly TabOrganizeManager tabOrganizeManager;
         private readonly PropertiesScreen propertiesScreen;
+        private readonly HistoryActionsManager historyActionsManager;
         private readonly KeyboardShortcutManager shortcutManager;
 
         public ToolMenuManager ToolMenuManager => toolMenuManager;
         public PropertiesScreen PropertiesScreen => propertiesScreen;
+        public HistoryActionsManager HistoryActionsManager => historyActionsManager;
 
         public PanelWindow(ControlPanel panel)
         {
@@ -38,6 +41,7 @@ namespace NoteKeeper.Shell
             toolMenuManager = new ToolMenuManager() { ScreenLocation = new Point(60, 240) };
             tabOrganizeManager = new TabOrganizeManager(panel.ActiveTabs) { ScreenBounds = new Rectangle(20, 168, 1880, 32) };
             propertiesScreen = new PropertiesScreen();
+            historyActionsManager = new HistoryActionsManager();
             shortcutManager = new KeyboardShortcutManager();
 
             tabOrganizeManager.DisplayedTabChanged += panel.DisplayTab;
@@ -181,6 +185,7 @@ namespace NoteKeeper.Shell
             }
 
             propertiesScreen.Render();
+            historyActionsManager.Render();
 
             DrawHelper.EndBatch();
 
@@ -206,6 +211,7 @@ namespace NoteKeeper.Shell
             contextMenuManager.MouseButtonStateUpdate(e);
             tabOrganizeManager.MouseButtonStateChange(e);
             propertiesScreen.OnMouseButtonStateChange(e);
+            historyActionsManager.MouseButtonStateChange(e);
             base.OnMouseButtonStateChange(e);
         }
 
@@ -214,6 +220,7 @@ namespace NoteKeeper.Shell
             toolMenuManager.MousePositionChangeUpdate(e);
             contextMenuManager.MousePositionChangeUpdate(e);
             tabOrganizeManager.MousePositionChangeUpdate(e);
+            historyActionsManager.MousePositionChangeUpdate(e);
             base.OnMousePositionChange(e);
         }
 
