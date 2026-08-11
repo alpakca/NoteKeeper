@@ -21,14 +21,14 @@ namespace NoteKeeper.Shell.ContextMenus
 
         private readonly ContextMenuRenderer renderer;
         private readonly MenuLayoutCalculator layoutCalculator;
-        private readonly LinkedList<SubMenuEntry> openMenus;
+        private readonly LinkedList<SubMenuPair> openMenus;
 
         public MenuItemStyleProvider StyleProvider { get; }
 
         public ContextMenuManager()
         {
             StyleProvider = new MenuItemStyleProvider();
-            openMenus = new LinkedList<SubMenuEntry>();
+            openMenus = new LinkedList<SubMenuPair>();
 
             layoutCalculator = new MenuLayoutCalculator(StyleProvider);
             renderer = new ContextMenuRenderer(openMenus, StyleProvider, layoutCalculator);
@@ -43,7 +43,7 @@ namespace NoteKeeper.Shell.ContextMenus
             menu.Location = AdjustedMenuTopLeftPosition(mousePosition, menu);
             layoutCalculator.PositionContextMenuItems(menu);
 
-            openMenus.AddLast(new SubMenuEntry(null, menu));
+            openMenus.AddLast(new SubMenuPair(null, menu));
         }
 
         public void HideAll()
@@ -56,17 +56,19 @@ namespace NoteKeeper.Shell.ContextMenus
             if (openMenus.Count > 1)
             {
                 Point mousePosition = Mouse.GetState().Position;
-                LinkedListNode<SubMenuEntry> peek = openMenus.Last!;
+                LinkedListNode<SubMenuPair> peek = openMenus.Last!;
 
                 while (peek != openMenus.First)
                 {
-                    if (!InsideContextMenuItem(peek.Value.Button, mousePosition) && !peek.Value.ContextMenu.InsideBoundaries(mousePosition))
+                    SubMenuPair pair = peek.Value;
+                    if (!InsideContextMenuItem(pair.Button, mousePosition) && 
+                        !layoutCalculator.GetContextMenuBackgroundBounds(pair.ContextMenu).Contains(mousePosition))
                     {
-                        peek.Value.UpdateCloseTime();
+                        pair.UpdateCloseTime();
                     }
                     else
                     {
-                        peek.Value.DisableCloseTime();
+                        pair.DisableCloseTime();
                     }
 
                     peek = peek.Previous!;
@@ -122,26 +124,27 @@ namespace NoteKeeper.Shell.ContextMenus
 
         private void HoverUpdate(PopWindowMouseEventArgs e)
         {
-            LinkedListNode<SubMenuEntry> peek = openMenus.Last!;
+            LinkedListNode<SubMenuPair> peek = openMenus.Last!;
             while (peek != openMenus.First)
             {
-                SubMenuEntry value = peek.Value;
-                if (!InsideContextMenuItem(value.Button, e.MousePosition) && !value.ContextMenu.InsideBoundaries(e.MousePosition))
+                SubMenuPair pair = peek.Value;
+                if (!InsideContextMenuItem(pair.Button, e.MousePosition) && 
+                    !layoutCalculator.GetContextMenuBackgroundBounds(pair.ContextMenu).Contains(e.MousePosition))
                 {
-                    value.ActiveCloseTime(SubMenuCloseOpenTime);
+                    pair.ActiveCloseTime(SubMenuCloseOpenTime);
                 }
 
                 peek = peek.Previous!;
             }
 
-            (IContextMenuItem? hovered, SubMenuEntry? foundEntry) = FindItemOnPosition(e.MousePosition);
+            (IContextMenuItem? hovered, SubMenuPair? foundPair) = FindItemOnPosition(e.MousePosition);
 
             if (hovered != hoveredItem)
             {
                 subMenuOpenRemainingTime = SubMenuCloseOpenTime;
             }
 
-            hoveringSubMenuOpener = foundEntry == openMenus.Last!.Value && hovered is SubContextMenuButton;
+            hoveringSubMenuOpener = foundPair == openMenus.Last!.Value && hovered is SubContextMenuButton;
             hoveredItem = hovered;
         }
 
@@ -158,9 +161,9 @@ namespace NoteKeeper.Shell.ContextMenus
             }
 
             bool anyContextMenuSelected = false;
-            foreach (var entry in openMenus)
+            foreach (SubMenuPair pair in openMenus)
             {
-                if (entry.ContextMenu.InsideBoundaries(e.MousePosition))
+                if (layoutCalculator.GetContextMenuBackgroundBounds(pair.ContextMenu).Contains(e.MousePosition))
                 {
                     anyContextMenuSelected = true;
                     break;
@@ -192,37 +195,57 @@ namespace NoteKeeper.Shell.ContextMenus
             ContextMenu contextMenu = contextMenuButton.SubMenu;
             layoutCalculator.CalculateContextMenuSize(contextMenu);
 
-            contextMenu.Location = AdjustedMenuTopLeftPosition(contextMenuButton.GetPossibleSubMenuPlacement(), contextMenu);
+            contextMenu.Location = GetSubMenuLocation(contextMenuButton);
             layoutCalculator.PositionContextMenuItems(contextMenu);
 
-            openMenus.AddLast(new SubMenuEntry(contextMenuButton, contextMenu));
+            openMenus.AddLast(new SubMenuPair(contextMenuButton, contextMenu));
         }
 
-        private static Point AdjustedMenuTopLeftPosition(Point topLeftPosition, ContextMenu menu)
+        private Point AdjustedMenuTopLeftPosition(Point topLeftPosition, ContextMenu menu)
         {
             Point location = topLeftPosition;
-            if (topLeftPosition.X + menu.FramedSize.X >= WindowOptions.Width)
+            Point backgroundSize = layoutCalculator.GetContextMenuBackgroundBounds(menu).Size;
+
+            if (topLeftPosition.X + backgroundSize.X >= WindowOptions.Width)
             {
-                location.X -= topLeftPosition.X + menu.FramedSize.X - WindowOptions.Width;
+                location.X -= topLeftPosition.X + backgroundSize.X - WindowOptions.Width;
             }
 
-            if (topLeftPosition.Y + menu.FramedSize.Y >= WindowOptions.Height)
+            if (topLeftPosition.Y + backgroundSize.Y >= WindowOptions.Height)
             {
-                location.Y -= topLeftPosition.Y + menu.FramedSize.Y - WindowOptions.Height;
+                location.Y -= topLeftPosition.Y + backgroundSize.Y - WindowOptions.Height;
             }
 
             return location;
         }
 
-        private (IContextMenuItem? Item, SubMenuEntry? FoundEntry) FindItemOnPosition(Point mousePosition)
+        private Point GetSubMenuLocation(SubContextMenuButton button)
         {
-            foreach (var entry in openMenus)
+            Point subMenuSize = layoutCalculator.GetContextMenuBackgroundBounds(button.SubMenu).Size;
+            if (button.Location.X + button.Size.X + subMenuSize.X < WindowOptions.Width)
             {
-                foreach (var item in entry.ContextMenu.Items)
+                return new Point(button.Location.X + button.Size.X, button.Location.Y);
+            }
+            else
+            {
+                return new Point(button.Location.X - subMenuSize.X, button.Location.Y);
+            }
+        }
+
+        private (IContextMenuItem? Item, SubMenuPair? FoundPair) FindItemOnPosition(Point mousePosition)
+        {
+            foreach (var pair in openMenus)
+            {
+                foreach (var entry in pair.ContextMenu.Entries)
                 {
+                    if (entry is not IContextMenuItem item)
+                    {
+                        continue;
+                    }
+
                     if (InsideContextMenuItem(item, mousePosition))
                     {
-                        return (item, entry);
+                        return (item, pair);
                     }
                 }
             }
@@ -240,7 +263,7 @@ namespace NoteKeeper.Shell.ContextMenus
         }
     }
 
-    internal class SubMenuEntry
+    internal class SubMenuPair
     {
         private bool isClosing = false;
         private float remainingCloseTime;
@@ -250,7 +273,7 @@ namespace NoteKeeper.Shell.ContextMenus
 
         public bool ReadyToClose => isClosing && remainingCloseTime <= 0;
 
-        public SubMenuEntry(SubContextMenuButton? button, ContextMenu contextMenu)
+        public SubMenuPair(SubContextMenuButton? button, ContextMenu contextMenu)
         {
             Button = button;
             ContextMenu = contextMenu;

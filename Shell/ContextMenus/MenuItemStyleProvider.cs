@@ -7,24 +7,22 @@ namespace NoteKeeper.Shell.ContextMenus
 {
     internal class MenuItemStyleProvider
     {
-        private Dictionary<Type, MenuItemStyle> _styles;
-        private Texture2D _menuBackground;
+        private ContextMenuStyle _style;
 
-        public Texture2D MenuBackground => _menuBackground;
+        public ContextMenuStyle Style => _style;
 
         public event Action ThemeChanged;
 
-        public void ApplyTheme(Dictionary<Type, MenuItemStyle> styles, Texture2D menuBackground)
+        public void ApplyTheme(ContextMenuStyle style)
         {
-            _styles = styles;
-            _menuBackground = menuBackground;
+            _style = style;
 
             ThemeChanged?.Invoke();
         }
 
         public MenuItemStyle GetStyle(IContextMenuEntry entry)
         {
-            return _styles[entry.GetType()];
+            return _style.ItemStyles[entry.GetType()];
         }
     }
 }

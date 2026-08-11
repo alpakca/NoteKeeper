@@ -7,6 +7,8 @@ namespace NoteKeeper.Shell.ContextMenus
 {
     internal class MenuLayoutCalculator
     {
+        private const int ContextMenuFrameThickness = 2;
+
         private readonly MenuItemStyleProvider styleProvider;
 
         public MenuLayoutCalculator(MenuItemStyleProvider styleProvider)
@@ -19,9 +21,9 @@ namespace NoteKeeper.Shell.ContextMenus
             int maxWidth = 0;
             int totalHeight = 0;
 
-            foreach (var item in contextMenu.Items)
+            foreach (var item in contextMenu.Entries)
             {
-                Point itemSize = MeasureItem(item);
+                Point itemSize = MeasureEntry(item);
 
                 maxWidth = Math.Max(maxWidth, itemSize.X);
                 totalHeight += itemSize.Y;
@@ -30,13 +32,19 @@ namespace NoteKeeper.Shell.ContextMenus
             contextMenu.Size = new Point(maxWidth, totalHeight);
         }
 
+        public Rectangle GetContextMenuBackgroundBounds(ContextMenu menu)
+        {
+            return new Rectangle(menu.Location.X - ContextMenuFrameThickness, menu.Location.Y - ContextMenuFrameThickness,
+                                 menu.Size.X + ContextMenuFrameThickness * 2, menu.Size.Y + ContextMenuFrameThickness * 2);
+        }
+
         public void PositionContextMenuItems(ContextMenu contextMenu)
         {
             int currentY = 0;
 
-            foreach (var item in contextMenu.Items)
+            foreach (var item in contextMenu.Entries)
             {
-                Point itemSize = MeasureItem(item);
+                Point itemSize = MeasureEntry(item);
 
                 item.Location = contextMenu.Location + new Point(0, currentY);
                 item.Size = new Point(contextMenu.Size.X, itemSize.Y);
@@ -45,60 +53,108 @@ namespace NoteKeeper.Shell.ContextMenus
             }
         }
 
-        private Point MeasureItem(IContextMenuItem item)
+        private Point MeasureEntry(IContextMenuEntry entry)
         {
-            MenuItemStyle style = styleProvider.GetStyle(item);
-
-            int iconYSize = style.BoundaryPadding.Y * 2 + style.IconSize.Y;
-            int textYSize = style.BoundaryPadding.Y * 2 + style.LeftTextFont.LineSpacing;
-
-            Point size = new Point(style.BoundaryPadding.X * 2 + style.IconSize.X + style.IconHorizontalPadding + (int)style.LeftTextFont.MeasureString(style.LeftText).X, 
-                                   Math.Max(iconYSize, textYSize));
-
-            if (item is IHasRightIcon)
+            return entry switch
             {
-                size.X += style.IconHorizontalPadding * 2 + style.IconSize.X;
-            }
-            else if (item is IHasRightText rightText && rightText.RightTextFont != null && !string.IsNullOrEmpty(rightText.RightText))
-            {
-                size.X += rightText.RightTextHorizontalPadding * 2 + (int)style.LeftTextFont.MeasureString(rightText.RightText).X;
-            }
-
-            return size;
+                ActionContextMenuButton action => GetActionButtonSize(action),
+                SubContextMenuButton subContext => GetSubContextButtonSize(subContext),
+                GroupLineItem line => GetGroupLineSize(line),
+                _ => throw new ArgumentException("Unhandled IContextMenuEntry type: " + entry.GetType())
+            };
         }
 
-        public MenuItemLayout GetItemLayout(IContextMenuItem item)
+        private Point GetActionButtonSize(ActionContextMenuButton button)
         {
-            MenuItemStyle style = styleProvider.GetStyle(item);
-            Rectangle boundaries = new Rectangle(item.Location, item.Size);
-            
-            Rectangle leftIconBounds = new Rectangle(boundaries.Location + style.BoundaryPadding, style.IconSize);
-            Vector2 leftTextPosition = new Vector2(boundaries.X + style.BoundaryPadding.X + style.IconSize.X + style.IconHorizontalPadding,
-                                                   boundaries.Y + style.BoundaryPadding.Y);
+            ContextMenuStyle menuStyle = styleProvider.Style;
+            ActionMenuItemStyle itemStyle = (ActionMenuItemStyle)styleProvider.GetStyle(button);
 
-            Rectangle rightIconBounds = new Rectangle();
-            if (item is IHasRightIcon rightIcon && rightIcon.RightIcon != null)
+            int leftPartLength = itemStyle.ButtonStyle.HorizontalPadding + itemStyle.ButtonStyle.LeftIconSize.X + itemStyle.ButtonStyle.IconHorizontalPadding + (int)menuStyle.Font.MeasureString(button.LeftText).X;
+            int rightPartLength = itemStyle.ButtonStyle.HorizontalPadding;
+            if (button.RightText != null)
             {
-                rightIconBounds = new Rectangle(boundaries.Right - style.BoundaryPadding.X - style.IconSize.X, boundaries.Y + style.BoundaryPadding.Y,
-                                                style.IconSize.X, style.IconSize.Y);
+                rightPartLength += (int)menuStyle.Font.MeasureString(button.RightText).X;
             }
 
-            Vector2 rightTextPosition = new Vector2();
-            if (item is IHasRightText rightText && rightText.RightTextFont != null && !string.IsNullOrEmpty(rightText.RightText))
-            {
-                int textWidth = (int)rightText.RightTextFont.MeasureString(rightText.RightText).X;
+            return new Point(leftPartLength + itemStyle.ButtonStyle.LeftRightPartPadding + rightPartLength, itemStyle.Height);
+        }
 
-                rightTextPosition = new Vector2(boundaries.Right - style.BoundaryPadding.X - textWidth,
-                                                boundaries.Y + style.BoundaryPadding.Y);
-            }
+        private Point GetSubContextButtonSize(SubContextMenuButton button)
+        {
+            ContextMenuStyle menuStyle = styleProvider.Style;
+            SubContextMenuItemStyle itemStyle = (SubContextMenuItemStyle)styleProvider.GetStyle(button);
+
+            int leftPartLength = itemStyle.ButtonStyle.HorizontalPadding + itemStyle.ButtonStyle.LeftIconSize.X + itemStyle.ButtonStyle.IconHorizontalPadding + (int)menuStyle.Font.MeasureString(button.LeftText).X;
+            int rightPartLength = itemStyle.ButtonStyle.HorizontalPadding + itemStyle.RightIconSize.X;
+
+            return new Point(leftPartLength + itemStyle.ButtonStyle.LeftRightPartPadding + rightPartLength, itemStyle.Height);
+        }
+
+        private Point GetGroupLineSize(GroupLineItem line)
+        {
+            GroupLineStyle style = (GroupLineStyle)styleProvider.GetStyle(line);
+
+            return new Point(0, style.Height);
+        }
+
+        public MenuItemLayout GetEntryLayout(IContextMenuEntry entry)
+        {
+            return entry switch
+            {
+                ActionContextMenuButton button => GetActionButtonLayout(button),
+                SubContextMenuButton button => GetSubContextButtonLayout(button),
+                GroupLineItem line => GetGroupLineLayout(line),
+                _ => throw new ArgumentException("Unhandled IContextMenuEntry type: " + entry.GetType())
+            };
+        }
+
+        private MenuItemLayout GetActionButtonLayout(ActionContextMenuButton button)
+        {
+            ContextMenuStyle menuStyle = styleProvider.Style;
+            ActionMenuItemStyle itemStyle = (ActionMenuItemStyle)styleProvider.GetStyle(button);
+            Rectangle bounds = new Rectangle(button.Location, button.Size);
+
+            int rightTextWidth = button.RightText != null ? (int)menuStyle.Font.MeasureString(button.RightText).X : 0;
+            return new MenuItemLayout
+            {
+                ItemBounds = bounds,
+                LeftIconBounds = new Rectangle(new Point(bounds.X + itemStyle.ButtonStyle.HorizontalPadding, bounds.Y + (bounds.Height - itemStyle.ButtonStyle.LeftIconSize.Y) / 2), 
+                                               itemStyle.ButtonStyle.LeftIconSize),
+
+                LeftTextPosition = new Vector2(bounds.X + itemStyle.ButtonStyle.HorizontalPadding + itemStyle.ButtonStyle.LeftIconSize.X + itemStyle.ButtonStyle.IconHorizontalPadding,
+                                               bounds.Y + (bounds.Height - menuStyle.Font.LineSpacing) / 2),
+
+                RightTextPosition = new Vector2(bounds.Right - itemStyle.ButtonStyle.HorizontalPadding - rightTextWidth,
+                                                bounds.Y + (bounds.Height - menuStyle.Font.LineSpacing) / 2),
+            };
+        }
+
+        private MenuItemLayout GetSubContextButtonLayout(SubContextMenuButton button)
+        {
+            ContextMenuStyle menuStyle = styleProvider.Style;
+            SubContextMenuItemStyle itemStyle = (SubContextMenuItemStyle)styleProvider.GetStyle(button);
+            Rectangle bounds = new Rectangle(button.Location, button.Size);
 
             return new MenuItemLayout
             {
-                ItemBounds = boundaries,
-                LeftIconBounds = leftIconBounds,
-                LeftTextPosition = leftTextPosition,
-                RightIconBounds = rightIconBounds,
-                RightTextPosition = rightTextPosition
+                ItemBounds = bounds,
+                LeftTextPosition = new Vector2(bounds.X + itemStyle.ButtonStyle.HorizontalPadding + itemStyle.ButtonStyle.LeftIconSize.X + itemStyle.ButtonStyle.IconHorizontalPadding,
+                                               bounds.Y + (bounds.Height - menuStyle.Font.LineSpacing) / 2),
+
+                RightIconBounds = new Rectangle(bounds.Right - itemStyle.ButtonStyle.HorizontalPadding - itemStyle.RightIconSize.X, 
+                                                bounds.Y + (bounds.Height - itemStyle.RightIconSize.Y) / 2,
+                                                itemStyle.RightIconSize.X, 
+                                                itemStyle.RightIconSize.Y),
+            };
+        }
+
+        private MenuItemLayout GetGroupLineLayout(GroupLineItem line)
+        {
+            GroupLineStyle style = (GroupLineStyle)styleProvider.GetStyle(line);
+
+            return new MenuItemLayout
+            {
+                ItemBounds = new Rectangle(line.Location.X, line.Location.Y + (style.Height - style.Thickness) / 2, line.Size.X, style.Thickness)
             };
         }
     }

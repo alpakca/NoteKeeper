@@ -25,17 +25,5 @@ namespace NoteKeeper.Shell.ContextMenus
         public void Selected()
         {
         }
-
-        public Point GetPossibleSubMenuPlacement()
-        {
-            if (Location.X + Size.X + SubMenu.FramedSize.X < WindowOptions.Size.X)
-            {
-                return new Point(Location.X + Size.X, Location.Y);
-            }
-            else
-            {
-                return new Point(Location.X - SubMenu.FramedSize.X, Location.Y);
-            }
-        }
     }
 }

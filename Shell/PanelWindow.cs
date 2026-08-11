@@ -36,6 +36,8 @@ namespace NoteKeeper.Shell
             tabOrganizeManager = new TabOrganizeManager(panel.ActiveTabs) { ScreenBounds = new Rectangle(20, 168, 1880, 32) };
             shortcutManager = new KeyboardShortcutManager();
 
+            tabOrganizeManager.DisplayedTabChanged += panel.DisplayTab;
+
             #region Debug Styles
             tabOrganizeManager.StyleProvider.ApplyTheme(new TabsHeaderStyle
             {
@@ -54,40 +56,50 @@ namespace NoteKeeper.Shell
                 HeaderBackground = Util.GetTexture(1, 1, Color.Gray)
             });
 
-            MenuItemStyle actionButtonStyle = new MenuItemStyle
+            MenuButtonStyle buttonStyle = new MenuButtonStyle
             {
-                Background = Util.GetTexture(1, 1, Color.DarkRed),
-                BoundaryPadding = new Point(4),
-                IconHorizontalPadding = 4,
-                IconSize = new Point(32),
-                LeftText = "Action!",
-                LeftTextColor = Color.DarkTurquoise,
-                LeftTextFont = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans"),
-                LeftIcon = Util.GetTexture(1, 1, Color.DarkSlateBlue),
-                HeldOverlay = Util.GetTexture(1, 1, Color.Firebrick),
-                HoverOverlay = Util.GetTexture(1, 1, Color.DimGray)
+                HorizontalPadding = 2,
+                IconHorizontalPadding = 2,
+                LeftIconSize = new Point(25),
+                LeftRightPartPadding = 20,
+                LeftTextColor = Color.White,
             };
 
-            MenuItemStyle subMenuStyle = new MenuItemStyle
+            contextMenuManager.StyleProvider.ApplyTheme(new ContextMenuStyle
             {
-                Background = Util.GetTexture(1, 1, Color.DarkRed),
-                BoundaryPadding = new Point(4),
-                IconHorizontalPadding = 4,
-                IconSize = new Point(32),
-                LeftText = "Action!",
-                LeftTextColor = Color.DarkTurquoise,
-                LeftTextFont = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans"),
-                LeftIcon = Util.GetTexture(1, 1, Color.DarkSlateBlue)
-            };
+                Background = Util.GetTexture(1, 1, Color.SlateGray),
+                HoverOverlay = Util.GetTexture(1, 1, Color.LightGray * 0.3f),
+                HeldOverlay = Util.GetTexture(1, 1, Color.DarkGray * 0.3f),
+                Font = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans"),
 
-            Dictionary<Type, MenuItemStyle> defaultTheme = new Dictionary<Type, MenuItemStyle>
-            {
-                { typeof(ActionContextMenuButton), actionButtonStyle }, { typeof(SubContextMenuButton), subMenuStyle }
-            };
-            contextMenuManager.StyleProvider.ApplyTheme(defaultTheme);
+                ItemStyles = new Dictionary<Type, MenuItemStyle>
+                {
+                    { typeof(ActionContextMenuButton), new ActionMenuItemStyle
+                        {
+                            ButtonStyle = buttonStyle,
+                            RightTextColor = Color.WhiteSmoke,
+                            Height = 32,
+                        } 
+                    },
+                    {
+                        typeof(SubContextMenuButton), new SubContextMenuItemStyle
+                        {
+                            ButtonStyle = buttonStyle,
+                            RightIconSize = new Point(25),
+                            Height = 32
+                        }
+                    },
+                    {
+                        typeof(GroupLineItem), new GroupLineStyle
+                        {
+                            LineColor = Color.WhiteSmoke,
+                            Thickness = 2,
+                            Height = 4
+                        }
+                    }
+                }
+            });
             #endregion
-
-            tabOrganizeManager.DisplayedTabChanged += panel.DisplayTab;
 
             Elements.Add(shortcutManager);
             InitializeShortcuts();
