@@ -6,6 +6,7 @@ using NoteKeeper.Shell.ContextMenus;
 using NoteKeeper.Shell.PropertyExplorer;
 using NoteKeeper.Shell.TabOrganizer;
 using NoteKeeper.Shell.ToolBar;
+using NoteKeeper.Shell.UndoRedo;
 using PopUpUI.Input;
 using PopUpUI.Surface;
 using PopUpUI.Toolkit;
@@ -25,10 +26,12 @@ namespace NoteKeeper.Shell
         private readonly ToolMenuManager toolMenuManager;
         private readonly TabOrganizeManager tabOrganizeManager;
         private readonly PropertiesScreen propertiesScreen;
+        private readonly HistoryActionsManager historyActionsManager;
         private readonly KeyboardShortcutManager shortcutManager;
 
         public ToolMenuManager ToolMenuManager => toolMenuManager;
         public PropertiesScreen PropertiesScreen => propertiesScreen;
+        public HistoryActionsManager HistoryActionsManager => historyActionsManager;
 
         public PanelWindow(ControlPanel panel)
         {
@@ -38,9 +41,11 @@ namespace NoteKeeper.Shell
             toolMenuManager = new ToolMenuManager() { ScreenLocation = new Point(60, 240) };
             tabOrganizeManager = new TabOrganizeManager(panel.ActiveTabs) { ScreenBounds = new Rectangle(20, 168, 1880, 32) };
             propertiesScreen = new PropertiesScreen();
+            historyActionsManager = new HistoryActionsManager();
             shortcutManager = new KeyboardShortcutManager();
 
             tabOrganizeManager.DisplayedTabChanged += panel.DisplayTab;
+            historyActionsManager.ActionsReversed += HistoryActionsManager_ActionsReversed;
 
             #region Debug Styles
             tabOrganizeManager.StyleProvider.ApplyTheme(new TabsHeaderStyle
@@ -113,6 +118,17 @@ namespace NoteKeeper.Shell
                 DropdownOptionBackground = Util.GetTexture(1, 1, Color.LightGray),
                 FocusedBoxBackground = Util.GetTexture(1, 1, Color.Purple)
             });
+
+            historyActionsManager.StyleProvider.ApplyTheme(new HistoryActionsStyle
+            {
+                Font = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans_16"),
+                Background = Util.GetTexture(1, 1, Color.SlateGray),
+                Height = 24,
+                SelectedActionsHover = Util.GetTexture(1, 1, Color.LightBlue * 0.3f),
+                SelectedActionsIcon = Util.GetTexture(1, 1, Color.Purple),
+                SelectedActionsIconSize = new Point(4, 20),
+                TextHorizontalPadding = 16
+            });
             #endregion
 
             Elements.Add(shortcutManager);
@@ -152,13 +168,31 @@ namespace NoteKeeper.Shell
             }
         }
 
+        private void HistoryActionsManager_ActionsReversed(IEnumerable<IHistoryAction> actions, int count)
+        {
+            if (displayedTab == null)
+            {
+                return;
+            }
+
+            if (actions == displayedTab.TabHistory.UndoableActions)
+            {
+                for (int i = 0; i < count; i++)
+                    displayedTab.TabHistory.Undo();
+            }
+            else if (actions == displayedTab.TabHistory.RedoableActions)
+            {
+                for (int i = 0; i < count; i++)
+                    displayedTab.TabHistory.Redo();
+            }
+        }
+
         public void ZoomChanged()
         {
         }
 
         public void ScrollChanged()
         {
-
         }
 
         protected override void Update()
@@ -181,6 +215,7 @@ namespace NoteKeeper.Shell
             }
 
             propertiesScreen.Render();
+            historyActionsManager.Render();
 
             DrawHelper.EndBatch();
 
@@ -206,6 +241,7 @@ namespace NoteKeeper.Shell
             contextMenuManager.MouseButtonStateUpdate(e);
             tabOrganizeManager.MouseButtonStateChange(e);
             propertiesScreen.MouseButtonStateChange(e);
+            historyActionsManager.MouseButtonStateChange(e);
             base.OnMouseButtonStateChange(e);
         }
 
@@ -214,6 +250,7 @@ namespace NoteKeeper.Shell
             toolMenuManager.MousePositionChangeUpdate(e);
             contextMenuManager.MousePositionChangeUpdate(e);
             tabOrganizeManager.MousePositionChangeUpdate(e);
+            historyActionsManager.MousePositionChangeUpdate(e);
             base.OnMousePositionChange(e);
         }
 

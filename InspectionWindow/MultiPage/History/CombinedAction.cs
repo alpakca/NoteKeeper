@@ -8,11 +8,12 @@ namespace NoteKeeper.InspectionWindow.MultiPage.History
     {
         private readonly IHistoryAction[] _actions;
 
-        public string UIDescription => throw new NotImplementedException();
+        public string UIDescription { get; }
 
-        public CombinedAction(params IHistoryAction[] actions)
+        public CombinedAction(string uiDescription, params IHistoryAction[] actions)
         {
             _actions = actions;
+            UIDescription = uiDescription;
         }
 
         public void Run()
