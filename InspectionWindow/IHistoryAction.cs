@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace NoteKeeper.InspectionWindow.MultiPage.History
+namespace NoteKeeper.InspectionWindow
 {
     internal interface IHistoryAction
     {
