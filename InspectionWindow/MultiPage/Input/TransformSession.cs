@@ -286,7 +286,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Input
                 }
             }
 
-            CombinedAction action = new CombinedAction(contentActions);
+            CombinedAction action = new CombinedAction("Content(s) Transform", contentActions);
             _snapshotSelectedContents.Add(action, (_selectedContents.ToArray(), _marqueePageIndex));
             _pageActions.RunAction(action);
 

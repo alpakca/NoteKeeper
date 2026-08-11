@@ -117,6 +117,17 @@ namespace NoteKeeper.Shell
                 DropdownOptionBackground = Util.GetTexture(1, 1, Color.LightGray),
                 FocusedBoxBackground = Util.GetTexture(1, 1, Color.Purple)
             });
+
+            historyActionsManager.StyleProvider.ApplyTheme(new HistoryActionsStyle
+            {
+                Font = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans_12"),
+                Background = Util.GetTexture(1, 1, Color.SlateGray),
+                Height = 16,
+                SelectedActionsHover = Util.GetTexture(1, 1, Color.LightBlue * 0.3f),
+                SelectedActionsIcon = Util.GetTexture(1, 1, Color.Purple),
+                SelectedActionsIconSize = new Point(4, 16),
+                TextHorizontalPadding = 8
+            });
             #endregion
 
             Elements.Add(shortcutManager);

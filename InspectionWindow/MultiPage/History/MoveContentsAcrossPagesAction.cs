@@ -11,7 +11,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage.History
         private readonly IPageContent[] _contents;
         private readonly SortedList<int, IPageContent> _contentsPageIndeces;
 
-        public string UIDescription => throw new NotImplementedException();
+        public string UIDescription => "Content Page Changed";
 
         public MoveContentsAcrossPagesAction(NotePage oldPage, NotePage newPage, IPageContent[] contents)
         {

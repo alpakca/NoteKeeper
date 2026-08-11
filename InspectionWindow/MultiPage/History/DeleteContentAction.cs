@@ -10,7 +10,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage.History
         private readonly IPageContent _content;
         private int _contentIndex;
 
-        public string UIDescription => throw new NotImplementedException();
+        public string UIDescription => "Delete Content";
 
         public DeleteContentAction(NotePage notePage, IPageContent content)
         {

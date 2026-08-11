@@ -10,7 +10,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage.History
         private readonly IPageContent _content;
         private int _contentIndex;
 
-        public string UIDescription => throw new NotImplementedException();
+        public string UIDescription => "Add Content";
 
         public AddContentAction(NotePage notePage, IPageContent content)
         {

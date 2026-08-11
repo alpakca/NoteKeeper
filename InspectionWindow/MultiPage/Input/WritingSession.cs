@@ -58,7 +58,8 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Input
                 IHistoryAction action;
                 if (newText != oldText && newSize != oldSize)
                 {
-                    action = new CombinedAction(new PropertyChangeAction<IKeyTextReceiverContent, string>(oldText, newText, WritingContent, (element, value) => element.Text = value),
+                    action = new CombinedAction("Insert Text",
+                                                new PropertyChangeAction<IKeyTextReceiverContent, string>(oldText, newText, WritingContent, (element, value) => element.Text = value),
                                                 new PropertyChangeAction<IKeyTextReceiverContent, Point>(oldSize, newSize, WritingContent, (element, value) => element.SetSize(value)));
                 }
                 else

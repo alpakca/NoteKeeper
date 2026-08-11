@@ -10,7 +10,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage.History
         private readonly int _secondPageIndex;
         private readonly IList<NotePage> _notePages;
 
-        public string UIDescription => throw new NotImplementedException();
+        public string UIDescription => "Pages Swapped";
 
         public PagesSwappedAction(int firstPageIndex, int secondPageIndex, IList<NotePage> notePages)
         {

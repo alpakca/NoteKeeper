@@ -21,9 +21,9 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
             _history.RunAction(action);
         }
 
-        public void CombinedAction(params IHistoryAction[] actions)
+        public void CombinedAction(string uiDescription, params IHistoryAction[] actions)
         {
-            _history.RunAction(new CombinedAction(actions));
+            _history.RunAction(new CombinedAction(uiDescription, actions));
         }
 
         public void ChangeContentProperty<U, T>(T oldValue, T newValue, U element, Action<U, T> setAction)

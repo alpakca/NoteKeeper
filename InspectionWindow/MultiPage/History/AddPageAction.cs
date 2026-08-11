@@ -10,7 +10,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage.History
         private readonly NotePage _page;
         private readonly IList<NotePage> _notePages;
 
-        public string UIDescription => throw new NotImplementedException();
+        public string UIDescription => "Add Page";
 
         public AddPageAction(NotePage page, IList<NotePage> notePages)
         {

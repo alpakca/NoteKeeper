@@ -11,7 +11,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage.History
         private readonly T _oldValue;
         private readonly T _newValue;
 
-        public string UIDescription => throw new NotImplementedException();
+        public string UIDescription => "Property Updated";
 
         public PropertyChangeAction(T oldValue, T newValue, U element, Action<U, T> setAction)
         {
