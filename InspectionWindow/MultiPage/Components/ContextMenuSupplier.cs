@@ -2,6 +2,7 @@
 using NoteKeeper.InspectionWindow.MultiPage.Properties;
 using NoteKeeper.Shell.ContextMenus;
 using NoteKeeper.Shell.PropertyExplorer;
+using System;
 using System.Collections.Generic;
 
 #nullable enable
@@ -13,9 +14,9 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
         private readonly PageActions _pageActions;
         private readonly TabViewport _viewport;
         private readonly ContentQuery _contentQuery;
-        private readonly PropertiesScreen _propertiesScreen;
         private readonly IList<NotePage> _notePages;
 
+        private readonly Action<IPropertyCollection> _requestPropertyScreen;
         private readonly PageContentProperties _contentProperties;
 
         private ContextMenu? _contentMenu;
@@ -24,14 +25,15 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
         private int _affectedPageIndex;
         private IPageContent? _affectedContent;
 
-        public ContextMenuSupplier(PageActions pageActions, TabViewport viewport, ContentQuery contentQuery, PropertiesScreen propertiesScreen, IList<NotePage> notePages)
+        public ContextMenuSupplier(PageActions pageActions, TabViewport viewport, ContentQuery contentQuery, 
+                                   Action<IPropertyCollection> requestPropertyScreen, IList<NotePage> notePages)
         {
             _pageActions = pageActions;
             _viewport = viewport;
             _contentQuery = contentQuery;
-            _propertiesScreen = propertiesScreen;
             _notePages = notePages;
 
+            _requestPropertyScreen = requestPropertyScreen;
             _contentProperties = new PageContentProperties();
         }
 
@@ -76,7 +78,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
                 new ActionContextMenuButton(() =>
                 {
                     _contentProperties.SetContent(_affectedContent);
-                    _propertiesScreen.Show(_contentProperties, new Rectangle(1620, 168, 300, 800));
+                    _requestPropertyScreen(_contentProperties);
                 }, null, "Properties", null)
             });
         }

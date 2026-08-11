@@ -55,7 +55,7 @@ namespace NoteKeeper
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-            ContentAssistant.LoadWithContentManager<SpriteFont>(("ComicSans", "Font_ComicSans"));
+            ContentAssistant.LoadWithContentManager<SpriteFont>(("ComicSans_16", "Font_ComicSans_16"));
             ContentAssistant.LoadWithContentManager<SpriteFont>(("ComicSans_24", "Font_ComicSans_24"));
 
             string shellAssetsPath = @"C:\Users\user\Desktop\C#\NoteKeeper\NoteKeeper\Assets";

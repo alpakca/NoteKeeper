@@ -117,6 +117,7 @@ namespace NoteKeeper.Shell
             if (displayedTab != null)
             {
                 displayedTab.ShellModeChangeRequested -= Tab_ShellModeChangeRequested;
+                displayedTab.PropertyScreenOpenRequested -= Tab_PropertyScreenOpenRequested;
 
                 displayedTab.TabViewport.ZoomChanged -= TabViewport_ZoomChanged;
                 displayedTab.TabViewport.ScrollChanged -= TabViewport_ScrollChanged;
@@ -129,6 +130,7 @@ namespace NoteKeeper.Shell
             if (tab != null)
             {
                 tab.ShellModeChangeRequested += Tab_ShellModeChangeRequested;
+                tab.PropertyScreenOpenRequested += Tab_PropertyScreenOpenRequested;
 
                 tab.TabViewport.ZoomChanged += TabViewport_ZoomChanged;
                 tab.TabViewport.ScrollChanged += TabViewport_ScrollChanged;
@@ -162,6 +164,11 @@ namespace NoteKeeper.Shell
         private void Tab_ShellModeChangeRequested(ShellModes mode)
         {
             Mode = mode;
+        }
+
+        private void Tab_PropertyScreenOpenRequested(PropertyExplorer.IPropertyCollection collection)
+        {
+            panelWindow.PropertiesScreen.Show(collection, new Rectangle(1620, 168, 300, 800));
         }
 
         public bool TryExitApp()

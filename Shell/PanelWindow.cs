@@ -49,8 +49,8 @@ namespace NoteKeeper.Shell
                 TabHoveredBackground = Util.GetTexture(1, 1, Color.LightGray),
                 DisplayedTabBackground = Util.GetTexture(1, 1, Color.DarkMagenta),
 
-                DefaultFont = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans"),
-                DisplayedTabFont = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans"),
+                DefaultFont = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans_16"),
+                DisplayedTabFont = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans_16"),
 
                 TabCloseButtonIcon = Util.GetTexture(1, 1, Color.Red),
                 TabListButtonIcon = Util.GetTexture(1, 1, Color.Aqua),
@@ -74,7 +74,7 @@ namespace NoteKeeper.Shell
                 Background = Util.GetTexture(1, 1, Color.SlateGray),
                 HoverOverlay = Util.GetTexture(1, 1, Color.LightGray * 0.3f),
                 HeldOverlay = Util.GetTexture(1, 1, Color.DarkGray * 0.3f),
-                Font = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans"),
+                Font = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans_16"),
 
                 ItemStyles = new Dictionary<Type, MenuItemStyle>
                 {
@@ -102,6 +102,16 @@ namespace NoteKeeper.Shell
                         }
                     }
                 }
+            });
+
+            propertiesScreen.StyleProvider.ApplyTheme(new PropertyScreenStyle
+            {
+                Font = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans_16"),
+                BoxBackground = Util.GetTexture(1, 1, Color.Black),
+                DropdownButtonTexture = Util.GetTexture(1, 1, Color.Gray),
+                ScreenBackground = Util.GetTexture(1, 1, Color.DarkGray),
+                DropdownOptionBackground = Util.GetTexture(1, 1, Color.LightGray),
+                FocusedBoxBackground = Util.GetTexture(1, 1, Color.Purple)
             });
             #endregion
 

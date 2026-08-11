@@ -22,21 +22,26 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Properties
             IntegerPropertyEntry width = new IntegerPropertyEntry("Width", v => _currentContent.SetSize(new Point(v, _currentContent.Size.Y)));
             IntegerPropertyEntry height = new IntegerPropertyEntry("Height", v => _currentContent.SetSize(new Point(_currentContent.Size.X, v)));
 
-            IntegerDropdownPropertyEntry fontSize = new IntegerDropdownPropertyEntry("Font Size", [], size =>
+            IntegerDropdownPropertyEntry fontSize = new IntegerDropdownPropertyEntry("Font Size", [16, 24], size =>
             {
                 PageTextContent textContent = (PageTextContent)_currentContent;
                 textContent.SetFont(textContent.FontName, size);
             });
-            StringDropdownPropertyEntry fontName = new StringDropdownPropertyEntry("Font Name", [], name =>
+            StringDropdownPropertyEntry fontName = new StringDropdownPropertyEntry("Font Name", ["ComicSans"], name =>
             {
                 PageTextContent textContent = (PageTextContent)_currentContent;
-                textContent.SetFont(name, textContent.FontSize);
+                textContent.SetFont("Font_" + name, textContent.FontSize);
+            });
+            StringPropertyEntry text = new StringPropertyEntry("Text", textValue =>
+            {
+                PageTextContent textContent = (PageTextContent)_currentContent;
+                textContent.Text = textValue;
             });
 
             _entries = new Dictionary<PropertyType, IUnderlyingValueSetter>
             {
                 { PropertyType.X, x }, { PropertyType.Y, y}, { PropertyType.Width, width }, { PropertyType.Height, height },
-                { PropertyType.FontName, fontName }, { PropertyType.FontSize, fontSize }
+                { PropertyType.FontName, fontName }, { PropertyType.FontSize, fontSize }, { PropertyType.Text, text }
             };
 
             _imageContentProperties = [x, y, width, height];
@@ -56,7 +61,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Properties
             }
             else if (content is PageTextContent textContent)
             {
-                _entries[PropertyType.FontName].SetUnderlyingValue(textContent.FontName);
+                _entries[PropertyType.FontName].SetUnderlyingValue(textContent.FontName[5..]);
                 _entries[PropertyType.FontSize].SetUnderlyingValue(textContent.FontSize);
                 _entries[PropertyType.Text].SetUnderlyingValue(textContent.Text);
                 Properties = _textContentProperties;

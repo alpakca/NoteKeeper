@@ -41,7 +41,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage
 
             contentQuery = new ContentQuery(NotePages);
             window = new TabWindow(pageActions, viewport, contentQuery, NotePages);
-            menuSupplier = new ContextMenuSupplier(pageActions, viewport, contentQuery, NotePages);
+            menuSupplier = new ContextMenuSupplier(pageActions, viewport, contentQuery, RequestPropertyScreenOpen, NotePages);
 
             ToolMenu = new TabToolMenu(this, pageActions);
             TabSerializer = new TabSerializer(this);

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using NoteKeeper.Shell.ContextMenus;
+using NoteKeeper.Shell.PropertyExplorer;
 using NoteKeeper.Shell.ToolBar;
 using PopUpUI.Input;
 using PopUpUI.Surface;
@@ -17,7 +18,8 @@ namespace NoteKeeper.InspectionWindow
         public string SourcePath => _sourcePath;
         public string Name { get; set; }
 
-        public event Action<ShellModes> ShellModeChangeRequested;
+        public event Action<ShellModes>? ShellModeChangeRequested;
+        public event Action<IPropertyCollection>? PropertyScreenOpenRequested;
 
         public abstract ITabSerializer TabSerializer { get; }
         public abstract ITabViewport TabViewport { get; }
@@ -45,6 +47,11 @@ namespace NoteKeeper.InspectionWindow
         public void RequestShellModeChange(ShellModes mode)
         {
             ShellModeChangeRequested?.Invoke(mode);
+        }
+
+        public void RequestPropertyScreenOpen(IPropertyCollection collection)
+        {
+            PropertyScreenOpenRequested?.Invoke(collection);
         }
     }
 }

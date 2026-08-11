@@ -28,7 +28,7 @@ namespace NoteKeeper.Shell.UnsavedTabsWindow
         public CloseTabsWindow()
         {
             _topTextFont = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans_24");
-            _tabNamesFont = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans");
+            _tabNamesFont = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans_16");
 
             _buttons = [
             new WindowButton {
