@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using NoteKeeper.InspectionWindow;
 using NoteKeeper.Shell.ContextMenus;
+using NoteKeeper.Shell.PropertyExplorer;
 using NoteKeeper.Shell.TabOrganizer;
 using NoteKeeper.Shell.ToolBar;
 using PopUpUI.Input;
@@ -23,9 +24,11 @@ namespace NoteKeeper.Shell
         private readonly ContextMenuManager contextMenuManager;
         private readonly ToolMenuManager toolMenuManager;
         private readonly TabOrganizeManager tabOrganizeManager;
+        private readonly PropertiesScreen propertiesScreen;
         private readonly KeyboardShortcutManager shortcutManager;
 
         public ToolMenuManager ToolMenuManager => toolMenuManager;
+        public PropertiesScreen PropertiesScreen => propertiesScreen;
 
         public PanelWindow(ControlPanel panel)
         {
@@ -34,6 +37,7 @@ namespace NoteKeeper.Shell
             contextMenuManager = new ContextMenuManager();
             toolMenuManager = new ToolMenuManager() { ScreenLocation = new Point(60, 240) };
             tabOrganizeManager = new TabOrganizeManager(panel.ActiveTabs) { ScreenBounds = new Rectangle(20, 168, 1880, 32) };
+            propertiesScreen = new PropertiesScreen();
             shortcutManager = new KeyboardShortcutManager();
 
             tabOrganizeManager.DisplayedTabChanged += panel.DisplayTab;
@@ -166,6 +170,8 @@ namespace NoteKeeper.Shell
                 tabOrganizeManager.Render();
             }
 
+            propertiesScreen.Render();
+
             DrawHelper.EndBatch();
 
             // render context menu on top of everything
@@ -189,6 +195,7 @@ namespace NoteKeeper.Shell
             toolMenuManager.MouseButtonStateChange(e);
             contextMenuManager.MouseButtonStateUpdate(e);
             tabOrganizeManager.MouseButtonStateChange(e);
+            propertiesScreen.OnMouseButtonStateChange(e);
             base.OnMouseButtonStateChange(e);
         }
 
@@ -198,6 +205,18 @@ namespace NoteKeeper.Shell
             contextMenuManager.MousePositionChangeUpdate(e);
             tabOrganizeManager.MousePositionChangeUpdate(e);
             base.OnMousePositionChange(e);
+        }
+
+        protected override void OnTextInput(PopWindowMouseEventArgs e, char ch)
+        {
+            propertiesScreen.OnTextInsert(e, ch);
+            base.OnTextInput(e, ch);
+        }
+
+        protected override void OnKeyDown(PopWindowMouseEventArgs e, Keys key)
+        {
+            propertiesScreen.OnKeyDown(e, key);
+            base.OnKeyDown(e, key);
         }
     }
 }

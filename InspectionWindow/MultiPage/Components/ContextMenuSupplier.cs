@@ -1,8 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
+using NoteKeeper.InspectionWindow.MultiPage.Properties;
 using NoteKeeper.Shell.ContextMenus;
-using System;
+using NoteKeeper.Shell.PropertyExplorer;
 using System.Collections.Generic;
-using System.Text;
 
 #nullable enable
 
@@ -13,7 +13,10 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
         private readonly PageActions _pageActions;
         private readonly TabViewport _viewport;
         private readonly ContentQuery _contentQuery;
+        private readonly PropertiesScreen _propertiesScreen;
         private readonly IList<NotePage> _notePages;
+
+        private readonly PageContentProperties _contentProperties;
 
         private ContextMenu? _contentMenu;
         private ContextMenu? _pageMenu;
@@ -21,12 +24,15 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
         private int _affectedPageIndex;
         private IPageContent? _affectedContent;
 
-        public ContextMenuSupplier(PageActions pageActions, TabViewport viewport, ContentQuery contentQuery, IList<NotePage> notePages)
+        public ContextMenuSupplier(PageActions pageActions, TabViewport viewport, ContentQuery contentQuery, PropertiesScreen propertiesScreen, IList<NotePage> notePages)
         {
             _pageActions = pageActions;
             _viewport = viewport;
             _contentQuery = contentQuery;
+            _propertiesScreen = propertiesScreen;
             _notePages = notePages;
+
+            _contentProperties = new PageContentProperties();
         }
 
         public ContextMenu? GetMenu(Point mousePosition)
@@ -66,7 +72,12 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
         {
             return new ContextMenu(new IContextMenuEntry[]
             {
-                new ActionContextMenuButton(() => _pageActions.DeleteContent(_notePages[_affectedPageIndex], _affectedContent), null, "Delete Content", null)
+                new ActionContextMenuButton(() => _pageActions.DeleteContent(_notePages[_affectedPageIndex], _affectedContent), null, "Delete Content", null),
+                new ActionContextMenuButton(() =>
+                {
+                    _contentProperties.SetContent(_affectedContent);
+                    _propertiesScreen.Show(_contentProperties, new Rectangle(1620, 168, 300, 800));
+                }, null, "Properties", null)
             });
         }
     }

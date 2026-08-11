@@ -10,18 +10,23 @@ namespace NoteKeeper.InspectionWindow.MultiPage
 {
     internal class PageTextContent : IKeyTextReceiverContent
     {
-        private readonly string _fontName;
         private readonly TextProcesser processer;
 
         private Point location;
         private Point size;
         private Point absSize;
 
+        private int _fontSize;
+        private string _fontName;
+
         private ITextProcesserResult lastResult;
         private RenderTarget2D renderTarget;
 
         public Point Location => location;
         public Point Size => size;
+
+        public int FontSize => _fontSize;
+        public string FontName => _fontName;
 
         public string Text
         {
@@ -34,10 +39,16 @@ namespace NoteKeeper.InspectionWindow.MultiPage
         }
         public ITextProcesserResult LastResult => lastResult;
 
-        public PageTextContent(string fontName)
+        public PageTextContent()
         {
+            processer = new TextProcesser();
+        }
+
+        public void SetFont(string fontName, int fontSize)
+        {
+            _fontSize = fontSize;
             _fontName = fontName;
-            processer = new TextProcesser { Font = ContentAssistant.FromLoaded<SpriteFont>(fontName) };
+            processer.Font = ContentAssistant.FromLoaded<SpriteFont>(fontName + "_" + fontSize);
         }
 
         public void ResizeUpdate(Point value)
@@ -215,6 +226,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage
                 Size = size,
 
                 Text = this.Text,
+                FontSize = _fontSize,
                 FontName = _fontName
             };
         }
@@ -226,9 +238,11 @@ namespace NoteKeeper.InspectionWindow.MultiPage
                 throw new System.Exception();
             }
 
-            PageTextContent content = new PageTextContent(textInfo.FontName);
+            PageTextContent content = new PageTextContent();
             content.SetLocation(textInfo.Location);
             content.SetSize(textInfo.Size);
+
+            content.SetFont(textInfo.FontName, textInfo.FontSize);
             content.Text = textInfo.Text;
 
             return content;

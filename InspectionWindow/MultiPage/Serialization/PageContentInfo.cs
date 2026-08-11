@@ -23,5 +23,6 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Serialization
     {
         public string Text { get; init; }
         public string FontName { get; init; }
+        public int FontSize { get; init; }
     }
 }
