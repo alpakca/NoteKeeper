@@ -20,6 +20,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage
 
         private readonly PageActions pageActions;
         private readonly ContentQuery contentQuery;
+        private readonly ContextMenuSupplier menuSupplier;
 
         public override ITabSerializer TabSerializer { get; }
         public override ITabViewport TabViewport => viewport;
@@ -40,6 +41,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage
 
             contentQuery = new ContentQuery(NotePages);
             window = new TabWindow(pageActions, viewport, contentQuery, NotePages);
+            menuSupplier = new ContextMenuSupplier(pageActions, viewport, contentQuery, NotePages);
 
             ToolMenu = new TabToolMenu(this, pageActions);
             TabSerializer = new TabSerializer(this);
@@ -68,16 +70,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage
 
         public Point GetContentScreenLocation(IPageContent content)
         {
-            int contentPageIndex = -1;
-            for (int i = 0; i < NotePages.Count; i++)
-            {
-                if (NotePages[i].Contents.Contains(content))
-                {
-                    contentPageIndex = i;
-                    break;
-                }
-            }
-
+            int contentPageIndex = contentQuery.PageIndexOf(content);
             if (contentPageIndex == -1)
             {
                 throw new ArgumentException("Content does not exist in any tab.");
@@ -98,7 +91,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage
 
         public override ContextMenu? GetContextMenu(Point mousePosition)
         {
-            return new ContextMenu([]);
+            return menuSupplier.GetMenu(mousePosition);
         }
 
         public static MultiPageTab Creator(string path)
