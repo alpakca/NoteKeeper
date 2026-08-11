@@ -231,7 +231,10 @@ namespace NoteKeeper.Shell
         private void TabHistory_HistoryUpdated(TabHistory history)
         {
             buttonPlate.UndoButton.Enabled = history.CanUndo;
+            buttonPlate.UndoDescriptionsButton.Enabled = history.CanUndo;
+
             buttonPlate.RedoButton.Enabled = history.CanRedo;
+            buttonPlate.RedoDescriptionsButton.Enabled = history.CanRedo;
         }
 
         private void TabViewport_ScrollChanged()

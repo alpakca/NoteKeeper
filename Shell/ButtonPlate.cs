@@ -5,6 +5,7 @@ using PopUpUI.Elements.Visual;
 using PopUpUI.PUI;
 using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 
 namespace NoteKeeper.Shell
 {
@@ -21,6 +22,9 @@ namespace NoteKeeper.Shell
         public VisualClickable UndoButton { get; }
         public VisualClickable RedoButton { get; }
 
+        public VisualClickable UndoDescriptionsButton { get; }
+        public VisualClickable RedoDescriptionsButton { get; }
+
         public VisualClickable SaveCurrentTabButton { get; }
         public VisualClickable SaveAllTabsButton { get; }
 
@@ -36,7 +40,10 @@ namespace NoteKeeper.Shell
             _transformModeToggle = new VisualToggleButton();
 
             UndoButton = new VisualClickable();
+            UndoDescriptionsButton = new VisualClickable();
+
             RedoButton = new VisualClickable();
+            RedoDescriptionsButton = new VisualClickable();
 
             SaveCurrentTabButton = new VisualClickable();
             SaveAllTabsButton = new VisualClickable();
@@ -65,12 +72,34 @@ namespace NoteKeeper.Shell
             });
             UndoButton.Enabled = false;
 
+            interpreter.AssignProperties(PUIHelper.VisualClickableAssigner, "Undo_Descriptions", UndoDescriptionsButton);
+            UndoDescriptionsButton.ClickCommand = new ActionCommander<Clickable>(button =>
+            {
+                if (panel.DisplayedTab != null)
+                {
+                    panel.PanelWindow.HistoryActionsManager.Show(panel.DisplayedTab.TabHistory.UndoableActions,
+                                                                 new Point(button.Boundaries.X, button.Boundaries.Bottom));
+                }
+            });
+            UndoDescriptionsButton.Enabled = false;
+
             interpreter.AssignProperties(PUIHelper.VisualClickableAssigner, "Redo", RedoButton);
             RedoButton.ClickCommand = new ActionCommander<Clickable>(_ =>
             {
                 panel.DisplayedTab?.TabHistory.Redo();
             });
             RedoButton.Enabled = false;
+
+            interpreter.AssignProperties(PUIHelper.VisualClickableAssigner, "Redo_Descriptions", RedoDescriptionsButton);
+            RedoDescriptionsButton.ClickCommand = new ActionCommander<Clickable>(button =>
+            {
+                if (panel.DisplayedTab != null)
+                {
+                    panel.PanelWindow.HistoryActionsManager.Show(panel.DisplayedTab.TabHistory.RedoableActions, 
+                                                                 new Point(button.Boundaries.X, button.Boundaries.Bottom));
+                }
+            });
+            RedoDescriptionsButton.Enabled = false;
 
             interpreter.AssignProperties(PUIHelper.VisualClickableAssigner, "Save_Current_Tab", SaveCurrentTabButton);
             SaveCurrentTabButton.ClickCommand = new ActionCommander<Clickable>(_ =>
@@ -98,8 +127,8 @@ namespace NoteKeeper.Shell
             panel.PanelWindow.ToolMenuManager.MenuVisibilityChanged += ToolMenuToggle.SetStatusWithoutCommander;
 
 
-            Buttons.AddRange(_writingModeToggle, _transformModeToggle, UndoButton, RedoButton, SaveCurrentTabButton, SaveAllTabsButton,
-                             ToolMenuToggle);
+            Buttons.AddRange(_writingModeToggle, _transformModeToggle, UndoButton, UndoDescriptionsButton, RedoButton, RedoDescriptionsButton, 
+                             SaveCurrentTabButton, SaveAllTabsButton, ToolMenuToggle);
         }
 
         public void ShellModeUpdated()

@@ -25,7 +25,7 @@ VisualToggleButton Transform_Mode_Toggle
 	HoldablePacket = holdablePacket
 }
 
-VisualClickable Undo 
+VisualClickable Undo
 {
 	Name = "Undo",
 	Boundaries = Rectangle(180, 60, 32, 32),
@@ -38,10 +38,23 @@ VisualClickable Undo
 	HoldablePacket = holdablePacket
 }
 
+VisualClickable Undo_Descriptions
+{
+	Name = "UndoDescriptions",
+	Boundaries = Rectangle(212, 60, 20, 32),
+	DefaultAnimation = Animation(ShellFolderPath + "DownArrow.png"),
+	HoverAnimation = Animation(ShellFolderPath + "DownArrowHovered.png"),
+	HoldAnimation = Animation(ShellFolderPath + "DownArrowHeld.png"),
+	UnenabledAnimation = Animation(ShellFolderPath + "DownArrowUnenabled.png"),
+
+	SelectablePacket = selectablePacket,
+	HoldablePacket = holdablePacket
+}
+
 VisualClickable Redo 
 {
 	Name = "Undo",
-	Boundaries = Rectangle(220, 60, 32, 32),
+	Boundaries = Rectangle(240, 60, 32, 32),
 	DefaultAnimation = Animation(ShellFolderPath + "Redo.png"),
 	HoverAnimation = Animation(ShellFolderPath + "RedoHovered.png"),
 	HoldAnimation = Animation(ShellFolderPath + "RedoHeld.png"),
@@ -51,10 +64,23 @@ VisualClickable Redo
 	HoldablePacket = holdablePacket
 }
 
+VisualClickable Redo_Descriptions
+{
+	Name = "UndoDescriptions",
+	Boundaries = Rectangle(272, 60, 20, 32),
+	DefaultAnimation = Animation(ShellFolderPath + "DownArrow.png"),
+	HoverAnimation = Animation(ShellFolderPath + "DownArrowHovered.png"),
+	HoldAnimation = Animation(ShellFolderPath + "DownArrowHeld.png"),
+	UnenabledAnimation = Animation(ShellFolderPath + "DownArrowUnenabled.png"),
+
+	SelectablePacket = selectablePacket,
+	HoldablePacket = holdablePacket
+}
+
 VisualClickable Save_Current_Tab 
 {
 	Name = "SaveCurrentTab",
-	Boundaries = Rectangle(260, 60, 32, 32),
+	Boundaries = Rectangle(300, 60, 32, 32),
 	DefaultAnimation = Animation(ShellFolderPath + "SaveCurrentTab.png"),
 	HoverAnimation = Animation(ShellFolderPath + "SaveCurrentTabHovered.png"),
 	HeldAnimation = Animation(ShellFolderPath + "SaveCurrentTabHeld.png"),
@@ -67,7 +93,7 @@ VisualClickable Save_Current_Tab
 VisualClickable Save_All_Tabs
 {
 	Name = "SaveAllTabs",
-	Boundaries = Rectangle(300, 60, 32, 32),
+	Boundaries = Rectangle(340, 60, 32, 32),
 	DefaultAnimation = Animation(ShellFolderPath + "SaveAllTabs.png"),
 	HoverAnimation = Animation(ShellFolderPath + "SaveAllTabsHovered.png"),
 	HeldAnimation = Animation(ShellFolderPath + "SaveAllTabsHeld.png"),
@@ -80,7 +106,7 @@ VisualClickable Save_All_Tabs
 VisualToggleButton Tool_Menu_Toggle 
 {
 	Name = "ToolMenuToggle",
-	Boundaries = Rectangle(340, 60, 32, 32),
+	Boundaries = Rectangle(380, 60, 32, 32),
 	UncheckedAnimation = Animation(ShellFolderPath + "ToolMenu.png"),
 	CheckedAnimation = Animation(ShellFolderPath + "ToolMenuSelected.png"),
 	UnenabledAnimation = Animation(ShellFolderPath + "ToolMenuUnenabled.png"),

@@ -73,6 +73,12 @@ namespace NoteKeeper.Shell.UndoRedo
             if (_actions == null)
                 return;
 
+            if (!layoutCalculator.BackgroundBounds(_actions.Count()).Contains(e.MousePosition))
+            {
+                Hide();
+                return;
+            }
+
             if (e.FirstTimeButtons.HasLeft && _hoveredItemIndex != -1)
             {
                 _itemHeld = true;
