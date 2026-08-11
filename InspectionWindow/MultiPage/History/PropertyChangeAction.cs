@@ -11,14 +11,21 @@ namespace NoteKeeper.InspectionWindow.MultiPage.History
         private readonly T _oldValue;
         private readonly T _newValue;
 
-        public string UIDescription => "Property Updated";
+        public string UIDescription { get; }
 
         public PropertyChangeAction(T oldValue, T newValue, U element, Action<U, T> setAction)
+            : this("Property Updated", oldValue, newValue, element, setAction)
+        {
+        }
+
+        public PropertyChangeAction(string uiDescription, T oldValue, T newValue, U element, Action<U, T> setAction)
         {
             _oldValue = oldValue;
             _newValue = newValue;
             _element = element;
             _setAction = setAction;
+
+            UIDescription = uiDescription;
         }
 
         public void Run()

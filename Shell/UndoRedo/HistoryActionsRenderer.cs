@@ -26,11 +26,16 @@ namespace NoteKeeper.Shell.UndoRedo
 
             int i = 0;
             int textPadding = (style.Height - style.Font.LineSpacing) / 2;
+            int iconPadding = (style.Height - style.SelectedActionsIconSize.Y) / 2;
             foreach (var action in actions)
             {
                 Rectangle bounds = _layoutCalculator.GetActionLayout(i);
 
-                DrawHelper.Batch.Draw(style.SelectedActionsIcon, new Rectangle(bounds.Location, style.SelectedActionsIconSize), Color.White);
+                DrawHelper.Batch.Draw(style.SelectedActionsIcon, 
+                                      new Rectangle(bounds.Location.X, bounds.Location.Y + iconPadding, 
+                                                    style.SelectedActionsIconSize.X, style.SelectedActionsIconSize.Y), 
+                                      Color.White);
+
                 DrawHelper.Batch.DrawString(style.Font, action.UIDescription, 
                                             new Vector2(bounds.Location.X + style.TextHorizontalPadding, bounds.Location.Y + textPadding), Color.White);
 

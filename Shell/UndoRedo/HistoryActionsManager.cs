@@ -19,7 +19,7 @@ namespace NoteKeeper.Shell.UndoRedo
 
         public HistoryActionsStyleProvider StyleProvider { get; }
 
-        public event Action<int> ActionsReversed;
+        public event Action<IEnumerable<IHistoryAction>, int> ActionsReversed;
 
         public HistoryActionsManager()
         {
@@ -57,15 +57,21 @@ namespace NoteKeeper.Shell.UndoRedo
             if (_actions == null)
                 return;
 
+            _hoveredItemIndex = GetHoveredItemIndex(e.MousePosition);
+        }
+
+        private int GetHoveredItemIndex(Point mousePosition)
+        {
             int count = _actions.Count();
             for (int i = count - 1; i >= 0; i--)
             {
-                if (layoutCalculator.GetActionLayout(i).Contains(e.MousePosition))
+                if (layoutCalculator.GetActionLayout(i).Contains(mousePosition))
                 {
-                    _hoveredItemIndex = i;
-                    break;
+                    return i;
                 }
             }
+
+            return -1;
         }
 
         public void MouseButtonStateChange(PopWindowMouseEventArgs e)
@@ -87,7 +93,8 @@ namespace NoteKeeper.Shell.UndoRedo
             {
                 if (_itemHeld && _hoveredItemIndex != -1)
                 {
-                    ActionsReversed?.Invoke(_hoveredItemIndex + 1); // returns the number of items, so add one
+                    ActionsReversed?.Invoke(_actions, _hoveredItemIndex + 1); // returns the number of items, so add one
+                    Hide();
                 }
 
                 _itemHeld = false;

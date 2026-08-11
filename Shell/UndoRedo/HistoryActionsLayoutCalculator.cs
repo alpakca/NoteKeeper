@@ -8,7 +8,7 @@ namespace NoteKeeper.Shell.UndoRedo
 {
     internal class HistoryActionsLayoutCalculator
     {
-        private const int FrameThickness = 2;
+        private const int FrameThickness = 4;
 
         private HistoryActionsStyleProvider _styleProvider;
         private int _actionsWidth;

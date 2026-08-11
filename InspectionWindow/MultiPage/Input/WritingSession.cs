@@ -64,7 +64,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Input
                 }
                 else
                 {
-                    action = new PropertyChangeAction<IKeyTextReceiverContent, string>(oldText, newText, WritingContent, (element, value) => element.Text = value);
+                    action = new PropertyChangeAction<IKeyTextReceiverContent, string>("InsertText", oldText, newText, WritingContent, (element, value) => element.Text = value);
                 }
 
                 _pageActions.RunAction(action);

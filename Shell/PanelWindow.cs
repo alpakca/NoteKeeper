@@ -45,6 +45,7 @@ namespace NoteKeeper.Shell
             shortcutManager = new KeyboardShortcutManager();
 
             tabOrganizeManager.DisplayedTabChanged += panel.DisplayTab;
+            historyActionsManager.ActionsReversed += HistoryActionsManager_ActionsReversed;
 
             #region Debug Styles
             tabOrganizeManager.StyleProvider.ApplyTheme(new TabsHeaderStyle
@@ -120,13 +121,13 @@ namespace NoteKeeper.Shell
 
             historyActionsManager.StyleProvider.ApplyTheme(new HistoryActionsStyle
             {
-                Font = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans_12"),
+                Font = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans_16"),
                 Background = Util.GetTexture(1, 1, Color.SlateGray),
-                Height = 16,
+                Height = 24,
                 SelectedActionsHover = Util.GetTexture(1, 1, Color.LightBlue * 0.3f),
                 SelectedActionsIcon = Util.GetTexture(1, 1, Color.Purple),
-                SelectedActionsIconSize = new Point(4, 16),
-                TextHorizontalPadding = 8
+                SelectedActionsIconSize = new Point(4, 20),
+                TextHorizontalPadding = 16
             });
             #endregion
 
@@ -167,13 +168,31 @@ namespace NoteKeeper.Shell
             }
         }
 
+        private void HistoryActionsManager_ActionsReversed(IEnumerable<IHistoryAction> actions, int count)
+        {
+            if (displayedTab == null)
+            {
+                return;
+            }
+
+            if (actions == displayedTab.TabHistory.UndoableActions)
+            {
+                for (int i = 0; i < count; i++)
+                    displayedTab.TabHistory.Undo();
+            }
+            else if (actions == displayedTab.TabHistory.RedoableActions)
+            {
+                for (int i = 0; i < count; i++)
+                    displayedTab.TabHistory.Redo();
+            }
+        }
+
         public void ZoomChanged()
         {
         }
 
         public void ScrollChanged()
         {
-
         }
 
         protected override void Update()
