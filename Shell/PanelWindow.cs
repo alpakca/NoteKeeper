@@ -205,7 +205,7 @@ namespace NoteKeeper.Shell
             toolMenuManager.MouseButtonStateChange(e);
             contextMenuManager.MouseButtonStateUpdate(e);
             tabOrganizeManager.MouseButtonStateChange(e);
-            propertiesScreen.OnMouseButtonStateChange(e);
+            propertiesScreen.MouseButtonStateChange(e);
             base.OnMouseButtonStateChange(e);
         }
 

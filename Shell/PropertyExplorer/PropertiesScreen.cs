@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using PopUpUI.Input;
-using System.Diagnostics;
 
 namespace NoteKeeper.Shell.PropertyExplorer
 {
@@ -73,7 +72,7 @@ namespace NoteKeeper.Shell.PropertyExplorer
             }
         }
 
-        public void OnMouseButtonStateChange(PopWindowMouseEventArgs e)
+        public void MouseButtonStateChange(PopWindowMouseEventArgs e)
         {
             if (_shownCollection == null || !e.FirstTimeButtons.HasLeft)
                 return;

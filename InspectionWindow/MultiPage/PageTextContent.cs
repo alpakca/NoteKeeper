@@ -41,7 +41,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage
 
         public PageTextContent()
         {
-            processer = new TextProcesser();
+            processer = new TextProcesser() { TextColor = Color.Black };
         }
 
         public void SetFont(string fontName, int fontSize)
