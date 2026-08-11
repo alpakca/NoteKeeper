@@ -8,24 +8,24 @@ using System.Text;
 
 namespace NoteKeeper.Shell.ContextMenus
 {
-    internal class ActionContextMenuButton : IContextMenuItem, IHasRightText
+    internal class ActionContextMenuButton : IContextMenuItem
     {
-        private Point size;
-
         private readonly Action _action;
 
         public Point Location { get; set; }
         public Point Size { get; set; }
 
-        public string? RightText { get; init; }
-        public SpriteFont? RightTextFont { get; init; }
-        public Color RightTextColor { get; init; }
+        public Texture2D? IconTexture { get; }
+        public string? RightText { get; }
+        public string LeftText { get; }
 
-        public int RightTextHorizontalPadding { get; init; }
-
-        public ActionContextMenuButton(Action action)
+        public ActionContextMenuButton(Action action, Texture2D? iconTexture, string leftText, string? rightText)
         {
             _action = action;
+
+            IconTexture = iconTexture;
+            RightText = rightText;
+            LeftText = leftText;
         }
 
         public void Selected()

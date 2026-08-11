@@ -8,7 +8,7 @@ namespace NoteKeeper.Shell.ContextMenus
     {
         private const int FrameMargin = 2;
 
-        private readonly IContextMenuItem[] _items;
+        private readonly IContextMenuEntry[] _entries;
 
         public Point Location { get; set; }
         /// <summary>Size of context menu without frame margin. Its where IContextMenuItem/s will belong in.</summary>
@@ -18,20 +18,11 @@ namespace NoteKeeper.Shell.ContextMenus
         /// <summary>Size of context menu with frame margin. Its the total rendered size.</summary>
         public Point FramedSize => Size + new Point(FrameMargin * 2);
 
-        public IContextMenuItem[] Items => _items;
+        public IContextMenuEntry[] Entries => _entries;
 
-        public Texture2D Background { get; init; }
-
-        public ContextMenu(IContextMenuItem[] items)
+        public ContextMenu(IContextMenuEntry[] entries)
         {
-            _items = items;
-        }
-
-        public void RenderBackground()
-        {
-            DrawHelper.Batch.Draw(Background, 
-                                  new Rectangle(FramedLocation, FramedSize), 
-                                  Color.White);
+            _entries = entries;
         }
 
         public bool InsideBoundaries(Point p)

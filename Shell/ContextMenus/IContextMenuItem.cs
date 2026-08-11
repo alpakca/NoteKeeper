@@ -8,10 +8,8 @@ using System.Text;
 
 namespace NoteKeeper.Shell.ContextMenus
 {
-    internal interface IContextMenuItem
+    internal interface IContextMenuItem : IContextMenuEntry
     {
-        public Point Location { get; set; }
-        public Point Size { get; set; }
         public void Selected();
     }
 }

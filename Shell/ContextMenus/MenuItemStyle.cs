@@ -1,38 +1,38 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace NoteKeeper.Shell.ContextMenus
 {
     internal class MenuItemStyle
     {
-        public Texture2D Background { get; init; }
-        public Texture2D? HoverOverlay { get; init; }
-        public Texture2D? HeldOverlay { get; init; }
+        public int Height { get; init; }
+    }
 
-        public string LeftText { get; init; }
-        public SpriteFont LeftTextFont { get; init; }
+    internal class MenuButtonStyle
+    {
         public Color LeftTextColor { get; init; }
-        public Texture2D? LeftIcon { get; init; }
+        public Point LeftIconSize { get; init; }
 
         public int IconHorizontalPadding { get; init; }
-        public Point IconSize { get; init; }
-        public Point BoundaryPadding { get; init; }
+        public int LeftRightPartPadding { get; init; }
+        public int HorizontalPadding { get; init; }
     }
 
-    internal interface IHasRightText
+    internal class ActionMenuItemStyle : MenuItemStyle
     {
-        public string? RightText { get; }
-        public SpriteFont? RightTextFont { get; }
-        public Color RightTextColor { get; }
-
-        public int RightTextHorizontalPadding { get; }
+        public MenuButtonStyle ButtonStyle { get; init; }
+        public Color RightTextColor { get; init; }
     }
 
-    internal interface IHasRightIcon
+    internal class SubContextMenuItemStyle : MenuItemStyle
     {
-        public Texture2D? RightIcon { get; }
+        public MenuButtonStyle ButtonStyle { get; init; }
+        public Point RightIconSize { get; init; }
+    }
+
+    internal class GroupLineStyle : MenuItemStyle
+    {
+        public Color LineColor { get; init; }
+        public int Thickness { get; init; }
     }
 }

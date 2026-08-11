@@ -4,18 +4,22 @@ using PopUpUI.Toolkit;
 
 namespace NoteKeeper.Shell.ContextMenus
 {
-    internal class SubContextMenuButton : IContextMenuItem, IHasRightIcon
+    internal class SubContextMenuButton : IContextMenuItem
     {
         public Point Location { get; set; }
         public Point Size { get; set; }
 
         public ContextMenu SubMenu { get; }
 
-        public Texture2D? RightIcon { get; init; }
+        public Texture2D RightIconTexture { get; }
+        public string LeftText { get; }
 
-        public SubContextMenuButton(ContextMenu subMenu)
+        public SubContextMenuButton(ContextMenu subMenu, Texture2D rightIconTexture, string leftText)
         {
             SubMenu = subMenu;
+
+            RightIconTexture = rightIconTexture;
+            LeftText = leftText;
         }
 
         public void Selected()
