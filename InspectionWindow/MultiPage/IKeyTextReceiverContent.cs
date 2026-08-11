@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using NoteKeeper.InspectionWindow.MultiPage.Components;
+using NoteKeeper.InspectionWindow.MultiPage.Input;
 using PopUpUI.Text;
 
 namespace NoteKeeper.InspectionWindow.MultiPage

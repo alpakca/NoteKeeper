@@ -1,9 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
+using NoteKeeper.InspectionWindow.MultiPage.Components;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NoteKeeper.InspectionWindow.MultiPage.Components
+namespace NoteKeeper.InspectionWindow.MultiPage.Input
 {
     internal class PageSwapSession
     {

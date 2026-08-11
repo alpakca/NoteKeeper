@@ -17,7 +17,9 @@ namespace NoteKeeper.InspectionWindow.MultiPage
     {
         private readonly TabViewport viewport;
         private readonly TabWindow window;
+
         private readonly PageActions pageActions;
+        private readonly ContentQuery contentQuery;
 
         public override ITabSerializer TabSerializer { get; }
         public override ITabViewport TabViewport => viewport;
@@ -35,12 +37,14 @@ namespace NoteKeeper.InspectionWindow.MultiPage
 
             pageActions = new PageActions(TabHistory);
             viewport = new TabViewport();
-            window = new TabWindow(pageActions, viewport, NotePages);
 
-            NotePages.CollectionChanged += (sender, _) => viewport.PageCount = ((ObservableCollection<NotePage>)sender!).Count;
+            contentQuery = new ContentQuery(NotePages);
+            window = new TabWindow(pageActions, viewport, contentQuery, NotePages);
 
             ToolMenu = new TabToolMenu(this, pageActions);
             TabSerializer = new TabSerializer(this);
+
+            NotePages.CollectionChanged += (sender, _) => viewport.PageCount = ((ObservableCollection<NotePage>)sender!).Count;
 
             TabSerializer.Load();
         }

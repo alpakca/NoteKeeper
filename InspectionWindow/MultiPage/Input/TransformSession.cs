@@ -1,11 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
+using NoteKeeper.InspectionWindow.MultiPage.Components;
 using NoteKeeper.InspectionWindow.MultiPage.History;
 using System;
 using System.Collections.Generic;
 
 #nullable enable
 
-namespace NoteKeeper.InspectionWindow.MultiPage.Components
+namespace NoteKeeper.InspectionWindow.MultiPage.Input
 {
     internal class TransformSession
     {

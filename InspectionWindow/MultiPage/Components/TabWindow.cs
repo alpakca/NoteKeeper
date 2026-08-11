@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using NoteKeeper.InspectionWindow.MultiPage.Input;
 using PopUpUI.Input;
 using PopUpUI.Surface;
 using PopUpUI.Toolkit;
@@ -22,18 +23,20 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
 
         private readonly PageActions pageActions;
         private readonly TabViewport viewport;
+        private readonly ContentQuery contentQuery;
         private readonly TabRenderer renderer;
         private readonly TabInputHandler inputHandler;
 
-        public TabWindow(PageActions pageActions, TabViewport viewport, IList<NotePage> notePages)
+        public TabWindow(PageActions pageActions, TabViewport viewport, ContentQuery contentQuery, IList<NotePage> notePages)
         {
             this.pageActions = pageActions;
             this.viewport = viewport;
+            this.contentQuery = contentQuery;
             this.notePages = notePages;
             this.random = new Random();
 
             renderer = new TabRenderer(viewport, notePages);
-            inputHandler = new TabInputHandler(pageActions, viewport, notePages);
+            inputHandler = new TabInputHandler(pageActions, viewport, contentQuery, notePages);
 
             viewport.UISizeChanged += Viewport_UISizeChanged;
         }
@@ -77,7 +80,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
             }
             else if (inputState == WindowInputState.Writing && inputHandler.WritingSession.WritingContent != null)
             {
-                int pageIndex = inputHandler.PageIndexOf(inputHandler.WritingSession.WritingContent);
+                int pageIndex = contentQuery.PageIndexOf(inputHandler.WritingSession.WritingContent);
                 renderer.RenderWritingSession(pageIndex, inputHandler.WritingSession);
             }
 

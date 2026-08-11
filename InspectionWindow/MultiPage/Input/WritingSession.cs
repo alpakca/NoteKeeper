@@ -1,12 +1,13 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using NoteKeeper.InspectionWindow.MultiPage.Components;
 using NoteKeeper.InspectionWindow.MultiPage.History;
 using PopUpUI.Text;
 using System.Collections.Generic;
 
 #nullable enable
 
-namespace NoteKeeper.InspectionWindow.MultiPage.Components
+namespace NoteKeeper.InspectionWindow.MultiPage.Input
 {
     internal class WritingSession
     {
