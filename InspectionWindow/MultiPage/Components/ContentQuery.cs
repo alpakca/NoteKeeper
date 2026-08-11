@@ -47,6 +47,21 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
             return -1;
         }
 
+        public IEnumerable<IPageContent> QueryContentsInRect(Rectangle rect, int pageIndex, int insideRectPercentage)
+        {
+            rect = rect.Normalized();
+            foreach (var content in _notePages[pageIndex].Contents.HitOrder)
+            {
+                Rectangle intersect = Rectangle.Intersect(new Rectangle(content.Location, content.Size).Normalized(), rect);
+                float fillPercentage = (float)(intersect.Width * intersect.Height) / (content.Size.X * content.Size.Y) * 100;
+
+                if (fillPercentage > insideRectPercentage)
+                {
+                    yield return content;
+                }
+            }
+        }
+
         public IEnumerable<IPageContent> HitOrder(int pageIndex)
         {
             return _notePages[pageIndex].Contents.HitOrder;

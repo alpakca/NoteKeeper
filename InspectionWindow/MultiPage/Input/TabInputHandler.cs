@@ -29,7 +29,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Input
             this.contentQuery = contentQuery;
 
             WritingSession = new WritingSession(pageActions);
-            TransformSession = new TransformSession(pageActions, viewport, notePages);
+            TransformSession = new TransformSession(pageActions, viewport, contentQuery, notePages);
             PageSwapSession = new PageSwapSession(pageActions, notePages);
         }
 

@@ -25,6 +25,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Input
 
         private readonly PageActions _pageActions;
         private readonly TabViewport _viewport;
+        private readonly ContentQuery _contentQuery;
         private readonly IList<NotePage> _notePages;
         private readonly Dictionary<TransformNode, Point> _nodePagePositions;
 
@@ -69,7 +70,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Input
         public int ContentsPageIndex => _marqueePageIndex;
         public IEnumerable<Point> NodePagePositions => _nodePagePositions.Values;
 
-        public TransformSession(PageActions pageActions, TabViewport viewport, IList<NotePage> notePages)
+        public TransformSession(PageActions pageActions, TabViewport viewport, ContentQuery contentQuery, IList<NotePage> notePages)
         {
             _nodePagePositions = new Dictionary<TransformNode, Point>(9);
             _selectedContents = new List<IPageContent>();
@@ -77,6 +78,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Input
 
             _pageActions = pageActions;
             _viewport = viewport;
+            _contentQuery = contentQuery;
             _notePages = notePages;
 
             _snapshotSelectedContents = new Dictionary<IHistoryAction, (IPageContent[] Contents, int MarqueePageIndex)>();
@@ -207,7 +209,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Input
             _selectedContents.Clear();
             if (size.X == 0 && size.Y == 0) // check if mouse just clicked to a single content instead of selecting
             {
-                IPageContent? hit = GetHitContent(position.PagePosition);
+                IPageContent? hit = _contentQuery.HitContent(position);
                 if (hit != null)
                 {
                     _selectedContents.Add(hit);
@@ -215,7 +217,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Input
             }
             else // try selecting contents through marquee
             {
-                GetContentsInRect(_marqueeRectangle);
+                _selectedContents.AddRange(_contentQuery.QueryContentsInRect(_marqueeRectangle, _marqueePageIndex, insideRectPercentage: 50));
             }
 
             if (_selectedContents.Count == 0)
@@ -417,36 +419,6 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Input
             }
 
             return new Rectangle(minX, minY, maxX - minX, maxY - minY);
-        }
-
-        private void GetContentsInRect(Rectangle rect)
-        {
-            rect = rect.Normalized();
-            foreach (var content in _notePages[_marqueePageIndex].Contents.HitOrder)
-            {
-                Rectangle intersect = Rectangle.Intersect(new Rectangle(content.Location, content.Size).Normalized(), rect);
-                float fillPercentage = (float)(intersect.Width * intersect.Height) / (content.Size.X * content.Size.Y) * 100;
-
-                if (fillPercentage > 50)
-                {
-                    _selectedContents.Add(content);
-                }
-            }
-        }
-
-        private IPageContent? GetHitContent(Point pagePosition)
-        {
-            foreach (var content in _notePages[_marqueePageIndex].Contents.HitOrder)
-            {
-                Rectangle normalized = new Rectangle(content.Location, content.Size).Normalized();
-                if (normalized.X < pagePosition.X && pagePosition.X < normalized.Right &&
-                    normalized.Y < pagePosition.Y && pagePosition.Y < normalized.Bottom)
-                {
-                    return content;
-                }
-            }
-
-            return null;
         }
 
         private void BuildNodePositions(Rectangle boundary)
