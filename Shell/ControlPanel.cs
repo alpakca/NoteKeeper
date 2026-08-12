@@ -106,9 +106,7 @@ namespace NoteKeeper.Shell
             {
                 displayedTab.PropertyScreenOpenRequested -= Tab_PropertyScreenOpenRequested;
 
-                displayedTab.TabViewport.ZoomChanged -= TabViewport_ZoomChanged;
                 displayedTab.TabViewport.ScrollChanged -= TabViewport_ScrollChanged;
-
                 displayedTab.TabHistory.HistoryUpdated -= TabHistory_HistoryUpdated;
 
                 PopWindowManager.ActiveWindows.Remove(displayedTab.Window);
@@ -118,9 +116,7 @@ namespace NoteKeeper.Shell
             {
                 tab.PropertyScreenOpenRequested += Tab_PropertyScreenOpenRequested;
 
-                tab.TabViewport.ZoomChanged += TabViewport_ZoomChanged;
                 tab.TabViewport.ScrollChanged += TabViewport_ScrollChanged;
-
                 tab.TabHistory.HistoryUpdated += TabHistory_HistoryUpdated;
                 tab.TabHistory.Clear();
 
@@ -221,14 +217,6 @@ namespace NoteKeeper.Shell
             foreach (var receiver in tabUpdateReceivers)
             {
                 receiver.ScrollChanged();
-            }
-        }
-
-        private void TabViewport_ZoomChanged()
-        {
-            foreach (var receiver in tabUpdateReceivers)
-            {
-                receiver.ZoomChanged();
             }
         }
     }

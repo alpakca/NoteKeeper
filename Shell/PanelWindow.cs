@@ -187,10 +187,6 @@ namespace NoteKeeper.Shell
             }
         }
 
-        public void ZoomChanged()
-        {
-        }
-
         public void ScrollChanged()
         {
         }

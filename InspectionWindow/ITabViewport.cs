@@ -16,7 +16,6 @@ namespace NoteKeeper.InspectionWindow
         public int TotalContentHeight { get; }
         public int TotalContentWidth { get; }
 
-        public event Action ZoomChanged;
         public event Action ScrollChanged;
         public event Action UISizeChanged;
 

@@ -66,7 +66,14 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
         {
             return new ContextMenu(new IContextMenuEntry[]
             {
-                new ActionContextMenuButton(() => _pageActions.DeletePage(_notePages[_affectedPageIndex], _notePages), null, "Delete Page", null)
+                new ActionContextMenuButton(() => 
+                {
+                    _pageActions.DeletePage(_notePages[_affectedPageIndex], _notePages);
+
+                    // update scrolled distance, for case that deleted page was last page & was viewing it
+                    _viewport.SetHorizontalScroll(_viewport.ScrolledDistance.X);
+                    _viewport.SetVerticalScroll(_viewport.ScrolledDistance.Y);
+                }, null, "Delete Page", null)
             });
         }
 

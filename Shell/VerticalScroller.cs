@@ -10,18 +10,12 @@ namespace NoteKeeper.Shell
 {
     internal class VerticalScroller : VisualVerticalSlider, ITabUpdateReceiver
     {
-        private bool slidedWithViewport = false;
+        private bool slidedFromNonUI = false;
         private ITabViewport? displayedTabViewport;
 
         public void DisplayedTabChanged(Tab? setTab)
         {
             displayedTabViewport = setTab?.TabViewport;
-            AdjustSliderHeight();
-        }
-
-        public void ZoomChanged()
-        {
-            AdjustSliderHeight();
         }
 
         public void ScrollChanged()
@@ -32,9 +26,15 @@ namespace NoteKeeper.Shell
                 float scrolledYRatio = (float)displayedTabViewport.ScrolledDistance.Y / (displayedTabViewport.TotalContentHeight - displayedTabViewport.ViewedHeight);
                 int thumbYPosition = (int)(thumbTravelDistance * scrolledYRatio);
 
-                slidedWithViewport = true;
+                slidedFromNonUI = true;
                 SlideTo(thumbYPosition);
             }
+        }
+
+        public override void Update()
+        {
+            UpdateSliderBounds();
+            base.Update();
         }
 
         public override IEnumerable<UIDrawInfo> GetDrawInfos()
@@ -49,9 +49,10 @@ namespace NoteKeeper.Shell
 
         protected override void OnSliding()
         {
-            if (slidedWithViewport)
+            // was called to update inherited ScrollOffset
+            if (slidedFromNonUI)
             {
-                slidedWithViewport = false;
+                slidedFromNonUI = false;
                 base.OnSliding();
 
                 return;
@@ -69,14 +70,9 @@ namespace NoteKeeper.Shell
             base.OnSliding();
         }
 
-        private void AdjustSliderHeight()
+        private void UpdateSliderBounds()
         {
-            if (displayedTabViewport == null)
-            {
-                return;
-            }
-
-            if (displayedTabViewport.ViewedHeight > displayedTabViewport.TotalContentHeight)
+            if (displayedTabViewport == null || displayedTabViewport.ViewedHeight > displayedTabViewport.TotalContentHeight)
             {
                 return;
             }
@@ -89,6 +85,8 @@ namespace NoteKeeper.Shell
             int thumbYPosition = (int)(thumbTravelDistance * scrolledYRatio);
 
             Boundaries = new Rectangle(Boundaries.X, Boundaries.Y, Boundaries.Width, thumbHeight);
+
+            slidedFromNonUI = true;
             SlideTo(thumbYPosition);
         }
     }

@@ -17,11 +17,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
         public float Zoom
         {
             get;
-            set
-            {
-                field = Math.Clamp(value, MinimumZoomValue, MaximumZoomValue);
-                ZoomChanged?.Invoke();
-            }
+            set => field = Math.Clamp(value, MinimumZoomValue, MaximumZoomValue);
         } = 1f;
         public Point UISize
         {
@@ -44,7 +40,6 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
         public int TotalContentWidth => InVerticalMode ? GetSinglePageContentLength(EachPageWidth, HorizontalMargin) 
                                                        : GetAllPagesContentLength(EachPageWidth, HorizontalMargin);
 
-        public event Action ZoomChanged;
         public event Action ScrollChanged;
         public event Action UISizeChanged;
 
@@ -172,11 +167,17 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
 
         private int GetAllPagesContentLength(int mainLength, int margin)
         {
+            if (PageCount == 0)
+                return 0;
+
             return PageCount * (mainLength + PageSpacing) - PageSpacing + 2 * margin;
         }
 
-        private static int GetSinglePageContentLength(int mainLength, int margin)
+        private int GetSinglePageContentLength(int mainLength, int margin)
         {
+            if (PageCount == 0)
+                return 0;
+
             return mainLength + 2 * margin;
         }
     }
