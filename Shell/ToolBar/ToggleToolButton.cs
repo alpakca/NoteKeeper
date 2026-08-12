@@ -35,5 +35,10 @@ namespace NoteKeeper.Shell.ToolBar
             _isChecked = !_isChecked;
             _toggleAction(this);
         }
+
+        public void SilentSetCheckStatus(bool isChecked)
+        {
+            _isChecked = isChecked;
+        }
     }
 }

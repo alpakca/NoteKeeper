@@ -79,11 +79,6 @@ namespace NoteKeeper.InspectionWindow.MultiPage
             return viewport.FirstPageStartPosition + contentPageIndex * viewport.MovingDimensionPageStep.Times(viewport.Zoom) + content.Location.Times(viewport.Zoom);
         }
 
-        public override void ShellModeUpdated(ShellModes mode)
-        {
-            window.ModeUpdated(mode);
-        }
-
         public override void SimulateMouseButtonStateInput(PopWindowMouseEventArgs e)
         {
             window.SimulateMouseButtonStateInput(e);

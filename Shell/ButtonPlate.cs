@@ -13,9 +13,6 @@ namespace NoteKeeper.Shell
     {
         private readonly ControlPanel panel;
 
-        private readonly VisualToggleButton _writingModeToggle;
-        private readonly VisualToggleButton _transformModeToggle;
-
         public List<Clickable> Buttons { get; }
         public int MinimumVisualHeight { get; }
 
@@ -36,9 +33,6 @@ namespace NoteKeeper.Shell
 
             Buttons = new List<Clickable>();
 
-            _writingModeToggle = new VisualToggleButton();
-            _transformModeToggle = new VisualToggleButton();
-
             UndoButton = new VisualClickable();
             UndoDescriptionsButton = new VisualClickable();
 
@@ -57,13 +51,6 @@ namespace NoteKeeper.Shell
         {
             PUIInterpreter interpreter = PUIHelper.GetInterpreter(PUIHelper.ShellAssetsFolderPath + "ButtonPlate.pui");
             interpreter.ProcessTokens();
-
-            interpreter.AssignProperties(PUIHelper.VisualToggleButtonAssigner, "Writing_Mode_Toggle", _writingModeToggle);
-            interpreter.AssignProperties(PUIHelper.VisualToggleButtonAssigner, "Transform_Mode_Toggle", _transformModeToggle);
-            IEnumerable<VisualToggleButton> oppositeButtons = [_writingModeToggle, _transformModeToggle];
-
-            _writingModeToggle.ToggleCommand = new OppositeButtonCommander(oppositeButtons, () => panel.Mode = ShellModes.Writing);
-            _transformModeToggle.ToggleCommand = new OppositeButtonCommander(oppositeButtons, () => panel.Mode = ShellModes.Transform);
 
             interpreter.AssignProperties(PUIHelper.VisualClickableAssigner, "Undo", UndoButton);
             UndoButton.ClickCommand = new ActionCommander<Clickable>(_ =>
@@ -127,51 +114,8 @@ namespace NoteKeeper.Shell
             panel.PanelWindow.ToolMenuManager.MenuVisibilityChanged += ToolMenuToggle.SetStatusWithoutCommander;
 
 
-            Buttons.AddRange(_writingModeToggle, _transformModeToggle, UndoButton, UndoDescriptionsButton, RedoButton, RedoDescriptionsButton, 
+            Buttons.AddRange(UndoButton, UndoDescriptionsButton, RedoButton, RedoDescriptionsButton, 
                              SaveCurrentTabButton, SaveAllTabsButton, ToolMenuToggle);
-        }
-
-        public void ShellModeUpdated()
-        {
-            if (panel.Mode == ShellModes.Writing && !_writingModeToggle.IsChecked)
-            {
-                _writingModeToggle.SetStatusWithoutCommander(true);
-                _transformModeToggle.SetStatusWithoutCommander(false);
-            }
-
-            if (panel.Mode == ShellModes.Transform && !_transformModeToggle.IsChecked)
-            {
-                _transformModeToggle.SetStatusWithoutCommander(true);
-                _writingModeToggle.SetStatusWithoutCommander(false);
-            }
-        }
-
-        private class OppositeButtonCommander : ICommander<ToggleButton>
-        {
-            private readonly Action _toggleAction;
-            private readonly IEnumerable<ToggleButton> _allButtons;
-
-            public OppositeButtonCommander(IEnumerable<ToggleButton> allButtons, Action toggleAction)
-            {
-                _toggleAction = toggleAction;
-                _allButtons = allButtons;
-            }
-
-            public void Execute(ToggleButton element)
-            {
-                if (element.IsChecked)
-                {
-                    foreach (var button in _allButtons)
-                    {
-                        button.SetStatusWithoutCommander(false);
-                    }
-
-                    _toggleAction();
-                }
-
-                // always set the toggled when clicked on it, no matter it was toggled-untoggled before
-                element.SetStatusWithoutCommander(true);
-            }
         }
     }
 }

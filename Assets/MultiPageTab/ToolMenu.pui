@@ -1,17 +1,28 @@
 ﻿#define Path FolderPath = "C:\Users\user\Desktop\C#\NoteKeeper\NoteKeeper\Assets\MultiPageTab\";
 
-ActionToolButton Add_Text_Block
+ToggleToolButton Transforming_Mode
 {
-	DefaultTexture = Texture(FolderPath + "AddTextBlock.png"),
-	HoveredTexture = Texture(FolderPath + "AddTextBlockHovered.png"),
-	HeldTexture = Texture(FolderPath + "AddTextBlockHeld.png"),
+	CheckedTexture = Texture(FolderPath + "TransformChecked.png"),
+	UncheckedTexture = Texture(FolderPath + "TransformUnchecked.png"),
+}
+
+ToggleToolButton Writing_Mode
+{
+	CheckedTexture = Texture(FolderPath + "WritingChecked.png"),
+	UncheckedTexture = Texture(FolderPath + "WritingUnchecked.png")
 }
 
 ToggleToolButton Swap_Pages
 {
 	CheckedTexture = Texture(FolderPath + "SwapPagesChecked.png"),
 	UncheckedTexture = Texture(FolderPath + "SwapPagesUnchecked.png"),
-	UnenabledTexture = Texture(FolderPath + "SwapPagesUnenabled.png"),
+}
+
+ActionToolButton Add_Text_Block
+{
+	DefaultTexture = Texture(FolderPath + "AddTextBlock.png"),
+	HoveredTexture = Texture(FolderPath + "AddTextBlockHovered.png"),
+	HeldTexture = Texture(FolderPath + "AddTextBlockHeld.png"),
 }
 
 ActionToolButton Append_Page

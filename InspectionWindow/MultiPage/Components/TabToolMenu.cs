@@ -11,6 +11,8 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
         private readonly MultiPageTab _tab;
         private readonly PageActions _pageActions;
 
+        private readonly ToggleToolButton[] _toggles;
+
         public IToolButton[] Buttons { get; }
         public ToolMenuStyle MenuStyle { get; }
 
@@ -32,24 +34,47 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
             PUIInterpreter interpreter = PUIHelper.GetInterpreter(PUIHelper.MultiPageTabAssetsFolderPath + "ToolMenu.pui");
             interpreter.ProcessTokens();
 
+            ToggleToolButton transformContents = new ToggleToolButton(button => ButtonToggled(button, WindowInputState.Transform));
+            interpreter.AssignProperties(PUIHelper.ToolButtonAssigner, "Transforming_Mode", transformContents);
+
+            ToggleToolButton writingContent = new ToggleToolButton(button => ButtonToggled(button, WindowInputState.Writing));
+            interpreter.AssignProperties(PUIHelper.ToolButtonAssigner, "Writing_Mode", writingContent);
+
+            ToggleToolButton swapPages = new ToggleToolButton(button => ButtonToggled(button, WindowInputState.SwappingPages));
+            interpreter.AssignProperties(PUIHelper.ToolButtonAssigner, "Swap_Pages", swapPages);
+
             ActionToolButton addTextBlock = new ActionToolButton(AddTextBlock);
             interpreter.AssignProperties(PUIHelper.ToolButtonAssigner, "Add_Text_Block", addTextBlock);
-
-            ToggleToolButton swapPages = new ToggleToolButton(SwapNotePagesToggled);
-            interpreter.AssignProperties(PUIHelper.ToolButtonAssigner, "Swap_Pages", swapPages);
 
             ActionToolButton appendPage = new ActionToolButton(AppendPage);
             interpreter.AssignProperties(PUIHelper.ToolButtonAssigner, "Append_Page", appendPage);
 
-            Buttons = [addTextBlock, swapPages, appendPage];
+            _toggles = [transformContents, writingContent, swapPages];
+            Buttons = [transformContents, writingContent, swapPages, addTextBlock, appendPage];
+        }
+
+        private void ButtonToggled(ToggleToolButton button, WindowInputState state)
+        {
+            bool isChecked = button.IsChecked;
+
+            ((TabWindow)_tab.Window).WindowInputStateUpdated(button.IsChecked ? state : WindowInputState.Default);
+            foreach (var toggle in _toggles)
+            {
+                if (toggle == button) continue;
+
+                toggle.SilentSetCheckStatus(false);
+            }
+
+            button.SilentSetCheckStatus(isChecked);
         }
 
         private void AddTextBlock()
         {
             PageTextContent content = new PageTextContent();
             content.SetFont("Font_ComicSans", 16);
+
             _tab.AddContent(content);
-            _tab.RequestShellModeChange(ShellModes.Writing);
+            ((TabWindow)_tab.Window).WindowInputStateUpdated(WindowInputState.Writing);
 
             // apply margin to Screen Location of content that may appear a little lower due to rounding errors
             // which shouldn't happen with zoom value of 1f
@@ -58,11 +83,6 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
             _tab.SimulateMouseButtonStateInput(
                 new PopWindowMouseEventArgs(MouseButtons.Left, MouseButtons.Left, MouseButtons.None,
                                             _tab.GetContentScreenLocation(content) + new Point(RoundingErrorMargin)));
-        }
-
-        private void SwapNotePagesToggled(ToggleToolButton button)
-        {
-            ((TabWindow)_tab.Window).WindowInputStateUpdated(button.IsChecked ? WindowInputState.SwappingPages : WindowInputState.Default);
         }
 
         private void AppendPage()

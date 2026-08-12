@@ -21,16 +21,6 @@ namespace NoteKeeper.Shell
         private readonly CloseTabsWindow closeTabsWindow;
         private readonly List<ITabUpdateReceiver> tabUpdateReceivers;
 
-        public ShellModes Mode
-        {
-            get;
-            set
-            {
-                field = value;
-                displayedTab?.ShellModeUpdated(value);
-                buttonPlate.ShellModeUpdated();
-            }
-        }
         public Tab? DisplayedTab => displayedTab;
         public TabCollection ActiveTabs { get; }
         public PanelWindow PanelWindow => panelWindow;
@@ -53,8 +43,6 @@ namespace NoteKeeper.Shell
 
             InitializeWindow();
             PopWindowManager.ActiveWindows.Add(panelWindow);
-
-            Mode = ShellModes.Transform;
         }
 
         private void InitializeWindow()
@@ -116,7 +104,6 @@ namespace NoteKeeper.Shell
 
             if (displayedTab != null)
             {
-                displayedTab.ShellModeChangeRequested -= Tab_ShellModeChangeRequested;
                 displayedTab.PropertyScreenOpenRequested -= Tab_PropertyScreenOpenRequested;
 
                 displayedTab.TabViewport.ZoomChanged -= TabViewport_ZoomChanged;
@@ -129,7 +116,6 @@ namespace NoteKeeper.Shell
 
             if (tab != null)
             {
-                tab.ShellModeChangeRequested += Tab_ShellModeChangeRequested;
                 tab.PropertyScreenOpenRequested += Tab_PropertyScreenOpenRequested;
 
                 tab.TabViewport.ZoomChanged += TabViewport_ZoomChanged;
@@ -149,8 +135,6 @@ namespace NoteKeeper.Shell
 
         private void DisplayedTabChanged(Tab? newTab)
         {
-            newTab?.ShellModeUpdated(Mode);
-
             foreach (var receiver in tabUpdateReceivers)
             {
                 receiver.DisplayedTabChanged(newTab);
@@ -159,11 +143,6 @@ namespace NoteKeeper.Shell
             buttonPlate.SaveCurrentTabButton.Enabled = newTab != null;
             buttonPlate.SaveAllTabsButton.Enabled = newTab != null;
             buttonPlate.ToolMenuToggle.Enabled = newTab?.ToolMenu != null;
-        }
-
-        private void Tab_ShellModeChangeRequested(ShellModes mode)
-        {
-            Mode = mode;
         }
 
         private void Tab_PropertyScreenOpenRequested(PropertyExplorer.IPropertyCollection collection)

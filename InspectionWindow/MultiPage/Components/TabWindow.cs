@@ -15,7 +15,6 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
 {
     internal class TabWindow : PopWindow
     {
-        private WindowInputState lastShellMode;
         private WindowInputState inputState;
 
         private readonly IList<NotePage> notePages;
@@ -46,28 +45,10 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
             this.Boundaries = new Rectangle(this.Boundaries.Size, viewport.UISize);
         }
 
-        public void ModeUpdated(ShellModes mode)
-        {
-            lastShellMode = mode switch
-            {
-                ShellModes.Writing => WindowInputState.Writing,
-                ShellModes.Transform => WindowInputState.Transform
-            };
-
-            inputState = lastShellMode;
-            inputHandler.InputState = inputState;
-        }
-
         public void WindowInputStateUpdated(WindowInputState state)
         {
             inputState = state;
             inputHandler.InputState = state;
-
-            if (state == WindowInputState.Default)
-            {
-                inputState = lastShellMode;
-                inputHandler.InputState = lastShellMode;
-            }
         }
 
         protected override void RenderUpdate()

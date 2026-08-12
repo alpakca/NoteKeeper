@@ -18,7 +18,6 @@ namespace NoteKeeper.InspectionWindow
         public string SourcePath => _sourcePath;
         public string Name { get; set; }
 
-        public event Action<ShellModes>? ShellModeChangeRequested;
         public event Action<IPropertyCollection>? PropertyScreenOpenRequested;
 
         public abstract ITabSerializer TabSerializer { get; }
@@ -29,7 +28,6 @@ namespace NoteKeeper.InspectionWindow
         public abstract IToolMenu? ToolMenu { get; }
 
         public abstract ContextMenu? GetContextMenu(Point mousePosition);
-        public abstract void ShellModeUpdated(ShellModes mode);
         public abstract void SimulateMouseButtonStateInput(PopWindowMouseEventArgs e);
 
         public Tab(string sourcePath)
@@ -42,11 +40,6 @@ namespace NoteKeeper.InspectionWindow
         {
             File.Move(_sourcePath, newPath);
             _sourcePath = newPath;
-        }
-
-        public void RequestShellModeChange(ShellModes mode)
-        {
-            ShellModeChangeRequested?.Invoke(mode);
         }
 
         public void RequestPropertyScreenOpen(IPropertyCollection collection)
