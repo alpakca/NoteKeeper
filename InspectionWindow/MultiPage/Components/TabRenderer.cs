@@ -5,6 +5,7 @@ using PopUpUI.Text;
 using PopUpUI.Toolkit;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace NoteKeeper.InspectionWindow.MultiPage.Components
@@ -130,6 +131,40 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
             DrawHelper.Batch.Draw(target, new Vector2(), Color.White);
 
             DrawHelper.EndBatch();
+        }
+
+        public void SavePages(string directoryPath)
+        {
+            foreach (var page in notePages)
+            {
+                foreach (var content in page.Contents.DrawOrder)
+                {
+                    content.RenderUpdate();
+                }
+            }
+
+            RenderTarget2D pageTarget = DrawHelper.CreateRenderTarget(viewport.EachPageWidth, viewport.EachPageHeight);
+
+            int pageCount = 1;
+            foreach (var page in notePages)
+            {
+                DrawHelper.SetBeginBatch(pageTarget);
+                DrawHelper.Device.Clear(Color.White);
+
+                foreach (var content in page.Contents.DrawOrder)
+                {
+                    content.RenderToPage(new Point(), 1f);
+                }
+
+                DrawHelper.EndBatch();
+
+                using FileStream stream = File.Create(Path.Combine(directoryPath, $"Page_{pageCount}.png"));
+                pageTarget.SaveAsPng(stream, pageTarget.Width, pageTarget.Height);
+
+                pageCount++;
+            }
+
+            pageTarget.Dispose();
         }
     }
 }

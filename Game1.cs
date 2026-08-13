@@ -97,6 +97,7 @@ namespace NoteKeeper
         protected override void Draw(GameTime gameTime)
         {
             PopUpUIManager.RenderUpdate(gameTime);
+            DrawCallRenderer.DrawUpdate();
 
             GraphicsDevice.SetRenderTarget(null);
             GraphicsDevice.Clear(Color.CornflowerBlue);

@@ -37,3 +37,10 @@ ToggleToolButton Lock_Transformer_Corner
 	CheckedTexture = Texture(FolderPath + "LockTransformerCornerChecked.png"),
 	UncheckedTexture = Texture(FolderPath + "LockTransformerCornerUnchecked.png"),
 }
+
+ActionToolButton Save_Pages
+{
+	DefaultTexture = Texture(FolderPath + "SavePages.png"),
+	HoveredTexture = Texture(FolderPath + "SavePagesHovered.png"),
+	HeldTexture = Texture(FolderPath + "SavePagesHeld.png"),
+}

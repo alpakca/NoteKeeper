@@ -1,12 +1,15 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using NoteKeeper.InspectionWindow.MultiPage.Input;
+using NoteKeeper.Shell;
+using NoteKeeper.Shell.ChildWindow;
 using PopUpUI.Input;
 using PopUpUI.Surface;
 using PopUpUI.Toolkit;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Text;
 
 #nullable enable
@@ -41,6 +44,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
 
             toolMenu.WindowInputStateChanged += ToolMenu_WindowInputStateChanged;
             toolMenu.TransformerCornerLockStateChanged += isLocked => inputHandler.TransformSession.LockAspectRatioOnCornerDrag = isLocked;
+            toolMenu.SavingPagesRequested += Toolmenu_SavingPagesRequested;
         }
 
         private void Viewport_UISizeChanged()
@@ -52,6 +56,17 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
         {
             inputState = state;
             inputHandler.InputState = state;
+        }
+
+        private void Toolmenu_SavingPagesRequested(string directory)
+        {
+            DrawCallRenderer.Enqueue(() =>
+            {
+                Directory.CreateDirectory(directory);
+                renderer.SavePages(directory);
+
+                MessageWindow.Show($"Pages have saved to: {directory}");
+            });
         }
 
         protected override void RenderUpdate()

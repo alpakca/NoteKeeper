@@ -1,9 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
+using NoteKeeper.Shell.ChildWindow;
 using NoteKeeper.Shell.PUIHelpers;
 using NoteKeeper.Shell.ToolBar;
 using PopUpUI.Input;
 using PopUpUI.PUI;
 using System;
+using System.IO;
 
 namespace NoteKeeper.InspectionWindow.MultiPage.Components
 {
@@ -19,6 +21,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
 
         public event Action<WindowInputState> WindowInputStateChanged;
         public event Action<bool> TransformerCornerLockStateChanged;
+        public event Action<string> SavingPagesRequested;
 
         public TabToolMenu(MultiPageTab tab, PageActions pageActions)
         {
@@ -56,8 +59,11 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
             ToggleToolButton lockTransformerCorner = new ToggleToolButton(button => TransformerCornerLockStateChanged?.Invoke(button.IsChecked));
             interpreter.AssignProperties(PUIHelper.ToolButtonAssigner, "Lock_Transformer_Corner", lockTransformerCorner);
 
+            ActionToolButton savePages = new ActionToolButton(SavePages);
+            interpreter.AssignProperties(PUIHelper.ToolButtonAssigner, "Save_Pages", savePages);
+
             _combinedToggles = [transformContents, writingContent, swapPages];
-            Buttons = [transformContents, writingContent, swapPages, addTextBlock, appendPage, lockTransformerCorner];
+            Buttons = [transformContents, writingContent, swapPages, addTextBlock, appendPage, lockTransformerCorner, savePages];
         }
 
         private void ButtonToggled(ToggleToolButton button, WindowInputState state)
@@ -109,6 +115,12 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
             {
                 viewport.SetHorizontalScroll(scrollOffset);
             }
+        }
+
+        private void SavePages()
+        {
+            string directoryPath = Path.ChangeExtension(_tab.SourcePath, null) + "Pages";
+            SavingPagesRequested?.Invoke(directoryPath);
         }
     }
 }

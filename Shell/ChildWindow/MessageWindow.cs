@@ -11,20 +11,24 @@ namespace NoteKeeper.Shell.ChildWindow
 {
     internal class MessageWindow : PopWindow
     {
-        private static MessageWindow _window = new MessageWindow();
+        private static readonly MessageWindow _window = new MessageWindow();
 
-        private readonly TextProcesser processer;
-        private ITextProcesserResult _lastResult;
+        private readonly TextPlaque _plaque;
         private readonly WindowButton _closeButton;
 
         private bool _buttonHeld;
 
         private MessageWindow()
         {
-            processer = new TextProcesser
+            _plaque = new TextPlaque
             {
-                Font = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans_16"),
-                FirstRowOffset = 20
+                Location = new Point(20, 90),
+                Processer = new TextProcesser
+                {
+                    Font = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans_16"),
+                    FirstRowOffset = 30
+                },
+                Width = 430
             };
 
             _closeButton = new WindowButton
@@ -35,14 +39,11 @@ namespace NoteKeeper.Shell.ChildWindow
 
             Point size = new Point(500, 200);
             this.Boundaries = new Rectangle((WindowOptions.Size - size) / 2, size);
-
-            processer.HorizontalTextLength = size.X;
         }
 
         public static void Show(string message)
         {
-            _window.processer.Text = message;
-            _window._lastResult = _window.processer.GetParseResult();
+            _window._plaque.Text = message;
 
             foreach (var window in PopWindowManager.ActiveWindows)
             {
@@ -64,7 +65,7 @@ namespace NoteKeeper.Shell.ChildWindow
             DrawHelper.DrawBackground(new Rectangle(default, this.Boundaries.Size), Color.SlateGray);
             DrawHelper.DrawBackground(_closeButton.Bounds, _closeButton.BackgroundColor);
 
-            _lastResult.Render(BatchDrawOptions.Default, new Vector2(20, 90), null, 1f);
+            _plaque.Render();
 
             DrawHelper.EndBatch();
         }
