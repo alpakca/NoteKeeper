@@ -26,7 +26,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
         private readonly TabRenderer renderer;
         private readonly TabInputHandler inputHandler;
 
-        public TabWindow(PageActions pageActions, TabViewport viewport, ContentQuery contentQuery, IList<NotePage> notePages)
+        public TabWindow(PageActions pageActions, TabViewport viewport, ContentQuery contentQuery, TabToolMenu toolMenu, IList<NotePage> notePages)
         {
             this.pageActions = pageActions;
             this.viewport = viewport;
@@ -38,6 +38,9 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
             inputHandler = new TabInputHandler(pageActions, viewport, contentQuery, notePages);
 
             viewport.UISizeChanged += Viewport_UISizeChanged;
+
+            toolMenu.WindowInputStateChanged += ToolMenu_WindowInputStateChanged;
+            toolMenu.TransformerCornerLockStateChanged += isLocked => inputHandler.TransformSession.LockAspectRatioOnCornerDrag = isLocked;
         }
 
         private void Viewport_UISizeChanged()
@@ -45,7 +48,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
             this.Boundaries = new Rectangle(this.Boundaries.Size, viewport.UISize);
         }
 
-        public void WindowInputStateUpdated(WindowInputState state)
+        private void ToolMenu_WindowInputStateChanged(WindowInputState state)
         {
             inputState = state;
             inputHandler.InputState = state;

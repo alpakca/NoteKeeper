@@ -3,6 +3,7 @@ using NoteKeeper.Shell.PUIHelpers;
 using NoteKeeper.Shell.ToolBar;
 using PopUpUI.Input;
 using PopUpUI.PUI;
+using System;
 
 namespace NoteKeeper.InspectionWindow.MultiPage.Components
 {
@@ -11,10 +12,13 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
         private readonly MultiPageTab _tab;
         private readonly PageActions _pageActions;
 
-        private readonly ToggleToolButton[] _toggles;
+        private readonly ToggleToolButton[] _combinedToggles;
 
         public IToolButton[] Buttons { get; }
         public ToolMenuStyle MenuStyle { get; }
+
+        public event Action<WindowInputState> WindowInputStateChanged;
+        public event Action<bool> TransformerCornerLockStateChanged;
 
         public TabToolMenu(MultiPageTab tab, PageActions pageActions)
         {
@@ -49,16 +53,19 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
             ActionToolButton appendPage = new ActionToolButton(AppendPage);
             interpreter.AssignProperties(PUIHelper.ToolButtonAssigner, "Append_Page", appendPage);
 
-            _toggles = [transformContents, writingContent, swapPages];
-            Buttons = [transformContents, writingContent, swapPages, addTextBlock, appendPage];
+            ToggleToolButton lockTransformerCorner = new ToggleToolButton(button => TransformerCornerLockStateChanged?.Invoke(button.IsChecked));
+            interpreter.AssignProperties(PUIHelper.ToolButtonAssigner, "Lock_Transformer_Corner", lockTransformerCorner);
+
+            _combinedToggles = [transformContents, writingContent, swapPages];
+            Buttons = [transformContents, writingContent, swapPages, addTextBlock, appendPage, lockTransformerCorner];
         }
 
         private void ButtonToggled(ToggleToolButton button, WindowInputState state)
         {
             bool isChecked = button.IsChecked;
 
-            ((TabWindow)_tab.Window).WindowInputStateUpdated(button.IsChecked ? state : WindowInputState.Default);
-            foreach (var toggle in _toggles)
+            WindowInputStateChanged?.Invoke(button.IsChecked ? state : WindowInputState.Default);
+            foreach (var toggle in _combinedToggles)
             {
                 if (toggle == button) continue;
 
@@ -74,7 +81,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
             content.SetFont("Font_ComicSans", 16);
 
             _tab.AddContent(content);
-            ((TabWindow)_tab.Window).WindowInputStateUpdated(WindowInputState.Writing);
+            WindowInputStateChanged?.Invoke(WindowInputState.Writing);
 
             // apply margin to Screen Location of content that may appear a little lower due to rounding errors
             // which shouldn't happen with zoom value of 1f

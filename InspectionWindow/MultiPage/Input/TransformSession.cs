@@ -63,7 +63,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Input
         }
 
         public int NodeHitRadius { get; set; } = 6;
-        public bool LockAspectRatioOnCornerDrag { get; set; } = true;
+        public bool LockAspectRatioOnCornerDrag { get; set; }
         public Rectangle SelectionBoundary { get; private set; }
 
         public bool NotIdle => _state != State.Idle || _selectedContents.Count != 0;

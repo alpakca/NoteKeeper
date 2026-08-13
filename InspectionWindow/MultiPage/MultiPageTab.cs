@@ -39,12 +39,13 @@ namespace NoteKeeper.InspectionWindow.MultiPage
             pageActions = new PageActions(TabHistory);
             viewport = new TabViewport();
 
-            contentQuery = new ContentQuery(NotePages);
-            window = new TabWindow(pageActions, viewport, contentQuery, NotePages);
-            menuSupplier = new ContextMenuSupplier(pageActions, viewport, contentQuery, RequestPropertyScreenOpen, NotePages);
-
-            ToolMenu = new TabToolMenu(this, pageActions);
+            TabToolMenu toolMenu = new TabToolMenu(this, pageActions);
+            ToolMenu = toolMenu;
             TabSerializer = new TabSerializer(this);
+
+            contentQuery = new ContentQuery(NotePages);
+            window = new TabWindow(pageActions, viewport, contentQuery, toolMenu, NotePages);
+            menuSupplier = new ContextMenuSupplier(pageActions, viewport, contentQuery, RequestPropertyScreenOpen, NotePages);
 
             NotePages.CollectionChanged += (sender, _) => viewport.PageCount = ((ObservableCollection<NotePage>)sender!).Count;
 

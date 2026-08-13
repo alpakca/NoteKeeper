@@ -31,3 +31,9 @@ ActionToolButton Append_Page
 	HoveredTexture = Texture(FolderPath + "AppendPageHovered.png"),
 	HeldTexture = Texture(FolderPath + "AppendPageHeld.png"),
 }
+
+ToggleToolButton Lock_Transformer_Corner
+{
+	CheckedTexture = Texture(FolderPath + "LockTransformerCornerChecked.png"),
+	UncheckedTexture = Texture(FolderPath + "LockTransformerCornerUnchecked.png"),
+}
