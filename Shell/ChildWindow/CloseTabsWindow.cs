@@ -1,15 +1,14 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using NoteKeeper.InspectionWindow;
+using PopUpUI.Input;
 using PopUpUI.Surface;
 using PopUpUI.Toolkit;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using PopUpUI.Input;
-using Microsoft.Xna.Framework.Input;
 
-namespace NoteKeeper.Shell.UnsavedTabsWindow
+namespace NoteKeeper.Shell.ChildWindow
 {
     internal class CloseTabsWindow : PopWindow
     {

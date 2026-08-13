@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace NoteKeeper.Shell.UnsavedTabsWindow
+namespace NoteKeeper.Shell.ChildWindow
 {
     internal enum CloseTabsResult
     {

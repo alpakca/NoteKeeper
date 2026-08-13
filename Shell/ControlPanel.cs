@@ -4,7 +4,7 @@ using PopUpUI.Toolkit;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using NoteKeeper.Shell.ContextMenus;
-using NoteKeeper.Shell.UnsavedTabsWindow;
+using NoteKeeper.Shell.ChildWindow;
 using System;
 
 #nullable enable
