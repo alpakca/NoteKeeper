@@ -1,7 +1,5 @@
-﻿using Microsoft.Xna.Framework;
-using NoteKeeper.Shell.Theming;
+﻿using NoteKeeper.Shell.Styling;
 using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace NoteKeeper.Shell.TabOrganizer
 {

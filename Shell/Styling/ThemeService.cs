@@ -3,21 +3,24 @@ using Microsoft.Xna.Framework.Graphics;
 using PopUpUI.Toolkit;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.IO;
+using System.Linq;
 
-namespace NoteKeeper.Shell.Theming
+namespace NoteKeeper.Shell.Styling
 {
     internal static class ThemeService
     {
-        private const string AssetsFolderRelativePath = "assets/";
-        private static readonly Dictionary<string, Theme> _loadedThemes;
+        public static string AssetsFolderRelativePath { get; } = Path.Combine(Program.RootPath, "assets");
+
+        private static Dictionary<string, Theme> _loadedThemes;
 
         public static ResolvedTheme CurrentTheme { get; private set; }
         public static event Action ThemeChanged;
 
-        public static void RegisterTheme(Theme theme)
+        public static void Refresh()
         {
-            _loadedThemes.Add(theme.Id, theme);
+            ThemeImporter.RefreshLoaded();
+            _loadedThemes = ThemeImporter.LoadedThemes.ToDictionary(theme => theme.Id);
         }
 
         public static bool SetTheme(string themeId)

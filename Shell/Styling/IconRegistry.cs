@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
-namespace NoteKeeper.Shell.Theming
+namespace NoteKeeper.Shell.Styling
 {
     internal static class IconRegistry
     {

@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 #nullable enable
 
-namespace NoteKeeper.Shell.Theming
+namespace NoteKeeper.Shell.Styling
 {
     internal static class ColorRegistry
     {
@@ -16,7 +14,7 @@ namespace NoteKeeper.Shell.Theming
         public const string HeldOverlayId = "base.heldoverlay";
 
         public const string TextColorId = "base.textcolor";
-        
+
         private static readonly Dictionary<string, ColorDefinition> _definitions = new Dictionary<string, ColorDefinition>();
 
         public static IEnumerable<string> RegisteredIds => _definitions.Keys;

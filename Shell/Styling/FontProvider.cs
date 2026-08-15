@@ -1,10 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using PopUpUI.Toolkit;
-using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace NoteKeeper.Shell.Styling
 {
@@ -12,8 +9,8 @@ namespace NoteKeeper.Shell.Styling
     {
         private static readonly Dictionary<int, SpriteFont> _loadedFontSizes = new Dictionary<int, SpriteFont>
         {
-            { 12, ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans_12") }, 
-            { 16, ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans_16") }, 
+            { 12, ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans_12") },
+            { 16, ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans_16") },
             { 24, ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans_24") },
         };
 
@@ -26,7 +23,7 @@ namespace NoteKeeper.Shell.Styling
 
         public static void DrawText(int size, bool isBold, string text, Vector2 position, Color color)
         {
-            DrawHelper.Batch.DrawString(isBold ? _loadedBoldFontSizes[size] : _loadedFontSizes[size], 
+            DrawHelper.Batch.DrawString(isBold ? _loadedBoldFontSizes[size] : _loadedFontSizes[size],
                                         text, position, color);
         }
 

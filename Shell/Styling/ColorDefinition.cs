@@ -1,9 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace NoteKeeper.Shell.Theming
+namespace NoteKeeper.Shell.Styling
 {
     internal class ColorDefinition
     {

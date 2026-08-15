@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using NoteKeeper.InspectionWindow;
 using NoteKeeper.Shell.Styling;
-using NoteKeeper.Shell.Theming;
 using PopUpUI.Toolkit;
 
 #nullable enable
