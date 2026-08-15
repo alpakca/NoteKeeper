@@ -12,8 +12,10 @@ namespace NoteKeeper.Shell.Theming
         public const string BorderId = "base.border";
         /// <summary>Color id of color to be used in surfaces above background.</summary>
         public const string SurfaceId = "base.surface";
-        public const string HoverOverlay = "base.hoveroverlay";
-        public const string HeldOverlay = "base.heldoverlay";
+        public const string HoverOverlayId = "base.hoveroverlay";
+        public const string HeldOverlayId = "base.heldoverlay";
+
+        public const string TextColorId = "base.textcolor";
         
         private static readonly Dictionary<string, ColorDefinition> _definitions = new Dictionary<string, ColorDefinition>();
 

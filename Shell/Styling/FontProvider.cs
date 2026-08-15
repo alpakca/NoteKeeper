@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using PopUpUI.Toolkit;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace NoteKeeper.Shell.Styling
@@ -23,14 +24,20 @@ namespace NoteKeeper.Shell.Styling
             { 24, ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans_Bold_24") },
         };
 
-        public static void DrawText(int size, string text, Vector2 position, Color color)
+        public static void DrawText(int size, bool isBold, string text, Vector2 position, Color color)
         {
-            DrawHelper.Batch.DrawString(_loadedFontSizes[size], text, position, color);
+            DrawHelper.Batch.DrawString(isBold ? _loadedBoldFontSizes[size] : _loadedFontSizes[size], 
+                                        text, position, color);
         }
 
-        public static void DrawTextBold(int size, string text, Vector2 position, Color color)
+        public static float MeasureWidth(int size, bool isBold, string text)
         {
-            DrawHelper.Batch.DrawString(_loadedBoldFontSizes[size], text, position, color);
+            return (isBold ? _loadedBoldFontSizes[size] : _loadedFontSizes[size]).MeasureString(text).X;
+        }
+
+        public static int GetLineSpacing(int size, bool isBold)
+        {
+            return isBold ? _loadedBoldFontSizes[size].LineSpacing : _loadedFontSizes[size].LineSpacing;
         }
     }
 }

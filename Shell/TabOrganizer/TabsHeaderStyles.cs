@@ -1,4 +1,5 @@
-﻿using NoteKeeper.Shell.Theming;
+﻿using Microsoft.Xna.Framework;
+using NoteKeeper.Shell.Theming;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -10,6 +11,8 @@ namespace NoteKeeper.Shell.TabOrganizer
         public static string Surface = "tabsheader.surface";
         public static string HoverOverlay = "tabsheader.hoveroverlay";
         public static string HeldOverlay = "tabsheader.heldoverlay";
+
+        public static string TextColor = "tabsheader.textcolor";
 
         public static string CloseButton = "tabsheader.closebutton";
         public static string TabListButton = "tabsheader.tablistbutton";
@@ -32,13 +35,19 @@ namespace NoteKeeper.Shell.TabOrganizer
             ColorRegistry.Register(new ColorDefinition
             {
                 Id = HoverOverlay,
-                FallbackColorId = ColorRegistry.HoverOverlay
+                FallbackColorId = ColorRegistry.HoverOverlayId
             });
 
             ColorRegistry.Register(new ColorDefinition
             {
                 Id = HeldOverlay,
-                FallbackColorId = ColorRegistry.HeldOverlay
+                FallbackColorId = ColorRegistry.HeldOverlayId
+            });
+
+            ColorRegistry.Register(new ColorDefinition
+            {
+                Id = TextColor,
+                FallbackColorId = ColorRegistry.TextColorId
             });
 
             IconRegistry.Register(new IconDefinition
