@@ -23,12 +23,6 @@ namespace NoteKeeper
             args = [@"C:\Users\user\Desktop\XXTest.mlpage", @"C:\Users\user\Desktop\MultiPageTest.mlpage"];
 #endif
 
-#if DEBUG
-            RootPath = File.ReadAllText(@"C:\Users\user\Desktop\C#\NoteKeeper\NoteKeeper\RootPath.txt");
-#else
-            RootPath = File.ReadAllText(RootPathFileRelativePath);
-#endif
-
             using var game = new Game1(args);
 
             if (!SingleInstanceChecker.TryStart(args))
@@ -36,6 +30,11 @@ namespace NoteKeeper
                 return;
             }
 
+#if DEBUG
+            RootPath = File.ReadAllText(@"C:\Users\user\Desktop\C#\NoteKeeper\NoteKeeper\bin\Release\net10.0\" + RootPathFileRelativePath);
+#else
+            RootPath = File.ReadAllText(AppContext.BaseDirectory + RootPathFileRelativePath);
+#endif
             game.Run();
         }
     }
