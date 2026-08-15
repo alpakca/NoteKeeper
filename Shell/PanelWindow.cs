@@ -48,23 +48,6 @@ namespace NoteKeeper.Shell
             historyActionsManager.ActionsReversed += HistoryActionsManager_ActionsReversed;
 
             #region Debug Styles
-            tabOrganizeManager.StyleProvider.ApplyTheme(new TabsHeaderStyle
-            {
-                TabDefaultBackground = Util.GetTexture(1, 1, Color.Gray),
-                TabHoveredBackground = Util.GetTexture(1, 1, Color.LightGray),
-                DisplayedTabBackground = Util.GetTexture(1, 1, Color.DarkMagenta),
-
-                DefaultFont = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans_16"),
-                DisplayedTabFont = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans_16"),
-
-                TabCloseButtonIcon = Util.GetTexture(1, 1, Color.Red),
-                TabListButtonIcon = Util.GetTexture(1, 1, Color.Aqua),
-                ButtonHoverOverlay = Util.GetTexture(1, 1, Color.Gray * 0.5f),
-                ButtonHeldOverlay = Util.GetTexture(1, 1, Color.LightGray * 0.5f),
-
-                HeaderBackground = Util.GetTexture(1, 1, Color.Gray)
-            });
-
             MenuButtonStyle buttonStyle = new MenuButtonStyle
             {
                 HorizontalPadding = 2,

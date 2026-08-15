@@ -5,6 +5,10 @@ namespace NoteKeeper
 {
     public class Program
     {
+        private const string RootPathFileRelativePath = "RootPath.txt";
+
+        public static string RootPath { get; private set; }
+
         public static void Main(string[] args)
         {
             AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
@@ -17,6 +21,12 @@ namespace NoteKeeper
 
 #if DEBUG
             args = [@"C:\Users\user\Desktop\XXTest.mlpage", @"C:\Users\user\Desktop\MultiPageTest.mlpage"];
+#endif
+
+#if DEBUG
+            RootPath = File.ReadAllText(@"C:\Users\user\Desktop\C#\NoteKeeper\NoteKeeper\RootPath.txt");
+#else
+            RootPath = File.ReadAllText(RootPathFileRelativePath);
 #endif
 
             using var game = new Game1(args);

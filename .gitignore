@@ -1,8 +1,9 @@
 # Only include .pui files in assets
 
-Assets/**
-!Assets/**/
-!Assets/**/*.pui
+assets/**
+!assets/**/
+!assets/**/*.pui
+!assets/**/*.spritefont
 
 Content/*/
 

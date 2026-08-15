@@ -58,6 +58,9 @@ namespace NoteKeeper
             ContentAssistant.LoadWithContentManager<SpriteFont>(("ComicSans_16", "Font_ComicSans_12"));
             ContentAssistant.LoadWithContentManager<SpriteFont>(("ComicSans_16", "Font_ComicSans_16"));
             ContentAssistant.LoadWithContentManager<SpriteFont>(("ComicSans_24", "Font_ComicSans_24"));
+            ContentAssistant.LoadWithContentManager<SpriteFont>(("ComicSans_Bold_16", "Font_ComicSans_Bold_12"));
+            ContentAssistant.LoadWithContentManager<SpriteFont>(("ComicSans_Bold_16", "Font_ComicSans_Bold_16"));
+            ContentAssistant.LoadWithContentManager<SpriteFont>(("ComicSans_Bold_24", "Font_ComicSans_Bold_24"));
 
             string shellAssetsPath = @"C:\Users\user\Desktop\C#\NoteKeeper\NoteKeeper\Assets";
             ContentAssistant.LoadTexture2Ds(

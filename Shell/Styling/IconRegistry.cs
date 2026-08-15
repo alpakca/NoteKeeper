@@ -6,7 +6,7 @@ namespace NoteKeeper.Shell.Theming
 {
     internal static class IconRegistry
     {
-        private static readonly Dictionary<string, IconDefinition> _definitions;
+        private static readonly Dictionary<string, IconDefinition> _definitions = new Dictionary<string, IconDefinition>();
 
         public static IEnumerable<string> RegisteredIds => _definitions.Keys;
 
