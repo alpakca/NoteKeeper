@@ -9,6 +9,7 @@ namespace NoteKeeper.Shell.Theming
 {
     internal static class ThemeService
     {
+        private const string AssetsFolderRelativePath = "assets/";
         private static readonly Dictionary<string, Theme> _loadedThemes;
 
         public static ResolvedTheme CurrentTheme { get; private set; }
@@ -78,7 +79,7 @@ namespace NoteKeeper.Shell.Theming
 
             if (theme.Icons.TryGetValue(definition.Id, out string path))
             {
-                return ContentAssistant.FromLoaded<Texture2D>(path);
+                return ContentAssistant.FromLoaded<Texture2D>(AssetsFolderRelativePath + path);
             }
 
             return ResolveIcon(theme, definition.FallbackIconId, visitedIds);
