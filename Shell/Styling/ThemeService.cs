@@ -59,12 +59,22 @@ namespace NoteKeeper.Shell.Styling
                 throw new InvalidOperationException("Circular fallback found on id: " + id);
             }
 
+            if (theme.Colors.TryGetValue(id, out Color color))
+            {
+                return color;
+            }
+
             ColorDefinition definition = ColorRegistry.Get(id)
                 ?? throw new InvalidOperationException("No definition found at the base of fallbacks: " + id);
 
-            if (theme.Colors.TryGetValue(definition.Id, out Color color))
+            if (definition.DefaultValue != null)
             {
-                return color;
+                return definition.DefaultValue.Value;
+            }
+
+            if (definition.FallbackColorId == null)
+            {
+                throw new InvalidOperationException("No color was registered at the base of fallbacks: " + id);
             }
 
             return ResolveColor(theme, definition.FallbackColorId, visitedIds);
@@ -77,12 +87,22 @@ namespace NoteKeeper.Shell.Styling
                 throw new InvalidOperationException("Circular fallback found on id: " + id);
             }
 
+            if (theme.Icons.TryGetValue(id, out string path))
+            {
+                return ContentAssistant.FromLoaded<Texture2D>(Path.Combine(AssetsFolderRelativePath, path));
+            }
+
             IconDefinition definition = IconRegistry.Get(id)
                 ?? throw new InvalidOperationException("No definition found at the base of fallbacks: " + id);
 
-            if (theme.Icons.TryGetValue(definition.Id, out string path))
+            if (definition.DefaultPath != null)
             {
-                return ContentAssistant.FromLoaded<Texture2D>(AssetsFolderRelativePath + path);
+                return ContentAssistant.FromLoaded<Texture2D>(Path.Combine(AssetsFolderRelativePath, definition.DefaultPath));
+            }
+
+            if (definition.FallbackIconId == null)
+            {
+                throw new InvalidOperationException("No icon was registered at the base of fallbacks: " + id);
             }
 
             return ResolveIcon(theme, definition.FallbackIconId, visitedIds);

@@ -58,7 +58,7 @@ namespace NoteKeeper.Shell.TabOrganizer
                 maxWidth = Math.Max(maxWidth, GetWidth(_activeTabs[i], displayedTabIndex == i));
             }
 
-            Point size = new Point(maxWidth, CloseButtonLength);
+            Point size = new Point(maxWidth, _activeTabs.Count * CloseButtonLength);
             Point location = new Point(TabListButtonBounds.Right - maxWidth, TabListButtonBounds.Bottom);
 
             return new Rectangle(location, size);

@@ -12,8 +12,11 @@ namespace NoteKeeper.Shell.Styling
     internal static class ThemeImporter
     {
         private static readonly string ThemesDirectoryPath = Path.Combine(ThemeService.AssetsFolderRelativePath, "themes");
+        private static readonly JsonSerializerOptions _options = new JsonSerializerOptions
+        {
+            Converters = { new ColorConverter() }
+        };
 
-        private static bool _isInitialized = false;
         private static readonly Dictionary<string, Theme> _loadedThemes = new Dictionary<string, Theme>();
 
         public static IEnumerable<Theme> LoadedThemes => _loadedThemes.Values;
@@ -30,7 +33,7 @@ namespace NoteKeeper.Shell.Styling
 
                 try
                 {
-                    Theme loaded = JsonSerializer.Deserialize<Theme>(File.ReadAllText(filePath))!;
+                    Theme loaded = JsonSerializer.Deserialize<Theme>(File.ReadAllText(filePath), _options)!;
                     _loadedThemes.Add(filePath, loaded);
                 }
                 catch (JsonException e)

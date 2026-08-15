@@ -53,21 +53,19 @@ namespace NoteKeeper.Shell.TabOrganizer
             ResolvedTheme theme = ThemeService.CurrentTheme;
             Rectangle tabListMenuBounds = _layoutCalculator.GetTabListMenuBounds(displayedTabIndex);
 
-            DrawHelper.DrawBackground(_layoutCalculator.ScreenBounds, theme.GetColor(TabsHeaderStyles.Surface));
+            DrawHelper.DrawBackground(tabListMenuBounds, theme.GetColor(TabsHeaderStyles.Surface));
             DrawHelper.DrawBackground(_layoutCalculator.TabListButtonBounds, theme.GetColor(TabsHeaderStyles.HoverOverlay));
 
             int hoveredTabIndex = activeTabs.IndexOf(button.HoveredTab!);
             for (int i = 0; i < activeTabs.Count; i++)
             {
                 TabLayout optionLayout = _layoutCalculator.GetTabListOptionLayout(tabListMenuBounds, i, displayedTabIndex);
+                DrawDefaultTabBox(activeTabs[i], optionLayout, theme, i == hoveredTabIndex);
 
+                // displayed tab's close button always gets rendered
                 if (i == displayedTabIndex)
                 {
-                    DrawDisplayedTabBox(activeTabs[i], optionLayout, theme);
-                }
-                else
-                {
-                    DrawDefaultTabBox(activeTabs[i], optionLayout, theme, i == hoveredTabIndex);
+                    DrawHelper.Batch.Draw(theme.GetIcon(TabsHeaderStyles.CloseButton), optionLayout.CloseButtonBounds, Color.White);
                 }
 
                 if (i == hoveredTabIndex)
@@ -84,11 +82,14 @@ namespace NoteKeeper.Shell.TabOrganizer
 
         private static void DrawDisplayedTabBox(Tab tab, TabLayout layout, ResolvedTheme theme)
         {
+            DrawHelper.DrawBorderedBackground(layout.BoxBounds, theme.GetColor(TabsHeaderStyles.Border), theme.GetColor(TabsHeaderStyles.Surface), 1);
+
             FontProvider.DrawText(TabsHeaderLayoutCalculator.TextSize, isBold: true, 
                                   (tab.TabHistory.IsModified ? tab.Name + "*" : tab.Name),
                                   (layout.BoxBounds.Location + layout.TextOffset).ToVector2(), 
                                   theme.GetColor(TabsHeaderStyles.TextColor));
 
+            // displayed tab's close button always gets rendered
             DrawHelper.Batch.Draw(theme.GetIcon(TabsHeaderStyles.CloseButton), layout.CloseButtonBounds, Color.White);
         }
 
@@ -102,6 +103,7 @@ namespace NoteKeeper.Shell.TabOrganizer
             if (isHovered)
             {
                 DrawHelper.DrawBackground(layout.BoxBounds, theme.GetColor(TabsHeaderStyles.HoverOverlay));
+                // close button on default tabs only get renderer if hovered
                 DrawHelper.Batch.Draw(theme.GetIcon(TabsHeaderStyles.CloseButton), layout.CloseButtonBounds, Color.White);
             }
         }

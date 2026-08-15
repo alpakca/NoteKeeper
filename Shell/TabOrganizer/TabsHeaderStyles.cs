@@ -7,6 +7,7 @@ namespace NoteKeeper.Shell.TabOrganizer
     {
         public static string Background = "tabsheader.background";
         public static string Surface = "tabsheader.surface";
+        public static string Border = "tabsheader.border";
         public static string HoverOverlay = "tabsheader.hoveroverlay";
         public static string HeldOverlay = "tabsheader.heldoverlay";
 
@@ -32,6 +33,12 @@ namespace NoteKeeper.Shell.TabOrganizer
 
             ColorRegistry.Register(new ColorDefinition
             {
+                Id = Border,
+                FallbackColorId = ColorRegistry.BorderId
+            });
+
+            ColorRegistry.Register(new ColorDefinition
+            {
                 Id = HoverOverlay,
                 FallbackColorId = ColorRegistry.HoverOverlayId
             });
@@ -51,13 +58,13 @@ namespace NoteKeeper.Shell.TabOrganizer
             IconRegistry.Register(new IconDefinition
             {
                 Id = CloseButton,
-                DefaultPath = "/shell/closebutton.png"
+                DefaultPath = @"shell\TabsHeaderCloseButton.png"
             });
 
             IconRegistry.Register(new IconDefinition
             {
                 Id = TabListButton,
-                DefaultPath = "/shell/tablistbutton.png"
+                DefaultPath = @"shell\TabsHeaderTabListButton.png"
             });
         }
     }

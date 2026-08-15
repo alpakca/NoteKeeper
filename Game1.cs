@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using NoteKeeper.InspectionWindow;
 using NoteKeeper.Project;
 using NoteKeeper.Shell;
+using NoteKeeper.Shell.Styling;
 using PopUpUI.Toolkit;
 using System;
 using System.Collections.Concurrent;
@@ -103,7 +104,7 @@ namespace NoteKeeper
             DrawCallRenderer.DrawUpdate();
 
             GraphicsDevice.SetRenderTarget(null);
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(ThemeService.CurrentTheme.GetColor(ColorRegistry.BackgroundId));
 
             _spriteBatch.Begin();
 

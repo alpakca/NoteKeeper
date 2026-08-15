@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 #nullable enable
 
@@ -18,6 +19,17 @@ namespace NoteKeeper.Shell.Styling
         private static readonly Dictionary<string, ColorDefinition> _definitions = new Dictionary<string, ColorDefinition>();
 
         public static IEnumerable<string> RegisteredIds => _definitions.Keys;
+
+        [ModuleInitializer]
+        public static void InitializeBaseColors()
+        {
+            Register(new ColorDefinition { Id = BackgroundId });
+            Register(new ColorDefinition { Id = BorderId });
+            Register(new ColorDefinition { Id = SurfaceId });
+            Register(new ColorDefinition { Id = HoverOverlayId });
+            Register(new ColorDefinition { Id = HeldOverlayId });
+            Register(new ColorDefinition { Id = TextColorId });
+        }
 
         public static void Register(ColorDefinition definition)
         {
