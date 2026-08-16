@@ -1,7 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace NoteKeeper.Shell.ToolBar
 {
@@ -10,16 +7,11 @@ namespace NoteKeeper.Shell.ToolBar
         private const int MarginBetweenBoxes = 2;
         private const int MoveBoxHeight = 32;
 
+        public const int ColumnCount = 2;
+
         private readonly Point BoxSize = new Point(32, 32);
 
-        private readonly ToolMenuStyleProvider _styleProvider;
-
         public Point ScreenLocation { get; set; }
-
-        public ToolMenuLayoutCalculator(ToolMenuStyleProvider styleProvider)
-        {
-            _styleProvider = styleProvider;
-        }
 
         public Rectangle GetButtonLayout(int row, int column)
         {
@@ -31,12 +23,12 @@ namespace NoteKeeper.Shell.ToolBar
 
         public Rectangle GetMoveBoxLayout()
         {
-            return new Rectangle(ScreenLocation.X, ScreenLocation.Y, GetMenuWidth(_styleProvider.Style.ColumnCount), MoveBoxHeight);
+            return new Rectangle(ScreenLocation.X, ScreenLocation.Y, GetMenuWidth(ColumnCount), MoveBoxHeight);
         }
 
         public Rectangle GetCloseButtonLayout()
         {
-            int width = GetMenuWidth(_styleProvider.Style.ColumnCount);
+            int width = GetMenuWidth(ColumnCount);
             Point location = new Point(ScreenLocation.X + width - BoxSize.X, ScreenLocation.Y);
 
             return new Rectangle(location, BoxSize);
@@ -44,10 +36,9 @@ namespace NoteKeeper.Shell.ToolBar
 
         public Point GetBackgroundSize(int buttonCount)
         {
-            ToolMenuStyle style = _styleProvider.Style;
-            int rowCount = buttonCount / style.ColumnCount + (buttonCount % style.ColumnCount == 0 ? 0 : 1);
+            int rowCount = buttonCount / ColumnCount + (buttonCount % ColumnCount == 0 ? 0 : 1);
 
-            return new Point(GetMenuWidth(style.ColumnCount), MoveBoxHeight + rowCount * (BoxSize.Y + MarginBetweenBoxes) + MarginBetweenBoxes);
+            return new Point(GetMenuWidth(ColumnCount), MoveBoxHeight + rowCount * (BoxSize.Y + MarginBetweenBoxes) + MarginBetweenBoxes);
         }
 
         private int GetMenuWidth(int columnCount)

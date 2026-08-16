@@ -10,7 +10,6 @@ namespace NoteKeeper.Shell.ToolBar
     {
         private readonly ToolMenuRenderer renderer;
         private readonly ToolMenuLayoutCalculator layoutCalculator;
-        private readonly ToolMenuStyleProvider styleProvider;
 
         private readonly ActionToolButton _closeButton;
 
@@ -32,19 +31,10 @@ namespace NoteKeeper.Shell.ToolBar
 
         public ToolMenuManager()
         {
-            styleProvider = new ToolMenuStyleProvider();
-
-            layoutCalculator = new ToolMenuLayoutCalculator(styleProvider);
-            renderer = new ToolMenuRenderer(styleProvider, layoutCalculator);
+            layoutCalculator = new ToolMenuLayoutCalculator();
+            renderer = new ToolMenuRenderer(layoutCalculator);
 
             _closeButton = new ActionToolButton(Hide);
-            styleProvider.ThemeChanged += () =>
-            {
-                ToolMenuStyle style = styleProvider.Style;
-                _closeButton.DefaultTexture = style.CloseButtonTexture;
-                _closeButton.HoveredTexture = style.CloseButtonHoverTexture;
-                _closeButton.HeldTexture = style.CloseButtonHeldTexture;
-            };
         }
 
         public void Show(IToolMenu menu)
@@ -52,7 +42,6 @@ namespace NoteKeeper.Shell.ToolBar
             Hide();
 
             _shownMenu = menu;
-            styleProvider.ApplyTheme(menu.MenuStyle);
 
             MenuVisibilityChanged?.Invoke(true);
         }
@@ -123,7 +112,6 @@ namespace NoteKeeper.Shell.ToolBar
         {
             int currentRow = 0;
             int currentColumn = 0;
-            ToolMenuStyle style = styleProvider.Style;
 
             foreach (var button in _shownMenu!.Buttons)
             {
@@ -133,7 +121,7 @@ namespace NoteKeeper.Shell.ToolBar
                 }
 
                 currentColumn++;
-                if (style.ColumnCount == currentColumn)
+                if (ToolMenuLayoutCalculator.ColumnCount == currentColumn)
                 {
                     currentColumn = 0;
                     currentRow++;

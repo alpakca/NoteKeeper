@@ -1,20 +1,15 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+using NoteKeeper.Shell.Styling;
 using PopUpUI.Toolkit;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace NoteKeeper.Shell.ToolBar
 {
     internal class ToolMenuRenderer
     {
-        private readonly ToolMenuStyleProvider _styleProvider;
         private readonly ToolMenuLayoutCalculator _layoutCalculator;
 
-        public ToolMenuRenderer(ToolMenuStyleProvider styleProvider, ToolMenuLayoutCalculator layoutCalculator)
+        public ToolMenuRenderer(ToolMenuLayoutCalculator layoutCalculator)
         {
-            _styleProvider = styleProvider;
             _layoutCalculator = layoutCalculator;
         }
 
@@ -22,22 +17,21 @@ namespace NoteKeeper.Shell.ToolBar
         {
             int currentRow = 0;
             int currentColumn = 0;
-            ToolMenuStyle style = _styleProvider.Style;
+            ResolvedTheme theme = ThemeService.CurrentTheme;
 
-            DrawTexture(style.Background, new Rectangle(_layoutCalculator.ScreenLocation, _layoutCalculator.GetBackgroundSize(menu.Buttons.Length)));
-            if (style.MoveBoxTexture != null)
-            {
-                DrawTexture(style.MoveBoxTexture, _layoutCalculator.GetMoveBoxLayout());
-            }
-            DrawTexture(closeButton.GetTexture(hoveredButton == closeButton, hoveredButton == closeButton && isHeld), _layoutCalculator.GetCloseButtonLayout());
+            DrawHelper.DrawBorderedBackground(new Rectangle(_layoutCalculator.ScreenLocation, _layoutCalculator.GetBackgroundSize(menu.Buttons.Length)),
+                                              theme.GetColor(ToolMenuStyles.Border), theme.GetColor(ToolMenuStyles.Background), 1);
+
+            DrawHelper.Batch.Draw(theme.GetIcon(ToolMenuStyles.MovementBox), _layoutCalculator.GetMoveBoxLayout(), Color.White);
+            DrawHelper.Batch.Draw(theme.GetIcon(ToolMenuStyles.CloseButton), _layoutCalculator.GetCloseButtonLayout(), Color.White);
 
             foreach (var button in menu.Buttons)
             {
                 Rectangle layout = _layoutCalculator.GetButtonLayout(currentRow, currentColumn);
-                DrawTexture(button.GetTexture(hoveredButton == button, hoveredButton == button && isHeld), layout);
+                DrawHelper.Batch.Draw(button.Texture, layout, Color.White);
                 
                 currentColumn++;
-                if (currentColumn == style.ColumnCount)
+                if (currentColumn == ToolMenuLayoutCalculator.ColumnCount)
                 {
                     currentColumn = 0;
                     currentRow++;
@@ -45,9 +39,10 @@ namespace NoteKeeper.Shell.ToolBar
             }
         }
 
-        private static void DrawTexture(Texture2D texture, Rectangle layout)
+        public void DrawHoveredButtonOverlay(Rectangle bounds, bool isHeld)
         {
-            DrawHelper.Batch.Draw(texture, layout, Color.White);
+            DrawHelper.DrawBackground(bounds, isHeld ? ThemeService.CurrentTheme.GetColor(ToolMenuStyles.HeldOverlay)
+                                                     : ThemeService.CurrentTheme.GetColor(ToolMenuStyles.HoverOverlay));
         }
     }
 }
