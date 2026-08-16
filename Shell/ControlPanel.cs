@@ -122,7 +122,7 @@ namespace NoteKeeper.Shell
 
                 tab.TabViewport.ScrollChanged += TabViewport_ScrollChanged;
                 tab.TabHistory.HistoryUpdated += TabHistory_HistoryUpdated;
-                tab.TabHistory.Clear();
+                TabHistory_HistoryUpdated(tab.TabHistory);
 
                 PopWindowManager.ActiveWindows.Add(tab.Window);
                 PopWindowManager.ActiveWindows.MoveToBottom(tab.Window);
