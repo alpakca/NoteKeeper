@@ -7,7 +7,7 @@ namespace NoteKeeper.Shell.PropertyExplorer
 {
     internal class OptionDropdown
     {
-        private readonly PropertiesLayoutCalculator _layoutCalculator;
+        private readonly PropertyExplorerLayoutCalculator _layoutCalculator;
         private readonly Dictionary<string, Rectangle> _optionBounds;
 
         private IEnumerable<string> _cachedOptions;
@@ -15,7 +15,7 @@ namespace NoteKeeper.Shell.PropertyExplorer
         public IEnumerable<KeyValuePair<string, Rectangle>> OptionBounds => _optionBounds;
         public Rectangle OptionsMenuBounds { get; private set; }
 
-        public OptionDropdown(PropertiesLayoutCalculator layoutCalculator)
+        public OptionDropdown(PropertyExplorerLayoutCalculator layoutCalculator)
         {
             _layoutCalculator = layoutCalculator;
             _optionBounds = new Dictionary<string, Rectangle>();

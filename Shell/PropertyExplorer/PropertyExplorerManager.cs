@@ -4,10 +4,10 @@ using PopUpUI.Input;
 
 namespace NoteKeeper.Shell.PropertyExplorer
 {
-    internal class PropertiesScreenManager
+    internal class PropertyExplorerManager
     {
-        private readonly PropertiesLayoutCalculator layoutCalculator;
-        private readonly PropertiesScreenRenderer renderer;
+        private readonly PropertyExplorerLayoutCalculator layoutCalculator;
+        private readonly PropertyExplorerRenderer renderer;
 
         private readonly ValueTextBox _valueTextBox;
         private readonly OptionDropdown _optionDropdown;
@@ -29,10 +29,10 @@ namespace NoteKeeper.Shell.PropertyExplorer
             set => layoutCalculator.ScreenBounds = value;
         }
 
-        public PropertiesScreenManager()
+        public PropertyExplorerManager()
         {
-            layoutCalculator = new PropertiesLayoutCalculator();
-            renderer = new PropertiesScreenRenderer(layoutCalculator);
+            layoutCalculator = new PropertyExplorerLayoutCalculator();
+            renderer = new PropertyExplorerRenderer(layoutCalculator);
 
             _valueTextBox = new ValueTextBox();
             _optionDropdown = new OptionDropdown(layoutCalculator);

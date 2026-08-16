@@ -25,12 +25,12 @@ namespace NoteKeeper.Shell
         private readonly ContextMenuManager contextMenuManager;
         private readonly ToolMenuManager toolMenuManager;
         private readonly TabOrganizeManager tabOrganizeManager;
-        private readonly PropertiesScreenManager propertiesScreen;
+        private readonly PropertyExplorerManager propertiesScreen;
         private readonly HistoryActionsManager historyActionsManager;
         private readonly KeyboardShortcutManager shortcutManager;
 
         public ToolMenuManager ToolMenuManager => toolMenuManager;
-        public PropertiesScreenManager PropertiesScreen => propertiesScreen;
+        public PropertyExplorerManager PropertiesScreen => propertiesScreen;
         public HistoryActionsManager HistoryActionsManager => historyActionsManager;
 
         public PanelWindow(ControlPanel panel) : base(new BatchDrawOptions { BlendState = BlendState.AlphaBlend })
@@ -40,7 +40,7 @@ namespace NoteKeeper.Shell
             contextMenuManager = new ContextMenuManager();
             toolMenuManager = new ToolMenuManager() { ScreenLocation = new Point(60, 240) };
             tabOrganizeManager = new TabOrganizeManager(panel.ActiveTabs) { ScreenBounds = new Rectangle(20, 168, 1880, 32) };
-            propertiesScreen = new PropertiesScreenManager() { ScreenBounds = new Rectangle(1600, 168, 300, 800) };
+            propertiesScreen = new PropertyExplorerManager() { ScreenBounds = new Rectangle(1600, 168, 300, 800) };
             historyActionsManager = new HistoryActionsManager();
             shortcutManager = new KeyboardShortcutManager();
 

@@ -26,12 +26,12 @@ namespace NoteKeeper.Shell.PropertyExplorer
 
         private void FontProvider_FontChanged()
         {
-            FontProvider.UpdateProcesserFont(processer, PropertiesLayoutCalculator.TextSize, isBold: false);
+            FontProvider.UpdateProcesserFont(processer, PropertyExplorerLayoutCalculator.TextSize, isBold: false);
         }
 
         public void Render()
         {
-            int yPadding = (Bounds.Height - FontProvider.GetLineSpacing(PropertiesLayoutCalculator.TextSize, false)) / 2;
+            int yPadding = (Bounds.Height - FontProvider.GetLineSpacing(PropertyExplorerLayoutCalculator.TextSize, false)) / 2;
             lastResult.Render(PopUpUI.Surface.BatchDrawOptions.Default, new Vector2(Bounds.X, Bounds.Y + yPadding), null, 1f);
         }
 

@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace NoteKeeper.Shell.PropertyExplorer
 {
-    internal static class PropertiesScreenStyles
+    internal static class PropertyExplorerStyles
     {
         public const string Background = "propertyexplorer.background";
         public const string Border = "propertyexplorer.border";

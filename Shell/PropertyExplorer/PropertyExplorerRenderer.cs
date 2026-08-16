@@ -1,15 +1,14 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using NoteKeeper.Shell.Styling;
 using PopUpUI.Toolkit;
 
 namespace NoteKeeper.Shell.PropertyExplorer
 {
-    internal class PropertiesScreenRenderer
+    internal class PropertyExplorerRenderer
     {
-        private readonly PropertiesLayoutCalculator _layoutCalculator;
+        private readonly PropertyExplorerLayoutCalculator _layoutCalculator;
 
-        public PropertiesScreenRenderer(PropertiesLayoutCalculator layoutCalculator)
+        public PropertyExplorerRenderer(PropertyExplorerLayoutCalculator layoutCalculator)
         {
             _layoutCalculator = layoutCalculator;
         }
@@ -23,7 +22,7 @@ namespace NoteKeeper.Shell.PropertyExplorer
         {
             ResolvedTheme theme = ThemeService.CurrentTheme;
             DrawHelper.DrawBorderedBackground(_layoutCalculator.ScreenBounds, 
-                                              theme.GetColor(PropertiesScreenStyles.Border), theme.GetColor(PropertiesScreenStyles.Surface), 1);
+                                              theme.GetColor(PropertyExplorerStyles.Border), theme.GetColor(PropertyExplorerStyles.Surface), 1);
 
             int index = 0;
             foreach (var entry in collection.Properties)
@@ -35,7 +34,7 @@ namespace NoteKeeper.Shell.PropertyExplorer
                 // value part, if text box was placed in this row
                 if (valueTextBox != null && rowLayout.ValueBounds == valueTextBox.Bounds)
                 {
-                    DrawHelper.DrawBackground(rowLayout.ValueBounds, theme.GetColor(PropertiesScreenStyles.BoxColor));
+                    DrawHelper.DrawBackground(rowLayout.ValueBounds, theme.GetColor(PropertyExplorerStyles.BoxColor));
                     valueTextBox.Render();
                 }
                 else
@@ -49,8 +48,8 @@ namespace NoteKeeper.Shell.PropertyExplorer
                 if (focusedEntry == entry && entry.HasDropdownOptions)
                 {
                     DrawHelper.DrawBorderedBackground(rowLayout.DropdownButtonBounds,
-                                                      theme.GetColor(PropertiesScreenStyles.BorderAccent), theme.GetColor(PropertiesScreenStyles.Background), 1f);
-                    DrawHelper.Batch.Draw(theme.GetIcon(PropertiesScreenStyles.DropdownBoxButton), rowLayout.DropdownButtonBounds, Color.White);
+                                                      theme.GetColor(PropertyExplorerStyles.BorderAccent), theme.GetColor(PropertyExplorerStyles.Background), 1f);
+                    DrawHelper.Batch.Draw(theme.GetIcon(PropertyExplorerStyles.DropdownBoxButton), rowLayout.DropdownButtonBounds, Color.White);
                 }
 
                 index++;
@@ -61,23 +60,23 @@ namespace NoteKeeper.Shell.PropertyExplorer
         {
             ResolvedTheme theme = ThemeService.CurrentTheme;
             DrawHelper.DrawBorderedBackground(_layoutCalculator.GetDropdownMenuBounds(optionDropdown),
-                                              theme.GetColor(PropertiesScreenStyles.Border), theme.GetColor(PropertiesScreenStyles.Background), 1);
+                                              theme.GetColor(PropertyExplorerStyles.Border), theme.GetColor(PropertyExplorerStyles.Background), 1);
             
             foreach ((string option, Rectangle bounds) in optionDropdown.OptionBounds)
             {
-                FontProvider.DrawText(PropertiesLayoutCalculator.TextSize, isBold: false, option,
-                                      bounds.Location.ToVector2(), theme.GetColor(PropertiesScreenStyles.TextColor));
+                FontProvider.DrawText(PropertyExplorerLayoutCalculator.TextSize, isBold: false, option,
+                                      bounds.Location.ToVector2(), theme.GetColor(PropertyExplorerStyles.TextColor));
             }
         }
 
         private static void DrawBox(bool isFocused, Rectangle boxBounds, string boxValue, ResolvedTheme theme)
         {
-            DrawHelper.DrawBackground(boxBounds, isFocused ? theme.GetColor(PropertiesScreenStyles.FocusedBoxColor)
-                                                           : theme.GetColor(PropertiesScreenStyles.BoxColor));
+            DrawHelper.DrawBackground(boxBounds, isFocused ? theme.GetColor(PropertyExplorerStyles.FocusedBoxColor)
+                                                           : theme.GetColor(PropertyExplorerStyles.BoxColor));
 
-            int yPadding = (boxBounds.Height - FontProvider.GetLineSpacing(PropertiesLayoutCalculator.TextSize, false)) / 2;
-            FontProvider.DrawText(PropertiesLayoutCalculator.TextSize, isBold: false,
-                                  boxValue, new Vector2(boxBounds.Location.X, boxBounds.Location.Y + yPadding),  theme.GetColor(PropertiesScreenStyles.TextColor));
+            int yPadding = (boxBounds.Height - FontProvider.GetLineSpacing(PropertyExplorerLayoutCalculator.TextSize, false)) / 2;
+            FontProvider.DrawText(PropertyExplorerLayoutCalculator.TextSize, isBold: false,
+                                  boxValue, new Vector2(boxBounds.Location.X, boxBounds.Location.Y + yPadding),  theme.GetColor(PropertyExplorerStyles.TextColor));
         }
     }
 }

@@ -1,13 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using NoteKeeper.Shell.Styling;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace NoteKeeper.Shell.PropertyExplorer
 {
-    internal class PropertiesLayoutCalculator
+    internal class PropertyExplorerLayoutCalculator
     {
         private const int FrameThickness = 2;
         private const int MarginBetweenBoxes = 2;
