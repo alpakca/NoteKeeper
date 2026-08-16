@@ -16,6 +16,8 @@ namespace NoteKeeper.InspectionWindow.MultiPage
         private Point size;
         private Point absSize;
 
+        private Point _resizeUpdateValue;
+
         private int _fontSize;
         private string _fontName;
 
@@ -55,6 +57,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage
 
         public void ResizeUpdate(Point value)
         {
+            _resizeUpdateValue = value;
         }
 
         public void SetSize(Point value)
@@ -81,7 +84,12 @@ namespace NoteKeeper.InspectionWindow.MultiPage
 
         public void RelocationUpdate(Point value)
         {
-            location = value;
+            // if location gets updated within the same direction size appears
+            if (int.Sign(_resizeUpdateValue.X) == int.Sign(size.X) && 
+                int.Sign(_resizeUpdateValue.Y) == int.Sign(size.Y))
+            {
+                location = value;
+            }
         }
 
         public void SetLocation(Point value)
