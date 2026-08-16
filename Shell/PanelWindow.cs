@@ -33,7 +33,7 @@ namespace NoteKeeper.Shell
         public PropertiesScreen PropertiesScreen => propertiesScreen;
         public HistoryActionsManager HistoryActionsManager => historyActionsManager;
 
-        public PanelWindow(ControlPanel panel)
+        public PanelWindow(ControlPanel panel) : base(new BatchDrawOptions { BlendState = BlendState.AlphaBlend })
         {
             this.panel = panel;
 
@@ -48,50 +48,6 @@ namespace NoteKeeper.Shell
             historyActionsManager.ActionsReversed += HistoryActionsManager_ActionsReversed;
 
             #region Debug Styles
-            MenuButtonStyle buttonStyle = new MenuButtonStyle
-            {
-                HorizontalPadding = 2,
-                IconHorizontalPadding = 2,
-                LeftIconSize = new Point(25),
-                LeftRightPartPadding = 20,
-                LeftTextColor = Color.White,
-            };
-
-            contextMenuManager.StyleProvider.ApplyTheme(new ContextMenuStyle
-            {
-                Background = Util.GetTexture(1, 1, Color.SlateGray),
-                HoverOverlay = Util.GetTexture(1, 1, Color.LightGray * 0.3f),
-                HeldOverlay = Util.GetTexture(1, 1, Color.DarkGray * 0.3f),
-                Font = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans_16"),
-
-                ItemStyles = new Dictionary<Type, MenuItemStyle>
-                {
-                    { typeof(ActionContextMenuButton), new ActionMenuItemStyle
-                        {
-                            ButtonStyle = buttonStyle,
-                            RightTextColor = Color.WhiteSmoke,
-                            Height = 32,
-                        } 
-                    },
-                    {
-                        typeof(SubContextMenuButton), new SubContextMenuItemStyle
-                        {
-                            ButtonStyle = buttonStyle,
-                            RightIconSize = new Point(25),
-                            Height = 32
-                        }
-                    },
-                    {
-                        typeof(GroupLineItem), new GroupLineStyle
-                        {
-                            LineColor = Color.WhiteSmoke,
-                            Thickness = 2,
-                            Height = 4
-                        }
-                    }
-                }
-            });
-
             propertiesScreen.StyleProvider.ApplyTheme(new PropertyScreenStyle
             {
                 Font = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans_16"),
@@ -173,7 +129,7 @@ namespace NoteKeeper.Shell
         {
             base.RenderUpdate();
 
-            DrawHelper.SetBeginBatch(WindowTexture);
+            DrawHelper.SetBeginBatch(WindowTexture, DrawOptions);
 
             toolMenuManager.Render();
 
@@ -185,10 +141,10 @@ namespace NoteKeeper.Shell
             propertiesScreen.Render();
             historyActionsManager.Render();
 
-            DrawHelper.EndBatch();
-
             // render context menu on top of everything
-            contextMenuManager.RenderUpdate(WindowTexture);
+            contextMenuManager.Render();
+
+            DrawHelper.EndBatch();
         }
 
         protected override void OnMouseButtonStateChange(PopWindowMouseEventArgs e)
