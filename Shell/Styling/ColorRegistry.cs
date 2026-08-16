@@ -8,7 +8,10 @@ namespace NoteKeeper.Shell.Styling
     internal static class ColorRegistry
     {
         public const string BackgroundId = "base.background";
+        /// <summary>A general border color.</summary>
         public const string BorderId = "base.border";
+        /// <summary>Border color to distinguish a surface from background.</summary>
+        public const string BorderAccentId = "base.borderaccent";
         /// <summary>Color id of color to be used in surfaces above background.</summary>
         public const string SurfaceId = "base.surface";
         public const string HoverOverlayId = "base.hoveroverlay";
@@ -25,6 +28,7 @@ namespace NoteKeeper.Shell.Styling
         {
             Register(new ColorDefinition { Id = BackgroundId });
             Register(new ColorDefinition { Id = BorderId });
+            Register(new ColorDefinition { Id = BorderAccentId });
             Register(new ColorDefinition { Id = SurfaceId });
             Register(new ColorDefinition { Id = HoverOverlayId });
             Register(new ColorDefinition { Id = HeldOverlayId });

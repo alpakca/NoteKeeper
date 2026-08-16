@@ -147,7 +147,7 @@ namespace NoteKeeper.Shell
 
         private void Tab_PropertyScreenOpenRequested(PropertyExplorer.IPropertyCollection collection)
         {
-            panelWindow.PropertiesScreen.Show(collection, new Rectangle(1620, 168, 300, 800));
+            panelWindow.PropertiesScreen.Show(collection);
         }
 
         public bool TryExitApp()

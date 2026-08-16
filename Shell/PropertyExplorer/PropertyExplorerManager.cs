@@ -4,10 +4,10 @@ using PopUpUI.Input;
 
 namespace NoteKeeper.Shell.PropertyExplorer
 {
-    internal class PropertiesScreen
+    internal class PropertyExplorerManager
     {
-        private readonly PropertiesLayoutCalculator layoutCalculator;
-        private readonly PropertiesScreenRenderer renderer;
+        private readonly PropertyExplorerLayoutCalculator layoutCalculator;
+        private readonly PropertyExplorerRenderer renderer;
 
         private readonly ValueTextBox _valueTextBox;
         private readonly OptionDropdown _optionDropdown;
@@ -16,8 +16,6 @@ namespace NoteKeeper.Shell.PropertyExplorer
         private IPropertyEntry _focusedEntry;
         private ScreenState _state;
 
-        public PropertyScreenStyleProvider StyleProvider { get; }
-
         private enum ScreenState
         {
             Idle,
@@ -25,23 +23,25 @@ namespace NoteKeeper.Shell.PropertyExplorer
             PickingDropdownOption
         }
 
-        public PropertiesScreen()
+        public Rectangle ScreenBounds
         {
-            StyleProvider = new PropertyScreenStyleProvider();
-            StyleProvider.ThemeChanged += () => _valueTextBox.SetFont(StyleProvider.Style.Font);
+            get => layoutCalculator.ScreenBounds;
+            set => layoutCalculator.ScreenBounds = value;
+        }
 
-            layoutCalculator = new PropertiesLayoutCalculator(StyleProvider);
-            renderer = new PropertiesScreenRenderer(StyleProvider, layoutCalculator);
+        public PropertyExplorerManager()
+        {
+            layoutCalculator = new PropertyExplorerLayoutCalculator();
+            renderer = new PropertyExplorerRenderer(layoutCalculator);
 
             _valueTextBox = new ValueTextBox();
             _optionDropdown = new OptionDropdown(layoutCalculator);
         }
 
-        public void Show(IPropertyCollection collection, Rectangle screenBounds)
+        public void Show(IPropertyCollection collection)
         {
             Hide();
 
-            layoutCalculator.ScreenBounds = screenBounds;
             _shownCollection = collection;
         }
 
@@ -59,16 +59,16 @@ namespace NoteKeeper.Shell.PropertyExplorer
 
             if (_state == ScreenState.Idle)
             {
-                renderer.Render(_shownCollection, _focusedEntry);
+                renderer.Render(_shownCollection, _focusedEntry, valueTextBox: null);
             }
             else if (_state == ScreenState.EditingTextBoxValue)
             {
-                renderer.RenderWithTextBox(_shownCollection, _focusedEntry, _valueTextBox);
+                renderer.Render(_shownCollection, _focusedEntry, _valueTextBox);
             }
             else if (_state == ScreenState.PickingDropdownOption)
             {
-                renderer.Render(_shownCollection, _focusedEntry);
-                renderer.RenderDropdown(_optionDropdown);
+                renderer.Render(_shownCollection, _focusedEntry, valueTextBox: null);
+                renderer.RenderDropdownOptions(_optionDropdown);
             }
         }
 

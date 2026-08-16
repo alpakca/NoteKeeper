@@ -10,16 +10,16 @@ namespace NoteKeeper.Shell.ToolBar
     {
         private readonly ToolMenuRenderer renderer;
         private readonly ToolMenuLayoutCalculator layoutCalculator;
-        private readonly ToolMenuStyleProvider styleProvider;
-
-        private readonly ActionToolButton _closeButton;
 
         private bool _movementBoxActive;
         private Point _movementBoxHoldOrigin;
 
+        private readonly ActionToolButton _closeButton;
+
         private IToolMenu? _shownMenu;
         private IToolButton? _hoveredButton;
-        private bool _isHoveredItemHeld;
+        private Rectangle _hoveredButtonBounds;
+        private bool _isHoveredButtonHeld;
 
         public Point ScreenLocation
         {
@@ -32,19 +32,10 @@ namespace NoteKeeper.Shell.ToolBar
 
         public ToolMenuManager()
         {
-            styleProvider = new ToolMenuStyleProvider();
-
-            layoutCalculator = new ToolMenuLayoutCalculator(styleProvider);
-            renderer = new ToolMenuRenderer(styleProvider, layoutCalculator);
+            layoutCalculator = new ToolMenuLayoutCalculator();
+            renderer = new ToolMenuRenderer(layoutCalculator);
 
             _closeButton = new ActionToolButton(Hide);
-            styleProvider.ThemeChanged += () =>
-            {
-                ToolMenuStyle style = styleProvider.Style;
-                _closeButton.DefaultTexture = style.CloseButtonTexture;
-                _closeButton.HoveredTexture = style.CloseButtonHoverTexture;
-                _closeButton.HeldTexture = style.CloseButtonHeldTexture;
-            };
         }
 
         public void Show(IToolMenu menu)
@@ -52,7 +43,6 @@ namespace NoteKeeper.Shell.ToolBar
             Hide();
 
             _shownMenu = menu;
-            styleProvider.ApplyTheme(menu.MenuStyle);
 
             MenuVisibilityChanged?.Invoke(true);
         }
@@ -61,7 +51,7 @@ namespace NoteKeeper.Shell.ToolBar
         {
             _shownMenu = null;
             _hoveredButton = null;
-            _isHoveredItemHeld = false;
+            _isHoveredButtonHeld = false;
 
             MenuVisibilityChanged?.Invoke(false);
         }
@@ -71,7 +61,7 @@ namespace NoteKeeper.Shell.ToolBar
             if (_shownMenu == null)
                 return;
 
-            renderer.Render(_shownMenu, _hoveredButton, _closeButton, _isHoveredItemHeld);
+            renderer.Render(_shownMenu, _hoveredButton, _isHoveredButtonHeld);
         }
 
         public void MousePositionChangeUpdate(PopWindowMouseEventArgs e)
@@ -79,7 +69,7 @@ namespace NoteKeeper.Shell.ToolBar
             if (_shownMenu == null)
                 return;
 
-            _hoveredButton = FindButtonOnPosition(e.MousePosition);
+            (_hoveredButton, _hoveredButtonBounds) = FindButtonOnPosition(e.MousePosition);
 
             if (_movementBoxActive)
             {
@@ -94,12 +84,16 @@ namespace NoteKeeper.Shell.ToolBar
 
             if (_hoveredButton != null && e.FirstTimeButtons.HasLeft)
             {
-                _isHoveredItemHeld = true;
+                _isHoveredButtonHeld = true;
             }
-            else if (_hoveredButton != null && _isHoveredItemHeld && e.ReleasedButtons.HasLeft)
+            else if (e.ReleasedButtons.HasLeft)
             {
-                _isHoveredItemHeld = false;
-                _hoveredButton.Selected();
+                if (_hoveredButton != null && _isHoveredButtonHeld)
+                {
+                    _hoveredButton.Selected();
+                }
+
+                _isHoveredButtonHeld = false;
             }
             
             // if they there any buttons (including close button) that is hovered, don't let movement of menu
@@ -119,33 +113,34 @@ namespace NoteKeeper.Shell.ToolBar
             }
         }
 
-        private IToolButton? FindButtonOnPosition(Point mousePosition)
+        private (IToolButton? Button, Rectangle ButtonBounds) FindButtonOnPosition(Point mousePosition)
         {
             int currentRow = 0;
             int currentColumn = 0;
-            ToolMenuStyle style = styleProvider.Style;
 
             foreach (var button in _shownMenu!.Buttons)
             {
-                if (button.Enabled && layoutCalculator.GetButtonLayout(currentRow, currentColumn).Contains(mousePosition))
+                Rectangle layout = layoutCalculator.GetButtonLayout(currentRow, currentColumn);
+                if (button.Enabled && layout.Contains(mousePosition))
                 {
-                    return button;
+                    return (button, layout);
                 }
 
                 currentColumn++;
-                if (style.ColumnCount == currentColumn)
+                if (ToolMenuLayoutCalculator.ColumnCount == currentColumn)
                 {
                     currentColumn = 0;
                     currentRow++;
                 }
             }
 
-            if (layoutCalculator.GetCloseButtonLayout().Contains(mousePosition))
+            Rectangle closeButtonlayout = layoutCalculator.GetCloseButtonLayout();
+            if (closeButtonlayout.Contains(mousePosition))
             {
-                return _closeButton;
+                return (_closeButton, closeButtonlayout);
             }
 
-            return null;
+            return (null, default);
         }
     }
 }

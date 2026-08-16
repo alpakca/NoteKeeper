@@ -1,27 +1,32 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+using NoteKeeper.Shell.Styling;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace NoteKeeper.Shell.PropertyExplorer
 {
-    internal class PropertiesLayoutCalculator
+    internal class PropertyExplorerLayoutCalculator
     {
+        private const int FrameThickness = 2;
         private const int MarginBetweenBoxes = 2;
         private const int DropDownOptionsRightMargin = 20;
+        private const int BoxHeight = 24;
 
-        private readonly Point DropdownBoxBounds = new Point(40, 40);
-        private readonly Point BoxBounds = new Point(100, 40);
-        private readonly Point BoxesStartPositionOffset = new Point(30, 200);
+        public const int TextSize = 12;
 
-        private readonly PropertyScreenStyleProvider _styleProvider;
+        private readonly Point DropdownBoxBounds = new Point(BoxHeight, BoxHeight);
+        private readonly Point BoxesStartPositionOffset = new Point(20, 20);
 
-        public Rectangle ScreenBounds { get; set; }
+        private Point BoxBounds;
 
-        public PropertiesLayoutCalculator(PropertyScreenStyleProvider styleProvider)
+        public Rectangle ScreenBounds
         {
-            _styleProvider = styleProvider;
+            get;
+            set
+            {
+                field = value;
+                BoxBounds = new Point((value.Width - BoxesStartPositionOffset.X * 2 - MarginBetweenBoxes * 2) / 2, BoxHeight);
+            }
         }
 
         public Point GetDropdownOptionsSize(IEnumerable<string> options)
@@ -29,11 +34,16 @@ namespace NoteKeeper.Shell.PropertyExplorer
             int maxWidth = 0;
             foreach (var option in options)
             {
-                int width = (int)_styleProvider.Style.Font.MeasureString(option).X;
-                maxWidth = Math.Max(maxWidth, width);
+                maxWidth = Math.Max(maxWidth, (int)FontProvider.MeasureWidth(TextSize, isBold: false, option));
             }
 
-            return new Point(maxWidth + DropDownOptionsRightMargin, _styleProvider.Style.Font.LineSpacing);
+            return new Point(maxWidth + DropDownOptionsRightMargin, FontProvider.GetLineSpacing(TextSize, isBold: false));
+        }
+
+        public Rectangle GetDropdownMenuBounds(OptionDropdown dropdown)
+        {
+            return new Rectangle(dropdown.OptionsMenuBounds.Location - new Point(FrameThickness),
+                                 dropdown.OptionsMenuBounds.Size + new Point(FrameThickness * 2));
         }
 
         public PropertyRowLayout GetRowLayout(IPropertyEntry entry, int index)

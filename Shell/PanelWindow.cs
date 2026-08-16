@@ -25,94 +25,27 @@ namespace NoteKeeper.Shell
         private readonly ContextMenuManager contextMenuManager;
         private readonly ToolMenuManager toolMenuManager;
         private readonly TabOrganizeManager tabOrganizeManager;
-        private readonly PropertiesScreen propertiesScreen;
+        private readonly PropertyExplorerManager propertiesScreen;
         private readonly HistoryActionsManager historyActionsManager;
         private readonly KeyboardShortcutManager shortcutManager;
 
         public ToolMenuManager ToolMenuManager => toolMenuManager;
-        public PropertiesScreen PropertiesScreen => propertiesScreen;
+        public PropertyExplorerManager PropertiesScreen => propertiesScreen;
         public HistoryActionsManager HistoryActionsManager => historyActionsManager;
 
-        public PanelWindow(ControlPanel panel)
+        public PanelWindow(ControlPanel panel) : base(new BatchDrawOptions { BlendState = BlendState.AlphaBlend })
         {
             this.panel = panel;
 
             contextMenuManager = new ContextMenuManager();
             toolMenuManager = new ToolMenuManager() { ScreenLocation = new Point(60, 240) };
             tabOrganizeManager = new TabOrganizeManager(panel.ActiveTabs) { ScreenBounds = new Rectangle(20, 168, 1880, 32) };
-            propertiesScreen = new PropertiesScreen();
+            propertiesScreen = new PropertyExplorerManager() { ScreenBounds = new Rectangle(1600, 168, 300, 800) };
             historyActionsManager = new HistoryActionsManager();
             shortcutManager = new KeyboardShortcutManager();
 
             tabOrganizeManager.DisplayedTabChanged += panel.DisplayTab;
             historyActionsManager.ActionsReversed += HistoryActionsManager_ActionsReversed;
-
-            #region Debug Styles
-            MenuButtonStyle buttonStyle = new MenuButtonStyle
-            {
-                HorizontalPadding = 2,
-                IconHorizontalPadding = 2,
-                LeftIconSize = new Point(25),
-                LeftRightPartPadding = 20,
-                LeftTextColor = Color.White,
-            };
-
-            contextMenuManager.StyleProvider.ApplyTheme(new ContextMenuStyle
-            {
-                Background = Util.GetTexture(1, 1, Color.SlateGray),
-                HoverOverlay = Util.GetTexture(1, 1, Color.LightGray * 0.3f),
-                HeldOverlay = Util.GetTexture(1, 1, Color.DarkGray * 0.3f),
-                Font = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans_16"),
-
-                ItemStyles = new Dictionary<Type, MenuItemStyle>
-                {
-                    { typeof(ActionContextMenuButton), new ActionMenuItemStyle
-                        {
-                            ButtonStyle = buttonStyle,
-                            RightTextColor = Color.WhiteSmoke,
-                            Height = 32,
-                        } 
-                    },
-                    {
-                        typeof(SubContextMenuButton), new SubContextMenuItemStyle
-                        {
-                            ButtonStyle = buttonStyle,
-                            RightIconSize = new Point(25),
-                            Height = 32
-                        }
-                    },
-                    {
-                        typeof(GroupLineItem), new GroupLineStyle
-                        {
-                            LineColor = Color.WhiteSmoke,
-                            Thickness = 2,
-                            Height = 4
-                        }
-                    }
-                }
-            });
-
-            propertiesScreen.StyleProvider.ApplyTheme(new PropertyScreenStyle
-            {
-                Font = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans_16"),
-                BoxBackground = Util.GetTexture(1, 1, Color.Black),
-                DropdownButtonTexture = Util.GetTexture(1, 1, Color.Gray),
-                ScreenBackground = Util.GetTexture(1, 1, Color.DarkGray),
-                DropdownOptionBackground = Util.GetTexture(1, 1, Color.LightGray),
-                FocusedBoxBackground = Util.GetTexture(1, 1, Color.Purple)
-            });
-
-            historyActionsManager.StyleProvider.ApplyTheme(new HistoryActionsStyle
-            {
-                Font = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans_16"),
-                Background = Util.GetTexture(1, 1, Color.SlateGray),
-                Height = 24,
-                SelectedActionsHover = Util.GetTexture(1, 1, Color.LightBlue * 0.3f),
-                SelectedActionsIcon = Util.GetTexture(1, 1, Color.Purple),
-                SelectedActionsIconSize = new Point(4, 20),
-                TextHorizontalPadding = 16
-            });
-            #endregion
 
             Elements.Add(shortcutManager);
             InitializeShortcuts();
@@ -184,7 +117,7 @@ namespace NoteKeeper.Shell
         {
             base.RenderUpdate();
 
-            DrawHelper.SetBeginBatch(WindowTexture);
+            DrawHelper.SetBeginBatch(WindowTexture, DrawOptions);
 
             toolMenuManager.Render();
 
@@ -196,10 +129,10 @@ namespace NoteKeeper.Shell
             propertiesScreen.Render();
             historyActionsManager.Render();
 
-            DrawHelper.EndBatch();
-
             // render context menu on top of everything
-            contextMenuManager.RenderUpdate(WindowTexture);
+            contextMenuManager.Render();
+
+            DrawHelper.EndBatch();
         }
 
         protected override void OnMouseButtonStateChange(PopWindowMouseEventArgs e)

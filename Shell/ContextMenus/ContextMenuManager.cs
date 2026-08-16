@@ -20,18 +20,15 @@ namespace NoteKeeper.Shell.ContextMenus
         private bool hoveringSubMenuOpener;
 
         private readonly ContextMenuRenderer renderer;
-        private readonly MenuLayoutCalculator layoutCalculator;
+        private readonly ContextMenuLayoutCalculator layoutCalculator;
         private readonly LinkedList<SubMenuPair> openMenus;
-
-        public MenuItemStyleProvider StyleProvider { get; }
 
         public ContextMenuManager()
         {
-            StyleProvider = new MenuItemStyleProvider();
             openMenus = new LinkedList<SubMenuPair>();
 
-            layoutCalculator = new MenuLayoutCalculator(StyleProvider);
-            renderer = new ContextMenuRenderer(openMenus, StyleProvider, layoutCalculator);
+            layoutCalculator = new ContextMenuLayoutCalculator();
+            renderer = new ContextMenuRenderer(openMenus, layoutCalculator);
         }
 
         public void Show(ContextMenu menu, Point mousePosition)
@@ -95,9 +92,9 @@ namespace NoteKeeper.Shell.ContextMenus
             }
         }
 
-        public void RenderUpdate(RenderTarget2D windowTexture)
+        public void Render()
         {
-            renderer.Render(windowTexture, hoveredItem, isHoveredItemHeld);
+            renderer.Render(hoveredItem, isHoveredItemHeld);
         }
 
         public void MousePositionChangeUpdate(PopWindowMouseEventArgs e)

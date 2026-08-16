@@ -14,8 +14,6 @@ namespace NoteKeeper.Shell.ToolBar
 
         public Texture2D DefaultTexture { get; set; }
         public Texture2D UnenabledTexture { get; set; }
-        public Texture2D HoveredTexture { get; set; }
-        public Texture2D HeldTexture { get; set; }
 
         public ActionToolButton(Action clickAction)
         {
@@ -25,14 +23,6 @@ namespace NoteKeeper.Shell.ToolBar
         public void Selected()
         {
             _clickAction.Invoke();
-        }
-
-        public Texture2D GetTexture(bool isHovered, bool isHeld)
-        {
-            if (!Enabled)
-                return UnenabledTexture;
-
-            return isHeld ? HeldTexture : (isHovered ? HoveredTexture : DefaultTexture);
         }
     }
 }

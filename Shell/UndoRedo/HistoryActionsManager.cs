@@ -17,16 +17,12 @@ namespace NoteKeeper.Shell.UndoRedo
         private int _hoveredItemIndex;
         private bool _itemHeld;
 
-        public HistoryActionsStyleProvider StyleProvider { get; }
-
         public event Action<IEnumerable<IHistoryAction>, int> ActionsReversed;
 
         public HistoryActionsManager()
         {
-            StyleProvider = new HistoryActionsStyleProvider();
-
-            layoutCalculator = new HistoryActionsLayoutCalculator(StyleProvider);
-            renderer = new HistoryActionsRenderer(StyleProvider, layoutCalculator);
+            layoutCalculator = new HistoryActionsLayoutCalculator();
+            renderer = new HistoryActionsRenderer(layoutCalculator);
         }
 
         public void Show(IEnumerable<IHistoryAction> actions, Point screenLocation)

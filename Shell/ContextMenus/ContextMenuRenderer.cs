@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using PopUpUI.Surface;
+using NoteKeeper.Shell.Styling;
 using PopUpUI.Toolkit;
 using System;
 using System.Collections.Generic;
@@ -9,45 +8,39 @@ namespace NoteKeeper.Shell.ContextMenus
 {
     internal class ContextMenuRenderer
     {
-        private readonly BatchDrawOptions _drawOptions;
+        private const float RightTextColorAlphaMultiplier = 0.7f;
 
-        private readonly IEnumerable<SubMenuPair> openMenuPairs;
-        private readonly MenuItemStyleProvider styleProvider;
-        private readonly MenuLayoutCalculator layoutCalculator;
+        private readonly IEnumerable<SubMenuPair> _openMenuPairs;
+        private readonly ContextMenuLayoutCalculator _layoutCalculator;
 
-        public ContextMenuRenderer(IEnumerable<SubMenuPair> openMenus, MenuItemStyleProvider styleProvider, MenuLayoutCalculator layoutCalculator)
+        public ContextMenuRenderer(IEnumerable<SubMenuPair> openMenus, ContextMenuLayoutCalculator layoutCalculator)
         {
-            _drawOptions = new BatchDrawOptions { BlendState = BlendState.AlphaBlend };
-
-            this.openMenuPairs = openMenus;
-            this.styleProvider = styleProvider;
-            this.layoutCalculator = layoutCalculator;
+            _openMenuPairs = openMenus;
+            _layoutCalculator = layoutCalculator;
         }
 
-        public void Render(RenderTarget2D windowTarget, IContextMenuItem hoveredItem, bool isHeld)
+        public void Render(IContextMenuItem hoveredItem, bool isHeld)
         {
-            ContextMenuStyle style = styleProvider.Style;
-
-            DrawHelper.SetBeginBatch(windowTarget,  _drawOptions);
-            
-            foreach (SubMenuPair pair in openMenuPairs)
+            ResolvedTheme theme = ThemeService.CurrentTheme;
+            foreach (SubMenuPair pair in _openMenuPairs)
             {
-                DrawTexture(style.Background, layoutCalculator.GetContextMenuBackgroundBounds(pair.ContextMenu));
+                DrawHelper.DrawBorderedBackground(_layoutCalculator.GetContextMenuBackgroundBounds(pair.ContextMenu),
+                                                  theme.GetColor(ContextMenuStyles.Border), theme.GetColor(ContextMenuStyles.Background), 1);
 
                 foreach (IContextMenuEntry entry in pair.ContextMenu.Entries)
                 {
                     switch (entry)
                     {
                         case ActionContextMenuButton button:
-                            DrawActionButton(button);
+                            DrawActionButton(button, theme);
                             break;
 
                         case SubContextMenuButton button:
-                            DrawSubContextMenuButton(button);
+                            DrawSubContextMenuButton(button, theme);
                             break;
 
                         case GroupLineItem line:
-                            DrawGroupLine(line);
+                            DrawGroupLine(line, theme);
                             break;
 
                         default:
@@ -56,57 +49,47 @@ namespace NoteKeeper.Shell.ContextMenus
 
                     if (entry == hoveredItem)
                     {
-                        DrawTexture(isHeld ? style.HeldOverlay : style.HoverOverlay, new Rectangle(entry.Location, entry.Size));
+                        DrawHelper.DrawBackground(new Rectangle(entry.Location, entry.Size), 
+                                                  isHeld ? theme.GetColor(ContextMenuStyles.HeldOverlay) : theme.GetColor(ContextMenuStyles.HoverOverlay));
                     }
                 }
             }
-
-            DrawHelper.EndBatch();
         }
 
-        private void DrawActionButton(ActionContextMenuButton button)
+        private void DrawActionButton(ActionContextMenuButton button, ResolvedTheme theme)
         {
-            ActionMenuItemStyle style = (ActionMenuItemStyle)styleProvider.GetStyle(button);
-            MenuItemLayout layout = layoutCalculator.GetEntryLayout(button);
+            MenuItemLayout layout = _layoutCalculator.GetEntryLayout(button);
 
             if (button.IconTexture != null)
             {
-                DrawTexture(button.IconTexture, layout.LeftIconBounds);
+                DrawHelper.Batch.Draw(button.IconTexture, layout.LeftTextPosition, Color.White);
             }
 
-            DrawString(button.LeftText, styleProvider.Style.Font, layout.LeftTextPosition, style.ButtonStyle.LeftTextColor);
+            FontProvider.DrawText(ContextMenuLayoutCalculator.TextSize, isBold: false, button.LeftText, 
+                                  layout.LeftTextPosition, theme.GetColor(ContextMenuStyles.TextColor));
 
             if (button.RightText != null)
             {
-                DrawString(button.RightText, styleProvider.Style.Font, layout.RightTextPosition, style.RightTextColor);
+                FontProvider.DrawText(ContextMenuLayoutCalculator.TextSize, isBold: false, button.RightText,
+                                      layout.RightTextPosition, theme.GetColor(ContextMenuStyles.TextColor) * RightTextColorAlphaMultiplier);
             }
         }
 
-        private void DrawSubContextMenuButton(SubContextMenuButton button)
+        private void DrawSubContextMenuButton(SubContextMenuButton button, ResolvedTheme theme)
         {
-            SubContextMenuItemStyle style = (SubContextMenuItemStyle)styleProvider.GetStyle(button);
-            MenuItemLayout layout = layoutCalculator.GetEntryLayout(button);
+            MenuItemLayout layout = _layoutCalculator.GetEntryLayout(button);
 
-            DrawString(button.LeftText, styleProvider.Style.Font, layout.LeftTextPosition, style.ButtonStyle.LeftTextColor);
-            DrawTexture(button.RightIconTexture, layout.RightIconBounds);
+            FontProvider.DrawText(ContextMenuLayoutCalculator.TextSize, isBold: false, button.LeftText, 
+                                  layout.LeftTextPosition, theme.GetColor(ContextMenuStyles.TextColor));
+
+            DrawHelper.Batch.Draw(theme.GetIcon(ContextMenuStyles.SubMenuButtonRightIcon), layout.RightIconBounds, Color.White);
         }
 
-        private void DrawGroupLine(GroupLineItem line)
+        private void DrawGroupLine(GroupLineItem line, ResolvedTheme theme)
         {
-            GroupLineStyle style = (GroupLineStyle)styleProvider.GetStyle(line);
-            MenuItemLayout layout = layoutCalculator.GetEntryLayout(line);
+            MenuItemLayout layout = _layoutCalculator.GetEntryLayout(line);
 
-            DrawHelper.DrawBackground(layout.ItemBounds, style.LineColor);
-        }
-
-        private static void DrawTexture(Texture2D texture, Rectangle destination)
-        {
-            DrawHelper.Batch.Draw(texture, destination, Color.White);
-        }
-
-        private static void DrawString(string text, SpriteFont font, Vector2 position, Color color)
-        {
-            DrawHelper.Batch.DrawString(font, text, position, color);
+            DrawHelper.DrawBackground(layout.ItemBounds, theme.GetColor(ContextMenuStyles.GroupLine));
         }
     }
 }

@@ -1,8 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using NoteKeeper.InspectionWindow;
+using NoteKeeper.Shell.Styling;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace NoteKeeper.Shell.UndoRedo
 {
@@ -10,38 +10,38 @@ namespace NoteKeeper.Shell.UndoRedo
     {
         private const int FrameThickness = 4;
 
-        private HistoryActionsStyleProvider _styleProvider;
+        public const int HorizontalPadding = 16;
+        public const int TextSize = 12;
+        public const int SelectedActionIndicatorHeight = 20;
+        public const int SelectedActionIndicatorWidth = 4;
+        public const int LineHeight = 30;
+
         private int _actionsWidth;
 
         public Point ScreenLocation { get; set; }
 
-        public HistoryActionsLayoutCalculator(HistoryActionsStyleProvider styleProvider)
-        {
-            _styleProvider = styleProvider;
-        }
-
         public void CalculateActionsWidth(IEnumerable<IHistoryAction> actions)
         {
             int maxWidth = 0;
-            HistoryActionsStyle style = _styleProvider.Style;
+
             foreach (var action in actions)
             {
-                maxWidth = Math.Max(maxWidth, (int)style.Font.MeasureString(action.UIDescription).X);
+                maxWidth = Math.Max(maxWidth, (int)FontProvider.MeasureWidth(TextSize, isBold: false, action.UIDescription));
             }
 
-            _actionsWidth = maxWidth + style.TextHorizontalPadding * 2;
+            _actionsWidth = maxWidth + HorizontalPadding * 2;
         }
 
         public Rectangle GetActionLayout(int index)
         {
-            HistoryActionsStyle style = _styleProvider.Style;
-            return new Rectangle(ScreenLocation.X, ScreenLocation.Y + index * style.Height, _actionsWidth, style.Height);
+
+            return new Rectangle(ScreenLocation.X, ScreenLocation.Y + index * LineHeight, _actionsWidth, LineHeight);
         }
 
         public Rectangle BackgroundBounds(int itemCount)
         {
             return new Rectangle(ScreenLocation.X - FrameThickness, ScreenLocation.Y - FrameThickness,
-                                 _actionsWidth + 2 * FrameThickness, itemCount * _styleProvider.Style.Height + 2 * FrameThickness);
+                                 _actionsWidth + 2 * FrameThickness, itemCount * LineHeight + 2 * FrameThickness);
         }
     }
 }

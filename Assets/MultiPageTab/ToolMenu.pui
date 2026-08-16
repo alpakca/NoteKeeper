@@ -2,45 +2,35 @@
 
 ToggleToolButton Transforming_Mode
 {
-	CheckedTexture = Texture(FolderPath + "TransformChecked.png"),
-	UncheckedTexture = Texture(FolderPath + "TransformUnchecked.png"),
+	DefaultTexture = Texture(FolderPath + "Transform.png")
 }
 
 ToggleToolButton Writing_Mode
 {
-	CheckedTexture = Texture(FolderPath + "WritingChecked.png"),
-	UncheckedTexture = Texture(FolderPath + "WritingUnchecked.png")
+	DefaultTexture = Texture(FolderPath + "Writing.png")
 }
 
 ToggleToolButton Swap_Pages
 {
-	CheckedTexture = Texture(FolderPath + "SwapPagesChecked.png"),
-	UncheckedTexture = Texture(FolderPath + "SwapPagesUnchecked.png"),
+	DefaultTexture = Texture(FolderPath + "SwapPages.png"),
 }
 
 ActionToolButton Add_Text_Block
 {
-	DefaultTexture = Texture(FolderPath + "AddTextBlock.png"),
-	HoveredTexture = Texture(FolderPath + "AddTextBlockHovered.png"),
-	HeldTexture = Texture(FolderPath + "AddTextBlockHeld.png"),
+	DefaultTexture = Texture(FolderPath + "AddTextBlock.png")
 }
 
 ActionToolButton Append_Page
 {
-	DefaultTexture = Texture(FolderPath + "AppendPage.png"),
-	HoveredTexture = Texture(FolderPath + "AppendPageHovered.png"),
-	HeldTexture = Texture(FolderPath + "AppendPageHeld.png"),
+	DefaultTexture = Texture(FolderPath + "AppendPage.png")
 }
 
 ToggleToolButton Lock_Transformer_Corner
 {
-	CheckedTexture = Texture(FolderPath + "LockTransformerCornerChecked.png"),
-	UncheckedTexture = Texture(FolderPath + "LockTransformerCornerUnchecked.png"),
+	DefaultTexture = Texture(FolderPath + "LockTransformerCorner.png")
 }
 
 ActionToolButton Save_Pages
 {
-	DefaultTexture = Texture(FolderPath + "SavePages.png"),
-	HoveredTexture = Texture(FolderPath + "SavePagesHovered.png"),
-	HeldTexture = Texture(FolderPath + "SavePagesHeld.png"),
+	DefaultTexture = Texture(FolderPath + "SavePages.png")
 }

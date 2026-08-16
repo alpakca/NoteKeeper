@@ -5,16 +5,17 @@ namespace NoteKeeper.Shell.TabOrganizer
 {
     internal static class TabsHeaderStyles
     {
-        public static string Background = "tabsheader.background";
-        public static string Surface = "tabsheader.surface";
-        public static string Border = "tabsheader.border";
-        public static string HoverOverlay = "tabsheader.hoveroverlay";
-        public static string HeldOverlay = "tabsheader.heldoverlay";
+        public const string Background = "tabsheader.background";
+        public const string Surface = "tabsheader.surface";
+        public const string Border = "tabsheader.border";
+        public const string BorderAccent = "tabsheader.borderaccent";
+        public const string HoverOverlay = "tabsheader.hoveroverlay";
+        public const string HeldOverlay = "tabsheader.heldoverlay";
 
-        public static string TextColor = "tabsheader.textcolor";
+        public const string TextColor = "tabsheader.textcolor";
 
-        public static string CloseButton = "tabsheader.closebutton";
-        public static string TabListButton = "tabsheader.tablistbutton";
+        public const string CloseButton = "tabsheader.closebutton";
+        public const string TabListButton = "tabsheader.tablistbutton";
 
         [ModuleInitializer]
         public static void InitializeColors()
@@ -39,6 +40,12 @@ namespace NoteKeeper.Shell.TabOrganizer
 
             ColorRegistry.Register(new ColorDefinition
             {
+                Id = BorderAccent,
+                FallbackColorId = ColorRegistry.BorderAccentId
+            });
+
+            ColorRegistry.Register(new ColorDefinition
+            {
                 Id = HoverOverlay,
                 FallbackColorId = ColorRegistry.HoverOverlayId
             });
@@ -58,7 +65,7 @@ namespace NoteKeeper.Shell.TabOrganizer
             IconRegistry.Register(new IconDefinition
             {
                 Id = CloseButton,
-                DefaultPath = @"shell\TabsHeaderCloseButton.png"
+                DefaultPath = @"shell\CloseButton.png"
             });
 
             IconRegistry.Register(new IconDefinition
