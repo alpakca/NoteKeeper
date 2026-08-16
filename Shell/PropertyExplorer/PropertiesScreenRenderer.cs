@@ -6,12 +6,10 @@ namespace NoteKeeper.Shell.PropertyExplorer
 {
     internal class PropertiesScreenRenderer
     {
-        private readonly PropertyScreenStyleProvider _styleProvider;
         private readonly PropertiesLayoutCalculator _layoutCalculator;
 
-        public PropertiesScreenRenderer(PropertyScreenStyleProvider styleProvider, PropertiesLayoutCalculator layoutCalculator)
+        public PropertiesScreenRenderer(PropertiesLayoutCalculator layoutCalculator)
         {
-            _styleProvider = styleProvider;
             _layoutCalculator = layoutCalculator;
         }
 

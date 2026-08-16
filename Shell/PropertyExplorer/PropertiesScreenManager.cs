@@ -4,7 +4,7 @@ using PopUpUI.Input;
 
 namespace NoteKeeper.Shell.PropertyExplorer
 {
-    internal class PropertiesScreen
+    internal class PropertiesScreenManager
     {
         private readonly PropertiesLayoutCalculator layoutCalculator;
         private readonly PropertiesScreenRenderer renderer;
@@ -16,8 +16,6 @@ namespace NoteKeeper.Shell.PropertyExplorer
         private IPropertyEntry _focusedEntry;
         private ScreenState _state;
 
-        public PropertyScreenStyleProvider StyleProvider { get; }
-
         private enum ScreenState
         {
             Idle,
@@ -25,23 +23,25 @@ namespace NoteKeeper.Shell.PropertyExplorer
             PickingDropdownOption
         }
 
-        public PropertiesScreen()
+        public Rectangle ScreenBounds
         {
-            StyleProvider = new PropertyScreenStyleProvider();
-            StyleProvider.ThemeChanged += () => _valueTextBox.SetFont(StyleProvider.Style.Font);
+            get => layoutCalculator.ScreenBounds;
+            set => layoutCalculator.ScreenBounds = value;
+        }
 
-            layoutCalculator = new PropertiesLayoutCalculator(StyleProvider);
-            renderer = new PropertiesScreenRenderer(StyleProvider, layoutCalculator);
+        public PropertiesScreenManager()
+        {
+            layoutCalculator = new PropertiesLayoutCalculator();
+            renderer = new PropertiesScreenRenderer(layoutCalculator);
 
             _valueTextBox = new ValueTextBox();
             _optionDropdown = new OptionDropdown(layoutCalculator);
         }
 
-        public void Show(IPropertyCollection collection, Rectangle screenBounds)
+        public void Show(IPropertyCollection collection)
         {
             Hide();
 
-            layoutCalculator.ScreenBounds = screenBounds;
             _shownCollection = collection;
         }
 

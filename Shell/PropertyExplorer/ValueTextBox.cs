@@ -1,17 +1,13 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using NoteKeeper.Shell.Styling;
 using PopUpUI.Text;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
 
 namespace NoteKeeper.Shell.PropertyExplorer
 {
     internal class ValueTextBox
     {
-        private readonly BasicProcesser processer;
+        private readonly TextProcesser processer;
 
         private TextPosition caretPosition;
         private ITextProcesserResult lastResult;
@@ -23,11 +19,14 @@ namespace NoteKeeper.Shell.PropertyExplorer
         public ValueTextBox()
         {
             processer = new TextProcesser();
+            FontProvider_FontChanged();
+
+            FontProvider.FontChanged += FontProvider_FontChanged;
         }
 
-        public void SetFont(SpriteFont font)
+        private void FontProvider_FontChanged()
         {
-            processer.Font = font;
+            FontProvider.UpdateProcesserFont(processer, PropertiesLayoutCalculator.TextSize, isBold: false);
         }
 
         public void Render()

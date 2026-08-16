@@ -25,12 +25,12 @@ namespace NoteKeeper.Shell
         private readonly ContextMenuManager contextMenuManager;
         private readonly ToolMenuManager toolMenuManager;
         private readonly TabOrganizeManager tabOrganizeManager;
-        private readonly PropertiesScreen propertiesScreen;
+        private readonly PropertiesScreenManager propertiesScreen;
         private readonly HistoryActionsManager historyActionsManager;
         private readonly KeyboardShortcutManager shortcutManager;
 
         public ToolMenuManager ToolMenuManager => toolMenuManager;
-        public PropertiesScreen PropertiesScreen => propertiesScreen;
+        public PropertiesScreenManager PropertiesScreen => propertiesScreen;
         public HistoryActionsManager HistoryActionsManager => historyActionsManager;
 
         public PanelWindow(ControlPanel panel) : base(new BatchDrawOptions { BlendState = BlendState.AlphaBlend })
@@ -40,24 +40,12 @@ namespace NoteKeeper.Shell
             contextMenuManager = new ContextMenuManager();
             toolMenuManager = new ToolMenuManager() { ScreenLocation = new Point(60, 240) };
             tabOrganizeManager = new TabOrganizeManager(panel.ActiveTabs) { ScreenBounds = new Rectangle(20, 168, 1880, 32) };
-            propertiesScreen = new PropertiesScreen();
+            propertiesScreen = new PropertiesScreenManager() { ScreenBounds = new Rectangle(1620, 168, 300, 800) };
             historyActionsManager = new HistoryActionsManager();
             shortcutManager = new KeyboardShortcutManager();
 
             tabOrganizeManager.DisplayedTabChanged += panel.DisplayTab;
             historyActionsManager.ActionsReversed += HistoryActionsManager_ActionsReversed;
-
-            #region Debug Styles
-            propertiesScreen.StyleProvider.ApplyTheme(new PropertyScreenStyle
-            {
-                Font = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans_16"),
-                BoxBackground = Util.GetTexture(1, 1, Color.Black),
-                DropdownButtonTexture = Util.GetTexture(1, 1, Color.Gray),
-                ScreenBackground = Util.GetTexture(1, 1, Color.DarkGray),
-                DropdownOptionBackground = Util.GetTexture(1, 1, Color.LightGray),
-                FocusedBoxBackground = Util.GetTexture(1, 1, Color.Purple)
-            });
-            #endregion
 
             Elements.Add(shortcutManager);
             InitializeShortcuts();

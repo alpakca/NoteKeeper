@@ -11,18 +11,13 @@ namespace NoteKeeper.Shell.PropertyExplorer
         private const int MarginBetweenBoxes = 2;
         private const int DropDownOptionsRightMargin = 20;
 
+        public const int TextSize = 12;
+
         private readonly Point DropdownBoxBounds = new Point(40, 40);
         private readonly Point BoxBounds = new Point(100, 40);
         private readonly Point BoxesStartPositionOffset = new Point(30, 200);
 
-        private readonly PropertyScreenStyleProvider _styleProvider;
-
         public Rectangle ScreenBounds { get; set; }
-
-        public PropertiesLayoutCalculator(PropertyScreenStyleProvider styleProvider)
-        {
-            _styleProvider = styleProvider;
-        }
 
         public Point GetDropdownOptionsSize(IEnumerable<string> options)
         {
