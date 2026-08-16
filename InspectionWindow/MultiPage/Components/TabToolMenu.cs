@@ -17,7 +17,6 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
         private readonly ToggleToolButton[] _combinedToggles;
 
         public IToolButton[] Buttons { get; }
-        public ToolMenuStyle MenuStyle { get; }
 
         public event Action<WindowInputState> WindowInputStateChanged;
         public event Action<bool> TransformerCornerLockStateChanged;
@@ -27,16 +26,6 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
         {
             _tab = tab;
             _pageActions = pageActions;
-
-            MenuStyle = new ToolMenuStyle
-            {
-                Background = Util.GetTexture(1, 1, Color.Yellow),
-                CloseButtonTexture = Util.GetTexture(1, 1, Color.Red),
-                CloseButtonHoverTexture = Util.GetTexture(1, 1, Color.DarkRed),
-                CloseButtonHeldTexture = Util.GetTexture(1, 1, Color.LightPink),
-                MoveBoxTexture = Util.GetTexture(1, 1, Color.Turquoise),
-                ColumnCount = 2,
-            };
 
             PUIInterpreter interpreter = PUIHelper.GetInterpreter(PUIHelper.MultiPageTabAssetsFolderPath + "ToolMenu.pui");
             interpreter.ProcessTokens();

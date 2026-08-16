@@ -11,23 +11,12 @@ namespace NoteKeeper.Shell.ToolBar
         public bool Enabled { get; set; } = true;
         public bool IsChecked => _isChecked;
 
-        public Texture2D CheckedTexture { get; set; }
-        public Texture2D UncheckedTexture { get; set; }
+        public Texture2D DefaultTexture { get; set; }
         public Texture2D UnenabledTexture { get; set; }
 
         public ToggleToolButton(Action<ToggleToolButton> toggleAction)
         {
             _toggleAction = toggleAction;
-        }
-
-        public Texture2D GetTexture(bool isHovered, bool isHeld)
-        {
-            if (!Enabled)
-            {
-                return UnenabledTexture;
-            }
-
-            return IsChecked ? CheckedTexture : UncheckedTexture;
         }
 
         public void Selected()

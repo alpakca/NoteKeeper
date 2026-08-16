@@ -1,4 +1,5 @@
 ﻿using NoteKeeper.Shell.Styling;
+using System.Runtime.CompilerServices;
 
 namespace NoteKeeper.Shell.ToolBar
 {
@@ -10,8 +11,8 @@ namespace NoteKeeper.Shell.ToolBar
         public const string HeldOverlay = "toolmenu.heldoverlay";
 
         public const string CloseButton = "toolmenu.closebutton";
-        public const string MovementBox = "toolmenu.movementbox";
 
+        [ModuleInitializer]
         public static void InitializeColors()
         {
             ColorRegistry.Register(new ColorDefinition
@@ -23,7 +24,7 @@ namespace NoteKeeper.Shell.ToolBar
             ColorRegistry.Register(new ColorDefinition
             {
                 Id = Border,
-                FallbackColorId = ColorRegistry.BorderAccentId
+                FallbackColorId = ColorRegistry.BorderId
             });
 
             ColorRegistry.Register(new ColorDefinition
@@ -42,12 +43,6 @@ namespace NoteKeeper.Shell.ToolBar
             {
                 Id = CloseButton,
                 DefaultPath = @"shell\CloseButton.png"
-            });
-
-            IconRegistry.Register(new IconDefinition
-            {
-                Id = MovementBox,
-                DefaultPath = @"shell\ToolMenuMovementBox.png"
             });
         }
     }

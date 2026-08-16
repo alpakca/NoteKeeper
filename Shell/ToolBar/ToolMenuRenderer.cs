@@ -22,13 +22,12 @@ namespace NoteKeeper.Shell.ToolBar
             DrawHelper.DrawBorderedBackground(new Rectangle(_layoutCalculator.ScreenLocation, _layoutCalculator.GetBackgroundSize(menu.Buttons.Length)),
                                               theme.GetColor(ToolMenuStyles.Border), theme.GetColor(ToolMenuStyles.Background), 1);
 
-            DrawHelper.Batch.Draw(theme.GetIcon(ToolMenuStyles.MovementBox), _layoutCalculator.GetMoveBoxLayout(), Color.White);
             DrawHelper.Batch.Draw(theme.GetIcon(ToolMenuStyles.CloseButton), _layoutCalculator.GetCloseButtonLayout(), Color.White);
 
             foreach (var button in menu.Buttons)
             {
                 Rectangle layout = _layoutCalculator.GetButtonLayout(currentRow, currentColumn);
-                DrawHelper.Batch.Draw(button.Texture, layout, Color.White);
+                DrawHelper.Batch.Draw(button.Enabled ? button.DefaultTexture : button.UnenabledTexture, layout, Color.White);
                 
                 currentColumn++;
                 if (currentColumn == ToolMenuLayoutCalculator.ColumnCount)
@@ -39,10 +38,18 @@ namespace NoteKeeper.Shell.ToolBar
             }
         }
 
-        public void DrawHoveredButtonOverlay(Rectangle bounds, bool isHeld)
+        public void DrawHoveredButtonOverlay(IToolButton button, Rectangle bounds, bool isHeld)
         {
-            DrawHelper.DrawBackground(bounds, isHeld ? ThemeService.CurrentTheme.GetColor(ToolMenuStyles.HeldOverlay)
-                                                     : ThemeService.CurrentTheme.GetColor(ToolMenuStyles.HoverOverlay));
+            if (button is ActionToolButton)
+            {
+                DrawHelper.DrawBackground(bounds, isHeld ? ThemeService.CurrentTheme.GetColor(ToolMenuStyles.HeldOverlay)
+                                                         : ThemeService.CurrentTheme.GetColor(ToolMenuStyles.HoverOverlay));
+            }
+            else if (button is ToggleToolButton toggle && toggle.IsChecked)
+            {
+                // toggle buttons always overlayed with held if checked
+                DrawHelper.DrawBackground(bounds, ThemeService.CurrentTheme.GetColor(ToolMenuStyles.HeldOverlay));
+            }
         }
     }
 }

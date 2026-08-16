@@ -14,6 +14,8 @@ namespace NoteKeeper.Shell.ToolBar
         private bool _movementBoxActive;
         private Point _movementBoxHoldOrigin;
 
+        private readonly ActionToolButton _closeButton;
+
         private IToolMenu? _shownMenu;
         private IToolButton? _hoveredButton;
         private Rectangle _hoveredButtonBounds;
@@ -32,6 +34,8 @@ namespace NoteKeeper.Shell.ToolBar
         {
             layoutCalculator = new ToolMenuLayoutCalculator();
             renderer = new ToolMenuRenderer(layoutCalculator);
+
+            _closeButton = new ActionToolButton(Hide);
         }
 
         public void Show(IToolMenu menu)
@@ -58,7 +62,7 @@ namespace NoteKeeper.Shell.ToolBar
                 return;
 
             renderer.Render(_shownMenu);
-            renderer.DrawHoveredButtonOverlay(_hoveredButtonBounds, _isHoveredButtonHeld);
+            renderer.DrawHoveredButtonOverlay(_hoveredButton, _hoveredButtonBounds, _isHoveredButtonHeld);
         }
 
         public void MousePositionChangeUpdate(PopWindowMouseEventArgs e)
@@ -130,7 +134,7 @@ namespace NoteKeeper.Shell.ToolBar
             Rectangle closeButtonlayout = layoutCalculator.GetCloseButtonLayout();
             if (closeButtonlayout.Contains(mousePosition))
             {
-                return (null, closeButtonlayout);
+                return (_closeButton, closeButtonlayout);
             }
 
             return (null, default);
