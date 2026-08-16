@@ -102,7 +102,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
 
             int zoomedMargin = (int)(WritingBoundaryOutlineMargin * viewport.Zoom);
             int zoomedThinkness = (int)(WritingBoundaryOutlineThickness * viewport.Zoom);
-            Point absoluteSize = writingSession.WritingContent.Size;
+            Point absoluteSize = writingSession.WritingContent.Size.Times(viewport.Zoom);
 
             DrawHelper.SetBeginBatch(target);
 

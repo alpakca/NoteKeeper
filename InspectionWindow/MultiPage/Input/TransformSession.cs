@@ -95,6 +95,10 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Input
                 SelectionBoundary = contentsBoundary;
                 BuildNodePositions(contentsBoundary);
             }
+            else if (_selectedContents.Count > 0 && appliedCommand is DeleteContentAction)
+            {
+                DiscardSelection();
+            }
         }
 
         public void HoldStart(NotePagePosition position)
