@@ -17,14 +17,11 @@ namespace NoteKeeper.Shell
         private Tab? displayedTab;
         private bool exitAppWasRequested = false;
 
-        private readonly ButtonPlate buttonPlate;
         private readonly PanelWindow panelWindow;
         private readonly CloseTabsWindow closeTabsWindow;
         private readonly List<ITabUpdateReceiver> tabUpdateReceivers;
 
-        public Tab? DisplayedTab => displayedTab;
         public TabCollection ActiveTabs { get; }
-        public PanelWindow PanelWindow => panelWindow;
 
         public event Action? ExitApp;
 
@@ -43,7 +40,6 @@ namespace NoteKeeper.Shell
             ThemeService.SetTheme("dark");
 
             panelWindow = new PanelWindow(this) { Boundaries = new Rectangle(new Point(), WindowOptions.Size) };
-            buttonPlate = new ButtonPlate(this);
 
             InitializeWindow();
             PopWindowManager.ActiveWindows.Add(panelWindow);
@@ -73,7 +69,6 @@ namespace NoteKeeper.Shell
 
             panelWindow.Elements.Add(verticalScroller);
             panelWindow.Elements.Add(horizontalScroller);
-            panelWindow.Elements.AddRange(buttonPlate.Buttons);
 
             tabUpdateReceivers.AddRange(verticalScroller, horizontalScroller, panelWindow);
         }
@@ -81,11 +76,6 @@ namespace NoteKeeper.Shell
         public ContextMenu? GetContextMenu(Point mousePosition)
         {
             return null;
-        }
-
-        public void SetToolMenuVisibility(bool isVisible)
-        {
-            panelWindow.SetToolMenuVisibility(isVisible);
         }
 
         /// <summary>Rearranges heights of TabGroup, ButtonPlate and DisplayedTab; by chaning DisplayedTab's height and keeping others minimum.</summary>
@@ -108,21 +98,14 @@ namespace NoteKeeper.Shell
 
             if (displayedTab != null)
             {
-                displayedTab.PropertyScreenOpenRequested -= Tab_PropertyScreenOpenRequested;
-
                 displayedTab.TabViewport.ScrollChanged -= TabViewport_ScrollChanged;
-                displayedTab.TabHistory.HistoryUpdated -= TabHistory_HistoryUpdated;
 
                 PopWindowManager.ActiveWindows.Remove(displayedTab.Window);
             }
 
             if (tab != null)
             {
-                tab.PropertyScreenOpenRequested += Tab_PropertyScreenOpenRequested;
-
                 tab.TabViewport.ScrollChanged += TabViewport_ScrollChanged;
-                tab.TabHistory.HistoryUpdated += TabHistory_HistoryUpdated;
-                TabHistory_HistoryUpdated(tab.TabHistory);
 
                 PopWindowManager.ActiveWindows.Add(tab.Window);
                 PopWindowManager.ActiveWindows.MoveToBottom(tab.Window);
@@ -130,24 +113,11 @@ namespace NoteKeeper.Shell
 
             displayedTab = tab;
             RearrangeUISizes();
-            DisplayedTabChanged(tab);
-        }
 
-        private void DisplayedTabChanged(Tab? newTab)
-        {
             foreach (var receiver in tabUpdateReceivers)
             {
-                receiver.DisplayedTabChanged(newTab);
+                receiver.DisplayedTabChanged(tab);
             }
-
-            buttonPlate.SaveCurrentTabButton.Enabled = newTab != null;
-            buttonPlate.SaveAllTabsButton.Enabled = newTab != null;
-            buttonPlate.ToolMenuToggle.Enabled = newTab?.ToolMenu != null;
-        }
-
-        private void Tab_PropertyScreenOpenRequested(PropertyExplorer.IPropertyCollection collection)
-        {
-            panelWindow.PropertiesScreen.Show(collection);
         }
 
         public bool TryExitApp()
@@ -205,15 +175,6 @@ namespace NoteKeeper.Shell
             {
                 DisplayTab(null);
             }
-        }
-
-        private void TabHistory_HistoryUpdated(TabHistory history)
-        {
-            buttonPlate.UndoButton.Enabled = history.CanUndo;
-            buttonPlate.UndoDescriptionsButton.Enabled = history.CanUndo;
-
-            buttonPlate.RedoButton.Enabled = history.CanRedo;
-            buttonPlate.RedoDescriptionsButton.Enabled = history.CanRedo;
         }
 
         private void TabViewport_ScrollChanged()

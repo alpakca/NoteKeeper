@@ -1,18 +1,13 @@
-﻿using Microsoft.Xna.Framework;
+﻿using NoteKeeper.Shell.Styling;
 using PopUpUI.PUI;
-using PopUpUI.Surface;
-using PopUpUI.Toolkit;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using System.IO;
 
 namespace NoteKeeper.Shell.PUIHelpers
 {
     internal static class PUIHelper
     {
-        public const string AssetsFolderPath = @"C:\Users\user\Desktop\C#\NoteKeeper\NoteKeeper\Assets\";
-        public const string MultiPageTabAssetsFolderPath = AssetsFolderPath + @"MultiPageTab\";
-        public const string ShellAssetsFolderPath = AssetsFolderPath + @"Shell\";
+        public static string MultiPageTabAssetsFolderPath = Path.Combine(ThemeService.AssetsFolderRelativePath, "multiPageTab\\");
+        public static string ShellAssetsFolderPath = Path.Combine(ThemeService.AssetsFolderRelativePath, "shell\\");
 
         public static ITupleParser[] TupleParsers { get; } = [new AnimationTupleParser(), new TextureTupleParser(),
                                                               new RectangleTupleParser(), new PointTupleParser()];

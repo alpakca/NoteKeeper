@@ -81,7 +81,7 @@ VisualClickable Save_All_Tabs
 	HoldablePacket = holdablePacket
 }
 
-VisualToggleButton Tool_Menu_Toggle 
+VisualToggleButton Tool_Menu 
 {
 	Name = "ToolMenuToggle",
 	Boundaries = Rectangle(300, 60, 32, 32),

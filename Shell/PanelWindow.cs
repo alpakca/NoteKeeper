@@ -28,10 +28,7 @@ namespace NoteKeeper.Shell
         private readonly PropertyExplorerManager propertiesScreen;
         private readonly HistoryActionsManager historyActionsManager;
         private readonly KeyboardShortcutManager shortcutManager;
-
-        public ToolMenuManager ToolMenuManager => toolMenuManager;
-        public PropertyExplorerManager PropertiesScreen => propertiesScreen;
-        public HistoryActionsManager HistoryActionsManager => historyActionsManager;
+        private readonly UIButtonEventService buttonService;
 
         public PanelWindow(ControlPanel panel) : base(new BatchDrawOptions { BlendState = BlendState.AlphaBlend })
         {
@@ -42,13 +39,37 @@ namespace NoteKeeper.Shell
             tabOrganizeManager = new TabOrganizeManager(panel.ActiveTabs) { ScreenBounds = new Rectangle(20, 168, 1880, 32) };
             propertiesScreen = new PropertyExplorerManager() { ScreenBounds = new Rectangle(1600, 168, 300, 800) };
             historyActionsManager = new HistoryActionsManager();
+
             shortcutManager = new KeyboardShortcutManager();
+            InitializeShortcuts();
+
+            buttonService = new UIButtonEventService();
+            buttonService.UndoRequested += () => displayedTab?.TabHistory.Undo();
+            buttonService.RedoRequested += () => displayedTab?.TabHistory.Redo();
+            buttonService.HistoryUndoDescriptionRequested += screenLocation =>
+            {
+                if (displayedTab != null)
+                    historyActionsManager.Show(displayedTab.TabHistory.UndoableActions, screenLocation);
+            };
+            buttonService.HistoryRedoDescriptionRequested += screenLocation =>
+            {
+                if (displayedTab != null)
+                    historyActionsManager.Show(displayedTab.TabHistory.RedoableActions, screenLocation);
+            };
+            buttonService.SaveDisplayedTabRequested += () => displayedTab?.TabSerializer.Save();
+            buttonService.SaveAllTabsRequested += () =>
+            {
+                foreach (var tab in panel.ActiveTabs)
+                    tab.TabSerializer.Save();
+            };
+            buttonService.ToolMenuVisibilityChangeRequested += SetToolMenuVisibility;
 
             tabOrganizeManager.DisplayedTabChanged += panel.DisplayTab;
             historyActionsManager.ActionsReversed += HistoryActionsManager_ActionsReversed;
+            toolMenuManager.MenuVisibilityChanged += buttonService.SetToolMenuCheck;
 
             Elements.Add(shortcutManager);
-            InitializeShortcuts();
+            Elements.AddRange(buttonService.Buttons);
         }
 
         private void InitializeShortcuts()
@@ -64,15 +85,35 @@ namespace NoteKeeper.Shell
 
         public void DisplayedTabChanged(Tab? setTab)
         {
+            if (displayedTab != null)
+            {
+                displayedTab.TabHistory.HistoryUpdated -= buttonService.DisplayedTabHistoryUpdated;
+                displayedTab.PropertyScreenOpenRequested -= ShowPropertyExplorer;
+            }
+
             displayedTab = setTab;
 
+            if (setTab != null)
+            {
+                setTab.TabHistory.HistoryUpdated += buttonService.DisplayedTabHistoryUpdated;
+                setTab.PropertyScreenOpenRequested += ShowPropertyExplorer;
+
+                buttonService.DisplayedTabHistoryUpdated(setTab.TabHistory);
+            }
+
+            buttonService.DisplayedTabChanged(setTab);
             tabOrganizeManager.DisplayedTabUpdated(setTab);
 
             // switched the open tool menu with new tab's tool menu
             SetToolMenuVisibility(toolMenuManager.IsShown);
         }
 
-        public void SetToolMenuVisibility(bool isVisible)
+        private void ShowPropertyExplorer(IPropertyCollection collection)
+        {
+            propertiesScreen.Show(collection);
+        }
+
+        private void SetToolMenuVisibility(bool isVisible)
         {
             if (isVisible && displayedTab?.ToolMenu != null)
             {
