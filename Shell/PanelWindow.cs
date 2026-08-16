@@ -40,7 +40,7 @@ namespace NoteKeeper.Shell
             contextMenuManager = new ContextMenuManager();
             toolMenuManager = new ToolMenuManager() { ScreenLocation = new Point(60, 240) };
             tabOrganizeManager = new TabOrganizeManager(panel.ActiveTabs) { ScreenBounds = new Rectangle(20, 168, 1880, 32) };
-            propertiesScreen = new PropertiesScreenManager() { ScreenBounds = new Rectangle(1620, 168, 300, 800) };
+            propertiesScreen = new PropertiesScreenManager() { ScreenBounds = new Rectangle(1600, 168, 300, 800) };
             historyActionsManager = new HistoryActionsManager();
             shortcutManager = new KeyboardShortcutManager();
 

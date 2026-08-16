@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using NoteKeeper.Shell.Styling;
 using PopUpUI.Toolkit;
 
 namespace NoteKeeper.Shell.PropertyExplorer
@@ -13,79 +14,70 @@ namespace NoteKeeper.Shell.PropertyExplorer
             _layoutCalculator = layoutCalculator;
         }
 
-        public void Render(IPropertyCollection collection, IPropertyEntry focusedEntry)
+        /// <summary>Renders given collection to a set render target.</summary>
+        /// <param name="valueTextBox">
+        /// ValueTextBox to render its current Text to its row. 
+        /// If given null; value box at its row uses actual row value.
+        /// </param>
+        public void Render(IPropertyCollection collection, IPropertyEntry focusedEntry, ValueTextBox? valueTextBox)
         {
-            PropertyScreenStyle style = _styleProvider.Style;
-
-            DrawHelper.Batch.Draw(style.ScreenBackground, _layoutCalculator.ScreenBounds, Color.White);
+            ResolvedTheme theme = ThemeService.CurrentTheme;
+            DrawHelper.DrawBorderedBackground(_layoutCalculator.ScreenBounds, 
+                                              theme.GetColor(PropertiesScreenStyles.Border), theme.GetColor(PropertiesScreenStyles.Surface), 1);
 
             int index = 0;
             foreach (var entry in collection.Properties)
             {
                 PropertyRowLayout rowLayout = _layoutCalculator.GetRowLayout(entry, index);
 
-                DrawBox(focusedEntry == entry ? style.FocusedBoxBackground : style.BoxBackground, style.Font, entry.Name, rowLayout.LabelBounds);
-                DrawBox(style.BoxBackground, style.Font, entry.CurrentValueAsString, rowLayout.ValueBounds);
+                DrawBox(isFocused: focusedEntry == entry, rowLayout.LabelBounds, entry.Name, theme); // label part
 
-                // Dropdown box is rendered here, only if it is contained in focusedEntry
-                // its options are drawn in RenderDropdown(), since only one Dropdown can be
-                // open at a time
-                if (focusedEntry == entry && entry.HasDropdownOptions)
+                // value part, if text box was placed in this row
+                if (valueTextBox != null && rowLayout.ValueBounds == valueTextBox.Bounds)
                 {
-                    DrawHelper.Batch.Draw(style.DropdownButtonTexture, rowLayout.DropdownButtonBounds, Color.White);
-                }
-
-                index++;
-            }
-        }
-
-        private static void DrawBox(Texture2D background, SpriteFont font, string boxValue, Rectangle boxBounds)
-        {
-            DrawHelper.Batch.Draw(background, boxBounds, Color.White);
-            DrawHelper.Batch.DrawString(font, boxValue, boxBounds.Location.ToVector2(), Color.White);
-        }
-
-        public void RenderDropdown(OptionDropdown optionDropdown)
-        {
-            PropertyScreenStyle style = _styleProvider.Style;
-            foreach ((string option, Rectangle bounds) in optionDropdown.OptionBounds)
-            {
-                DrawBox(style.DropdownOptionBackground, style.Font, option, bounds);
-            }
-        }
-
-        public void RenderWithTextBox(IPropertyCollection collection, IPropertyEntry focusedEntry, ValueTextBox valueTextBox)
-        {
-            PropertyScreenStyle style = _styleProvider.Style;
-            Rectangle textBoxBounds = valueTextBox.Bounds;
-
-            DrawHelper.Batch.Draw(style.ScreenBackground, _layoutCalculator.ScreenBounds, Color.White);
-
-            int index = 0;
-            foreach (var entry in collection.Properties)
-            {
-                PropertyRowLayout rowLayout = _layoutCalculator.GetRowLayout(entry, index);
-
-                DrawBox(focusedEntry == entry ? style.FocusedBoxBackground : style.BoxBackground, style.Font, entry.Name, rowLayout.LabelBounds);
-
-                if (rowLayout.ValueBounds == textBoxBounds)
-                {
-                    DrawHelper.Batch.Draw(style.BoxBackground, rowLayout.ValueBounds, Color.White);
+                    DrawHelper.DrawBackground(rowLayout.ValueBounds, theme.GetColor(PropertiesScreenStyles.BoxColor));
                     valueTextBox.Render();
                 }
                 else
-                    DrawBox(style.BoxBackground, style.Font, entry.CurrentValueAsString, rowLayout.ValueBounds);
+                {
+                    DrawBox(isFocused: false, rowLayout.ValueBounds, entry.CurrentValueAsString, theme);
+                }
 
                 // Dropdown box is rendered here, only if it is contained in focusedEntry
                 // its options are drawn in RenderDropdown(), since only one Dropdown can be
                 // open at a time
                 if (focusedEntry == entry && entry.HasDropdownOptions)
                 {
-                    DrawHelper.Batch.Draw(style.DropdownButtonTexture, rowLayout.DropdownButtonBounds, Color.White);
+                    DrawHelper.DrawBorderedBackground(rowLayout.DropdownButtonBounds,
+                                                      theme.GetColor(PropertiesScreenStyles.BorderAccent), theme.GetColor(PropertiesScreenStyles.Background), 1f);
+                    DrawHelper.Batch.Draw(theme.GetIcon(PropertiesScreenStyles.DropdownBoxButton), rowLayout.DropdownButtonBounds, Color.White);
                 }
 
                 index++;
             }
+        }
+
+        public void RenderDropdownOptions(OptionDropdown optionDropdown)
+        {
+            ResolvedTheme theme = ThemeService.CurrentTheme;
+            DrawHelper.DrawBorderedBackground(_layoutCalculator.GetDropdownMenuBounds(optionDropdown),
+                                              theme.GetColor(PropertiesScreenStyles.Border), theme.GetColor(PropertiesScreenStyles.Background), 1);
+            
+            foreach ((string option, Rectangle bounds) in optionDropdown.OptionBounds)
+            {
+                FontProvider.DrawText(PropertiesLayoutCalculator.TextSize, isBold: false, option,
+                                      bounds.Location.ToVector2(), theme.GetColor(PropertiesScreenStyles.TextColor));
+            }
+        }
+
+        private static void DrawBox(bool isFocused, Rectangle boxBounds, string boxValue, ResolvedTheme theme)
+        {
+            DrawHelper.DrawBackground(boxBounds, isFocused ? theme.GetColor(PropertiesScreenStyles.FocusedBoxColor)
+                                                           : theme.GetColor(PropertiesScreenStyles.BoxColor));
+
+            int yPadding = (boxBounds.Height - FontProvider.GetLineSpacing(PropertiesLayoutCalculator.TextSize, false)) / 2;
+            FontProvider.DrawText(PropertiesLayoutCalculator.TextSize, isBold: false,
+                                  boxValue, new Vector2(boxBounds.Location.X, boxBounds.Location.Y + yPadding),  theme.GetColor(PropertiesScreenStyles.TextColor));
         }
     }
 }

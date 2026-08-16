@@ -31,7 +31,8 @@ namespace NoteKeeper.Shell.PropertyExplorer
 
         public void Render()
         {
-            lastResult.Render(PopUpUI.Surface.BatchDrawOptions.Default, Bounds.Location.ToVector2(), null, 1f);
+            int yPadding = (Bounds.Height - FontProvider.GetLineSpacing(PropertiesLayoutCalculator.TextSize, false)) / 2;
+            lastResult.Render(PopUpUI.Surface.BatchDrawOptions.Default, new Vector2(Bounds.X, Bounds.Y + yPadding), null, 1f);
         }
 
         public void SetText(string value)

@@ -59,16 +59,16 @@ namespace NoteKeeper.Shell.PropertyExplorer
 
             if (_state == ScreenState.Idle)
             {
-                renderer.Render(_shownCollection, _focusedEntry);
+                renderer.Render(_shownCollection, _focusedEntry, valueTextBox: null);
             }
             else if (_state == ScreenState.EditingTextBoxValue)
             {
-                renderer.RenderWithTextBox(_shownCollection, _focusedEntry, _valueTextBox);
+                renderer.Render(_shownCollection, _focusedEntry, _valueTextBox);
             }
             else if (_state == ScreenState.PickingDropdownOption)
             {
-                renderer.Render(_shownCollection, _focusedEntry);
-                renderer.RenderDropdown(_optionDropdown);
+                renderer.Render(_shownCollection, _focusedEntry, valueTextBox: null);
+                renderer.RenderDropdownOptions(_optionDropdown);
             }
         }
 
