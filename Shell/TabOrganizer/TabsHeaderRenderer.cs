@@ -53,7 +53,7 @@ namespace NoteKeeper.Shell.TabOrganizer
             ResolvedTheme theme = ThemeService.CurrentTheme;
             Rectangle tabListMenuBounds = _layoutCalculator.GetTabListMenuBounds(displayedTabIndex);
 
-            DrawHelper.DrawBackground(tabListMenuBounds, theme.GetColor(TabsHeaderStyles.Surface));
+            DrawHelper.DrawBorderedBackground(tabListMenuBounds, theme.GetColor(TabsHeaderStyles.BorderAccent), theme.GetColor(TabsHeaderStyles.Surface), 1);
             DrawHelper.DrawBackground(_layoutCalculator.TabListButtonBounds, theme.GetColor(TabsHeaderStyles.HoverOverlay));
 
             int hoveredTabIndex = activeTabs.IndexOf(button.HoveredTab!);
