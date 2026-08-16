@@ -1,26 +1,25 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NoteKeeper.InspectionWindow;
+using NoteKeeper.Shell.Styling;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace NoteKeeper.Shell.TabOrganizer
 {
     internal class TabsHeaderLayoutCalculator
     {
+        public const int TextSize = 12;
+
         private const int BoxHorizontalMargin = 2;
         private int CloseButtonLength => ScreenBounds.Height;
 
-        private readonly TabsHeaderStyleProvider _styleProvider;
         private readonly TabCollection _activeTabs;
 
         public Rectangle ScreenBounds { get; set; }
         public Rectangle TabListButtonBounds => new Rectangle(ScreenBounds.Right - CloseButtonLength, ScreenBounds.Y, CloseButtonLength, CloseButtonLength);
 
-        public TabsHeaderLayoutCalculator(TabsHeaderStyleProvider styleProvider, TabCollection activeTabs)
+        public TabsHeaderLayoutCalculator(TabCollection activeTabs)
         {
-            _styleProvider = styleProvider;
             _activeTabs = activeTabs;
         }
 
@@ -59,7 +58,7 @@ namespace NoteKeeper.Shell.TabOrganizer
                 maxWidth = Math.Max(maxWidth, GetWidth(_activeTabs[i], displayedTabIndex == i));
             }
 
-            Point size = new Point(maxWidth, CloseButtonLength);
+            Point size = new Point(maxWidth, _activeTabs.Count * CloseButtonLength);
             Point location = new Point(TabListButtonBounds.Right - maxWidth, TabListButtonBounds.Bottom);
 
             return new Rectangle(location, size);
@@ -78,17 +77,14 @@ namespace NoteKeeper.Shell.TabOrganizer
 
         private Point GetNameOffset(bool isDisplayed)
         {
-            int lineSpacing = isDisplayed ? _styleProvider.Style.DisplayedTabFont.LineSpacing : _styleProvider.Style.DefaultFont.LineSpacing;
-            return new Point(BoxHorizontalMargin, (ScreenBounds.Height - lineSpacing) / 2);
+            return new Point(BoxHorizontalMargin, (ScreenBounds.Height - FontProvider.GetLineSpacing(TextSize, isDisplayed)) / 2);
         }
 
         private int GetWidth(Tab tab, bool isDisplayed)
         {
-            TabsHeaderStyle style = _styleProvider.Style;
-            SpriteFont fontToUse = isDisplayed ? style.DisplayedTabFont : style.DefaultFont;
+            int unmodifiedWidth = BoxHorizontalMargin * 2 + (int)FontProvider.MeasureWidth(TextSize, isBold: isDisplayed, tab.Name) + CloseButtonLength;
 
-            return (int)(BoxHorizontalMargin * 2 + fontToUse.MeasureString(tab.Name).X + (tab.TabHistory.IsModified ? fontToUse.MeasureString("*").X : 0)
-                       + CloseButtonLength);
+            return unmodifiedWidth + (tab.TabHistory.IsModified ? (int)FontProvider.MeasureWidth(TextSize, isBold: isDisplayed, "*") : 0);
         }
     }
 }

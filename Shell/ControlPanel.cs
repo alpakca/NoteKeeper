@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using NoteKeeper.Shell.ContextMenus;
 using NoteKeeper.Shell.ChildWindow;
 using System;
+using NoteKeeper.Shell.Styling;
 
 #nullable enable
 
@@ -37,6 +38,9 @@ namespace NoteKeeper.Shell
 
             closeTabsWindow = new CloseTabsWindow();
             closeTabsWindow.WindowClosed += CloseTabsWindow_WindowClosed;
+
+            ThemeService.Refresh();
+            ThemeService.SetTheme("dark");
 
             panelWindow = new PanelWindow(this) { Boundaries = new Rectangle(new Point(), WindowOptions.Size) };
             buttonPlate = new ButtonPlate(this);

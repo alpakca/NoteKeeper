@@ -5,6 +5,10 @@ namespace NoteKeeper
 {
     public class Program
     {
+        private const string RootPathFileRelativePath = "RootPath.txt";
+
+        public static string RootPath { get; private set; }
+
         public static void Main(string[] args)
         {
             AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
@@ -26,6 +30,11 @@ namespace NoteKeeper
                 return;
             }
 
+#if DEBUG
+            RootPath = File.ReadAllText(@"C:\Users\user\Desktop\C#\NoteKeeper\NoteKeeper\bin\Release\net10.0\" + RootPathFileRelativePath);
+#else
+            RootPath = File.ReadAllText(AppContext.BaseDirectory + RootPathFileRelativePath);
+#endif
             game.Run();
         }
     }

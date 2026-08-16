@@ -1,9 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using NoteKeeper.InspectionWindow;
+using NoteKeeper.Shell.Styling;
 using PopUpUI.Toolkit;
-using System;
-using System.Collections.Generic;
 
 #nullable enable
 
@@ -11,20 +9,19 @@ namespace NoteKeeper.Shell.TabOrganizer
 {
     internal class TabsHeaderRenderer
     {
-        private readonly TabsHeaderStyleProvider _styleProvider;
         private readonly TabsHeaderLayoutCalculator _layoutCalculator;
 
-        public TabsHeaderRenderer(TabsHeaderStyleProvider styleProvider, TabsHeaderLayoutCalculator layoutCalculator)
+        public TabsHeaderRenderer(TabsHeaderLayoutCalculator layoutCalculator)
         {
-            _styleProvider = styleProvider;
             _layoutCalculator = layoutCalculator;
         }
 
         public void Render(TabCollection activeTabs, int displayedTabIndex, int hoveredTabIndex)
         {
-            TabsHeaderStyle style = _styleProvider.Style;
-            DrawHelper.Batch.Draw(style.HeaderBackground, _layoutCalculator.ScreenBounds, Color.White);
-            DrawHelper.Batch.Draw(style.TabListButtonIcon, _layoutCalculator.TabListButtonBounds, Color.White);
+            ResolvedTheme theme = ThemeService.CurrentTheme;
+
+            DrawHelper.DrawBackground(_layoutCalculator.ScreenBounds, theme.GetColor(TabsHeaderStyles.Surface));
+            DrawHelper.Batch.Draw(theme.GetIcon(TabsHeaderStyles.TabListButton), _layoutCalculator.TabListButtonBounds, Color.White);
 
             for (int i = 0; i < activeTabs.Count; i++)
             {
@@ -34,67 +31,80 @@ namespace NoteKeeper.Shell.TabOrganizer
                     break;
                 }
 
-                Texture2D background = i == displayedTabIndex ? style.DisplayedTabBackground
-                                                              : i == hoveredTabIndex ? style.TabHoveredBackground
-                                                                                     : style.TabDefaultBackground;
-
-                SpriteFont font = i == displayedTabIndex ? style.DisplayedTabFont : style.DefaultFont;
-                Texture2D? closeButtonTexture = i != displayedTabIndex && i != hoveredTabIndex ? null : style.TabCloseButtonIcon;
-
-                DrawTabBox(activeTabs[i], layout, background, font, closeButtonTexture);
+                if (i == displayedTabIndex)
+                {
+                    DrawDisplayedTabBox(activeTabs[i], layout, theme);
+                }
+                else
+                {
+                    DrawDefaultTabBox(activeTabs[i], layout, theme, isHovered: i == hoveredTabIndex);
+                }
             }
         }
 
         public void DrawHoveredButtonOverlay(Rectangle hoveredButtonBounds, bool isButtonHeld)
         {
-            TabsHeaderStyle style = _styleProvider.Style;
-
-            DrawHelper.Batch.Draw(isButtonHeld ? style.ButtonHeldOverlay : style.ButtonHoverOverlay, hoveredButtonBounds, Color.White);
+            DrawHelper.DrawBackground(hoveredButtonBounds, ThemeService.CurrentTheme.GetColor(isButtonHeld ? TabsHeaderStyles.HeldOverlay
+                                                                                                           : TabsHeaderStyles.HoverOverlay));
         }
 
         public void DrawTabList(TabCollection activeTabs, TabListButton button, int displayedTabIndex)
         {
-            TabsHeaderStyle style = _styleProvider.Style;
+            ResolvedTheme theme = ThemeService.CurrentTheme;
             Rectangle tabListMenuBounds = _layoutCalculator.GetTabListMenuBounds(displayedTabIndex);
 
-            DrawHelper.Batch.Draw(style.HeaderBackground, tabListMenuBounds, Color.White);
-            DrawHelper.Batch.Draw(style.ButtonHoverOverlay, _layoutCalculator.TabListButtonBounds, Color.White);
+            DrawHelper.DrawBackground(tabListMenuBounds, theme.GetColor(TabsHeaderStyles.Surface));
+            DrawHelper.DrawBackground(_layoutCalculator.TabListButtonBounds, theme.GetColor(TabsHeaderStyles.HoverOverlay));
 
             int hoveredTabIndex = activeTabs.IndexOf(button.HoveredTab!);
             for (int i = 0; i < activeTabs.Count; i++)
             {
                 TabLayout optionLayout = _layoutCalculator.GetTabListOptionLayout(tabListMenuBounds, i, displayedTabIndex);
+                DrawDefaultTabBox(activeTabs[i], optionLayout, theme, i == hoveredTabIndex);
 
-                Texture2D background = i == displayedTabIndex ? style.DisplayedTabBackground
-                                              : i == hoveredTabIndex ? style.TabHoveredBackground
-                                                                     : style.TabDefaultBackground;
-
-                SpriteFont font = i == displayedTabIndex ? style.DisplayedTabFont : style.DefaultFont;
-                Texture2D? closeButtonTexture = i != displayedTabIndex && i != hoveredTabIndex ? null : style.TabCloseButtonIcon;
-
-                DrawTabBox(activeTabs[i], optionLayout, background, font, closeButtonTexture);
+                // displayed tab's close button always gets rendered
+                if (i == displayedTabIndex)
+                {
+                    DrawHelper.Batch.Draw(theme.GetIcon(TabsHeaderStyles.CloseButton), optionLayout.CloseButtonBounds, Color.White);
+                }
 
                 if (i == hoveredTabIndex)
                 {
-                    DrawHelper.Batch.Draw(button.HoveredTabIsHeld ? style.ButtonHeldOverlay : style.ButtonHoverOverlay, optionLayout.BoxBounds, Color.White);
+                    DrawHoveredButtonOverlay(optionLayout.BoxBounds, button.HoveredTabIsHeld);
 
                     if (button.CloseButtonHovered)
                     {
-                        DrawHelper.Batch.Draw(button.CloseButtonHeld ? style.ButtonHeldOverlay : style.ButtonHoverOverlay, optionLayout.CloseButtonBounds, Color.White);
+                        DrawHoveredButtonOverlay(optionLayout.CloseButtonBounds, button.CloseButtonHeld);
                     }
                 }
             }
         }
 
-        private static void DrawTabBox(Tab tab, TabLayout layout, Texture2D background, SpriteFont font, Texture2D? closeButtonTexture)
+        private static void DrawDisplayedTabBox(Tab tab, TabLayout layout, ResolvedTheme theme)
         {
-            DrawHelper.Batch.Draw(background, layout.BoxBounds, Color.White);
-            DrawHelper.Batch.DrawString(font, (tab.TabHistory.IsModified ? tab.Name + "*" : tab.Name), 
-                                        (layout.BoxBounds.Location + layout.TextOffset).ToVector2(), Color.White);
+            DrawHelper.DrawBorderedBackground(layout.BoxBounds, theme.GetColor(TabsHeaderStyles.Border), theme.GetColor(TabsHeaderStyles.Surface), 1);
 
-            if (closeButtonTexture != null)
+            FontProvider.DrawText(TabsHeaderLayoutCalculator.TextSize, isBold: true, 
+                                  (tab.TabHistory.IsModified ? tab.Name + "*" : tab.Name),
+                                  (layout.BoxBounds.Location + layout.TextOffset).ToVector2(), 
+                                  theme.GetColor(TabsHeaderStyles.TextColor));
+
+            // displayed tab's close button always gets rendered
+            DrawHelper.Batch.Draw(theme.GetIcon(TabsHeaderStyles.CloseButton), layout.CloseButtonBounds, Color.White);
+        }
+
+        private static void DrawDefaultTabBox(Tab tab, TabLayout layout, ResolvedTheme theme, bool isHovered)
+        {
+            FontProvider.DrawText(TabsHeaderLayoutCalculator.TextSize, isBold: false,
+                                  (tab.TabHistory.IsModified ? tab.Name + "*" : tab.Name),
+                                  (layout.BoxBounds.Location + layout.TextOffset).ToVector2(),
+                                  theme.GetColor(TabsHeaderStyles.TextColor));
+
+            if (isHovered)
             {
-                DrawHelper.Batch.Draw(closeButtonTexture, layout.CloseButtonBounds, Color.White);
+                DrawHelper.DrawBackground(layout.BoxBounds, theme.GetColor(TabsHeaderStyles.HoverOverlay));
+                // close button on default tabs only get renderer if hovered
+                DrawHelper.Batch.Draw(theme.GetIcon(TabsHeaderStyles.CloseButton), layout.CloseButtonBounds, Color.White);
             }
         }
     }

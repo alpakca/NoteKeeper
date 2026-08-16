@@ -22,7 +22,6 @@ namespace NoteKeeper.Shell.TabOrganizer
 
         private Rectangle _hoveredButtonBounds;
 
-        public TabsHeaderStyleProvider StyleProvider { get; }
         public Rectangle ScreenBounds
         {
             get => layoutCalculator.ScreenBounds;
@@ -42,10 +41,9 @@ namespace NoteKeeper.Shell.TabOrganizer
         public TabOrganizeManager(TabCollection activeTabs)
         {
             _activeTabs = activeTabs;
-            StyleProvider = new TabsHeaderStyleProvider();
 
-            layoutCalculator = new TabsHeaderLayoutCalculator(StyleProvider, activeTabs);
-            renderer = new TabsHeaderRenderer(StyleProvider, layoutCalculator);
+            layoutCalculator = new TabsHeaderLayoutCalculator(activeTabs);
+            renderer = new TabsHeaderRenderer(layoutCalculator);
             tabList = new TabListButton(activeTabs, layoutCalculator);
         }
 

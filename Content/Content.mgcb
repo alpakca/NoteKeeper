@@ -13,24 +13,45 @@
 
 #---------------------------------- Content ---------------------------------#
 
-#begin ComicSans_12.spritefont
+#begin ../assets/fonts/ComicSans_12.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
-/build:ComicSans_12.spritefont
+/build:../assets/fonts/ComicSans_12.spritefont;ComicSans_12.spritefont
 
-#begin ComicSans_16.spritefont
+#begin ../assets/fonts/ComicSans_16.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
-/build:ComicSans_16.spritefont
+/build:../assets/fonts/ComicSans_16.spritefont;ComicSans_16.spritefont
 
-#begin ComicSans_24.spritefont
+#begin ../assets/fonts/ComicSans_24.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
 /processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Color
-/build:ComicSans_24.spritefont
+/processorParam:TextureFormat=Compressed
+/build:../assets/fonts/ComicSans_24.spritefont;ComicSans_24.spritefont
+
+#begin ../assets/fonts/ComicSans_Bold_12.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:../assets/fonts/ComicSans_Bold_12.spritefont;ComicSans_Bold_12.spritefont
+
+#begin ../assets/fonts/ComicSans_Bold_16.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:../assets/fonts/ComicSans_Bold_16.spritefont;ComicSans_Bold_16.spritefont
+
+#begin ../assets/fonts/ComicSans_Bold_24.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:../assets/fonts/ComicSans_Bold_24.spritefont;ComicSans_Bold_24.spritefont
 

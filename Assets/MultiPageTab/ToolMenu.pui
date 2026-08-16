@@ -1,4 +1,4 @@
-﻿#define Path FolderPath = "C:\Users\user\Desktop\C#\NoteKeeper\NoteKeeper\Assets\MultiPageTab\";
+﻿#define Path FolderPath = "C:\Users\user\Desktop\C#\NoteKeeper\NoteKeeper\assets\multiPageTab\";
 
 ToggleToolButton Transforming_Mode
 {

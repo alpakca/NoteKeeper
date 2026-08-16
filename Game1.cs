@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using NoteKeeper.InspectionWindow;
 using NoteKeeper.Project;
 using NoteKeeper.Shell;
+using NoteKeeper.Shell.Styling;
 using PopUpUI.Toolkit;
 using System;
 using System.Collections.Concurrent;
@@ -58,8 +59,11 @@ namespace NoteKeeper
             ContentAssistant.LoadWithContentManager<SpriteFont>(("ComicSans_16", "Font_ComicSans_12"));
             ContentAssistant.LoadWithContentManager<SpriteFont>(("ComicSans_16", "Font_ComicSans_16"));
             ContentAssistant.LoadWithContentManager<SpriteFont>(("ComicSans_24", "Font_ComicSans_24"));
+            ContentAssistant.LoadWithContentManager<SpriteFont>(("ComicSans_Bold_16", "Font_ComicSans_Bold_12"));
+            ContentAssistant.LoadWithContentManager<SpriteFont>(("ComicSans_Bold_16", "Font_ComicSans_Bold_16"));
+            ContentAssistant.LoadWithContentManager<SpriteFont>(("ComicSans_Bold_24", "Font_ComicSans_Bold_24"));
 
-            string shellAssetsPath = @"C:\Users\user\Desktop\C#\NoteKeeper\NoteKeeper\Assets";
+            string shellAssetsPath = @"C:\Users\user\Desktop\C#\NoteKeeper\NoteKeeper\assets";
             ContentAssistant.LoadTexture2Ds(
                 Directory.EnumerateFiles(shellAssetsPath, "*.png", SearchOption.AllDirectories)
                 .Where(path => Path.GetExtension(path) != ".pui")
@@ -100,7 +104,7 @@ namespace NoteKeeper
             DrawCallRenderer.DrawUpdate();
 
             GraphicsDevice.SetRenderTarget(null);
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(ThemeService.CurrentTheme.GetColor(ColorRegistry.BackgroundId));
 
             _spriteBatch.Begin();
 
