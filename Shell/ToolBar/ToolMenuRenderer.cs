@@ -13,7 +13,7 @@ namespace NoteKeeper.Shell.ToolBar
             _layoutCalculator = layoutCalculator;
         }
 
-        public void Render(IToolMenu menu, IToolButton hoveredButton, IToolButton closeButton, bool isHeld)
+        public void Render(IToolMenu menu)
         {
             int currentRow = 0;
             int currentColumn = 0;
