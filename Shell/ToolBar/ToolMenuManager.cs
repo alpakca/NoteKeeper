@@ -61,8 +61,7 @@ namespace NoteKeeper.Shell.ToolBar
             if (_shownMenu == null)
                 return;
 
-            renderer.Render(_shownMenu);
-            renderer.DrawHoveredButtonOverlay(_hoveredButton, _hoveredButtonBounds, _isHoveredButtonHeld);
+            renderer.Render(_shownMenu, _hoveredButton, _isHoveredButtonHeld);
         }
 
         public void MousePositionChangeUpdate(PopWindowMouseEventArgs e)
@@ -87,10 +86,14 @@ namespace NoteKeeper.Shell.ToolBar
             {
                 _isHoveredButtonHeld = true;
             }
-            else if (_hoveredButton != null && _isHoveredButtonHeld && e.ReleasedButtons.HasLeft)
+            else if (e.ReleasedButtons.HasLeft)
             {
+                if (_hoveredButton != null && _isHoveredButtonHeld)
+                {
+                    _hoveredButton.Selected();
+                }
+
                 _isHoveredButtonHeld = false;
-                _hoveredButton.Selected();
             }
             
             // if they there any buttons (including close button) that is hovered, don't let movement of menu
