@@ -16,6 +16,7 @@ namespace NoteKeeper.Shell
     {
         private Tab? displayedTab;
         private bool exitAppWasRequested = false;
+        private Rectangle clientBounds;
 
         private readonly PanelWindow panelWindow;
         private readonly CloseTabsWindow closeTabsWindow;
@@ -79,14 +80,19 @@ namespace NoteKeeper.Shell
         }
 
         /// <summary>Rearranges heights of TabGroup, ButtonPlate and DisplayedTab; by chaning DisplayedTab's height and keeping others minimum.</summary>
-        public void RearrangeUISizes()
+        public void RearrangeUISizes(Rectangle newBounds)
         {
+            panelWindow.ClientBoundsUpdated(newBounds);
+
             if (displayedTab != null)
             {
+                // set scrollers position
                 Point uiSize = new Point(WindowOptions.Width - 40, 700);
                 displayedTab.TabViewport.UISize = uiSize;
                 displayedTab.Window.Boundaries = new Rectangle(20, 200, uiSize.X, uiSize.Y);
             }
+
+            clientBounds = newBounds;
         }
 
         public void DisplayTab(Tab? tab)
@@ -112,8 +118,7 @@ namespace NoteKeeper.Shell
             }
 
             displayedTab = tab;
-            RearrangeUISizes();
-
+            RearrangeUISizes(clientBounds);
             foreach (var receiver in tabUpdateReceivers)
             {
                 receiver.DisplayedTabChanged(tab);

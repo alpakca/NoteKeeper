@@ -73,6 +73,9 @@ namespace NoteKeeper
 
             panel = new ControlPanel();
             panel.ExitApp += Exit;
+
+            panel.RearrangeUISizes(this.Window.ClientBounds);
+            this.Window.ClientSizeChanged += (sender, _) => panel.RearrangeUISizes(((GameWindow)sender).ClientBounds);
         }
 
         protected override void OnExiting(object sender, ExitingEventArgs args)

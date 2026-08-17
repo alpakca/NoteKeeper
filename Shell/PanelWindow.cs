@@ -4,13 +4,13 @@ using Microsoft.Xna.Framework.Input;
 using NoteKeeper.InspectionWindow;
 using NoteKeeper.Shell.ContextMenus;
 using NoteKeeper.Shell.PropertyExplorer;
+using NoteKeeper.Shell.Styling;
 using NoteKeeper.Shell.TabOrganizer;
 using NoteKeeper.Shell.ToolBar;
 using NoteKeeper.Shell.UndoRedo;
 using PopUpUI.Input;
 using PopUpUI.Surface;
 using PopUpUI.Toolkit;
-using System;
 using System.Collections.Generic;
 
 #nullable enable
@@ -20,6 +20,7 @@ namespace NoteKeeper.Shell
     internal class PanelWindow : PopWindow, ITabUpdateReceiver
     {
         private Tab? displayedTab;
+        private Rectangle buttonsPanelBounds;
 
         private readonly ControlPanel panel;
         private readonly ContextMenuManager contextMenuManager;
@@ -28,7 +29,7 @@ namespace NoteKeeper.Shell
         private readonly PropertyExplorerManager propertiesScreen;
         private readonly HistoryActionsManager historyActionsManager;
         private readonly KeyboardShortcutManager shortcutManager;
-        private readonly UIButtonEventService buttonService;
+        private readonly UIService uiService;
 
         public PanelWindow(ControlPanel panel) : base(new BatchDrawOptions { BlendState = BlendState.AlphaBlend })
         {
@@ -36,40 +37,40 @@ namespace NoteKeeper.Shell
 
             contextMenuManager = new ContextMenuManager();
             toolMenuManager = new ToolMenuManager() { ScreenLocation = new Point(60, 240) };
-            tabOrganizeManager = new TabOrganizeManager(panel.ActiveTabs) { ScreenBounds = new Rectangle(20, 168, 1880, 32) };
+            tabOrganizeManager = new TabOrganizeManager(panel.ActiveTabs);
             propertiesScreen = new PropertyExplorerManager() { ScreenBounds = new Rectangle(1600, 168, 300, 800) };
             historyActionsManager = new HistoryActionsManager();
 
             shortcutManager = new KeyboardShortcutManager();
             InitializeShortcuts();
 
-            buttonService = new UIButtonEventService();
-            buttonService.UndoRequested += () => displayedTab?.TabHistory.Undo();
-            buttonService.RedoRequested += () => displayedTab?.TabHistory.Redo();
-            buttonService.HistoryUndoDescriptionRequested += screenLocation =>
+            uiService = new UIService();
+            uiService.UndoRequested += () => displayedTab?.TabHistory.Undo();
+            uiService.RedoRequested += () => displayedTab?.TabHistory.Redo();
+            uiService.HistoryUndoDescriptionRequested += screenLocation =>
             {
                 if (displayedTab != null)
                     historyActionsManager.Show(displayedTab.TabHistory.UndoableActions, screenLocation);
             };
-            buttonService.HistoryRedoDescriptionRequested += screenLocation =>
+            uiService.HistoryRedoDescriptionRequested += screenLocation =>
             {
                 if (displayedTab != null)
                     historyActionsManager.Show(displayedTab.TabHistory.RedoableActions, screenLocation);
             };
-            buttonService.SaveDisplayedTabRequested += () => displayedTab?.TabSerializer.Save();
-            buttonService.SaveAllTabsRequested += () =>
+            uiService.SaveDisplayedTabRequested += () => displayedTab?.TabSerializer.Save();
+            uiService.SaveAllTabsRequested += () =>
             {
                 foreach (var tab in panel.ActiveTabs)
                     tab.TabSerializer.Save();
             };
-            buttonService.ToolMenuVisibilityChangeRequested += SetToolMenuVisibility;
+            uiService.ToolMenuVisibilityChangeRequested += SetToolMenuVisibility;
 
             tabOrganizeManager.DisplayedTabChanged += panel.DisplayTab;
             historyActionsManager.ActionsReversed += HistoryActionsManager_ActionsReversed;
-            toolMenuManager.MenuVisibilityChanged += buttonService.SetToolMenuCheck;
+            toolMenuManager.MenuVisibilityChanged += uiService.SetToolMenuCheck;
 
             Elements.Add(shortcutManager);
-            Elements.AddRange(buttonService.Buttons);
+            Elements.AddRange(uiService.Buttons);
         }
 
         private void InitializeShortcuts()
@@ -87,7 +88,7 @@ namespace NoteKeeper.Shell
         {
             if (displayedTab != null)
             {
-                displayedTab.TabHistory.HistoryUpdated -= buttonService.DisplayedTabHistoryUpdated;
+                displayedTab.TabHistory.HistoryUpdated -= uiService.DisplayedTabHistoryUpdated;
                 displayedTab.PropertyScreenOpenRequested -= ShowPropertyExplorer;
             }
 
@@ -95,17 +96,37 @@ namespace NoteKeeper.Shell
 
             if (setTab != null)
             {
-                setTab.TabHistory.HistoryUpdated += buttonService.DisplayedTabHistoryUpdated;
+                setTab.TabHistory.HistoryUpdated += uiService.DisplayedTabHistoryUpdated;
                 setTab.PropertyScreenOpenRequested += ShowPropertyExplorer;
 
-                buttonService.DisplayedTabHistoryUpdated(setTab.TabHistory);
+                uiService.DisplayedTabHistoryUpdated(setTab.TabHistory);
             }
 
-            buttonService.DisplayedTabChanged(setTab);
+            uiService.DisplayedTabChanged(setTab);
             tabOrganizeManager.DisplayedTabUpdated(setTab);
 
             // switched the open tool menu with new tab's tool menu
             SetToolMenuVisibility(toolMenuManager.IsShown);
+        }
+
+        public void ClientBoundsUpdated(Rectangle newBounds)
+        {
+            // button positions
+            const int UIMargin = 10; // from first button's X: assets/shell/Buttons.pui
+            const int FrameThickness = 4;
+
+            const int ButtonLength = 32;
+            for (int i = 0; i < uiService.Buttons.Length; i++)
+            {
+                uiService.Buttons[i].Boundaries = new Rectangle(UIMargin + ButtonLength * i, UIMargin, ButtonLength, ButtonLength);
+            }
+
+            buttonsPanelBounds = new Rectangle(UIMargin - FrameThickness, UIMargin - FrameThickness, 
+                                               ButtonLength + 2 * FrameThickness, ButtonLength + 2 * FrameThickness);
+
+            // tabs header position
+            tabOrganizeManager.ScreenBounds = new Rectangle(buttonsPanelBounds.X, buttonsPanelBounds.Bottom + UIMargin,
+                                                            WindowOptions.Width - UIMargin * 2, ButtonLength);
         }
 
         private void ShowPropertyExplorer(IPropertyCollection collection)
@@ -156,10 +177,9 @@ namespace NoteKeeper.Shell
 
         protected override void RenderUpdate()
         {
-            base.RenderUpdate();
-
             DrawHelper.SetBeginBatch(WindowTexture, DrawOptions);
 
+            RenderUIButtons();
             toolMenuManager.Render();
 
             if (panel.ActiveTabs.Count != 0)
@@ -174,6 +194,21 @@ namespace NoteKeeper.Shell
             contextMenuManager.Render();
 
             DrawHelper.EndBatch();
+        }
+
+        private void RenderUIButtons()
+        {
+            ResolvedTheme theme = ThemeService.CurrentTheme;
+            DrawHelper.DrawBorderedBackground(buttonsPanelBounds, theme.GetColor(ColorRegistry.BorderAccentId), 
+                                              theme.GetColor(ColorRegistry.SurfaceId), 1);
+
+            foreach (var button in uiService.Buttons)
+            {
+                foreach (var drawInfo in button.GetDrawInfos())
+                {
+                    DrawHelper.Batch.Draw(drawInfo.GetTexture(), drawInfo.DestinationArea, drawInfo.Opacity * Color.White);
+                }
+            }
         }
 
         protected override void OnMouseButtonStateChange(PopWindowMouseEventArgs e)

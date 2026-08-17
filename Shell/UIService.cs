@@ -8,7 +8,7 @@ using System;
 
 namespace NoteKeeper.Shell
 {
-    internal class UIButtonEventService
+    internal class UIService
     {
         private readonly VisualClickable _undo;
         private readonly VisualClickable _redo;
@@ -31,7 +31,7 @@ namespace NoteKeeper.Shell
 
         public event Action<bool> ToolMenuVisibilityChangeRequested;
 
-        public UIButtonEventService()
+        public UIService()
         {
             PUIInterpreter interpreter = PUIHelper.GetInterpreter(PUIHelper.ShellAssetsFolderPath + "Buttons.pui");
             interpreter.ProcessTokens();
