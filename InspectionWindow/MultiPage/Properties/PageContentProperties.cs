@@ -2,11 +2,14 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using NoteKeeper.InspectionWindow.MultiPage.Components;
 
 namespace NoteKeeper.InspectionWindow.MultiPage.Properties
 {
     internal class PageContentProperties : IPropertyCollection
     {
+        private readonly PageActions _pageActions;
+
         private readonly IUnderlyingValueSetter[] _imageContentProperties;
         private readonly IUnderlyingValueSetter[] _textContentProperties;
         private readonly Dictionary<PropertyType, IUnderlyingValueSetter> _entries;
@@ -15,27 +18,48 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Properties
 
         public IPropertyEntry[] Properties { get; private set; }
 
-        public PageContentProperties()
+        public PageContentProperties(PageActions pageActions)
         {
-            IntegerPropertyEntry x = new IntegerPropertyEntry("X", v => _currentContent.SetLocation(new Point(v, _currentContent.Location.Y)));
-            IntegerPropertyEntry y = new IntegerPropertyEntry("Y", v => _currentContent.SetLocation(new Point(_currentContent.Location.X, v)));
-            IntegerPropertyEntry width = new IntegerPropertyEntry("Width", v => _currentContent.SetSize(new Point(v, _currentContent.Size.Y)));
-            IntegerPropertyEntry height = new IntegerPropertyEntry("Height", v => _currentContent.SetSize(new Point(_currentContent.Size.X, v)));
+            _pageActions = pageActions;
+
+            IntegerPropertyEntry x = new IntegerPropertyEntry("X", v =>
+            {
+                _pageActions.ChangeContentProperty(_currentContent.Location, new Point(v, _currentContent.Location.Y),
+                                                   _currentContent, (content, value) => content.SetLocation(value));
+            });
+            IntegerPropertyEntry y = new IntegerPropertyEntry("Y", v =>
+            {
+                _pageActions.ChangeContentProperty(_currentContent.Location, new Point(_currentContent.Location.X, v),
+                                                   _currentContent, (content, value) => content.SetLocation(value));
+            });
+            IntegerPropertyEntry width = new IntegerPropertyEntry("Width", v =>
+            {
+                _pageActions.ChangeContentProperty(_currentContent.Size, new Point(v, _currentContent.Size.Y),
+                                                   _currentContent, (content, value) => content.SetSize(value));
+            });
+            IntegerPropertyEntry height = new IntegerPropertyEntry("Height", v =>
+            {
+                _pageActions.ChangeContentProperty(_currentContent.Size, new Point(_currentContent.Size.X, v),
+                                                   _currentContent, (content, value) => content.SetSize(value));
+            });
 
             IntegerDropdownPropertyEntry fontSize = new IntegerDropdownPropertyEntry("Font Size", [16, 24], size =>
             {
                 PageTextContent textContent = (PageTextContent)_currentContent;
-                textContent.SetFont(textContent.FontName, size);
+                _pageActions.ChangeContentProperty(textContent.FontSize, size, textContent,
+                                                   (content, value) => content.SetFont(content.FontName, value));
             });
             StringDropdownPropertyEntry fontName = new StringDropdownPropertyEntry("Font Name", ["ComicSans"], name =>
             {
                 PageTextContent textContent = (PageTextContent)_currentContent;
-                textContent.SetFont("Font_" + name, textContent.FontSize);
+                _pageActions.ChangeContentProperty(textContent.FontName, name, textContent,
+                                                   (content, value) => content.SetFont(value, content.FontSize));
             });
             StringPropertyEntry text = new StringPropertyEntry("Text", textValue =>
             {
                 PageTextContent textContent = (PageTextContent)_currentContent;
-                textContent.Text = textValue;
+                _pageActions.ChangeContentProperty(textContent.Text, textValue, textContent,
+                                                   (content, value) => content.Text = value);
             });
 
             _entries = new Dictionary<PropertyType, IUnderlyingValueSetter>
@@ -61,7 +85,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Properties
             }
             else if (content is PageTextContent textContent)
             {
-                _entries[PropertyType.FontName].SetUnderlyingValue(textContent.FontName[5..]);
+                _entries[PropertyType.FontName].SetUnderlyingValue(textContent.FontName);
                 _entries[PropertyType.FontSize].SetUnderlyingValue(textContent.FontSize);
                 _entries[PropertyType.Text].SetUnderlyingValue(textContent.Text);
                 Properties = _textContentProperties;

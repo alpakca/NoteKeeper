@@ -51,7 +51,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage
             _fontSize = fontSize;
             _fontName = fontName;
 
-            processer.Font = ContentAssistant.FromLoaded<SpriteFont>(fontName + "_" + fontSize);
+            processer.Font = ContentAssistant.FromLoaded<SpriteFont>("Font_" + fontName + "_" + fontSize);
             lastResult = processer.GetParseResult();
         }
 

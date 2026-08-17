@@ -11,10 +11,12 @@ namespace NoteKeeper.Shell.PropertyExplorer
 
         public bool TryValidate(string input);
         public void SetValue(string input);
+        public bool IsCurrentValueEqual(string input);
 
         public bool HasDropdownOptions { get; }
 
         public IEnumerable<string> GetDropdownOptions();
         public void SetDropdownOptionValue(string option);
+        public bool IsCurrentDropdownOptionEqual(string option);
     }
 }

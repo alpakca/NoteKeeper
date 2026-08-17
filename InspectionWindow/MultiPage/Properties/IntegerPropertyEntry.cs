@@ -34,12 +34,22 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Properties
             return int.TryParse(input, out _);
         }
 
+        public bool IsCurrentValueEqual(string input)
+        {
+            return input == _value.ToString();
+        }
+
         public IEnumerable<string> GetDropdownOptions()
         {
             throw new NotSupportedException();
         }
 
         public void SetDropdownOptionValue(string option)
+        {
+            throw new NotSupportedException();
+        }
+
+        public bool IsCurrentDropdownOptionEqual(string option)
         {
             throw new NotSupportedException();
         }

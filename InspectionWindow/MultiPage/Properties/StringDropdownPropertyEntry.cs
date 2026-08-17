@@ -33,19 +33,29 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Properties
             _valueSetAction(_value);
         }
 
-        public IEnumerable<string> GetDropdownOptions()
-        {
-            return _options;
-        }
-
         public bool TryValidate(string input)
         {
             return _options.Contains(input);
         }
 
+        public bool IsCurrentValueEqual(string input)
+        {
+            return input == _value;
+        }
+
+        public IEnumerable<string> GetDropdownOptions()
+        {
+            return _options;
+        }
+
         public void SetDropdownOptionValue(string option)
         {
             SetValue(option);
+        }
+
+        public bool IsCurrentDropdownOptionEqual(string option)
+        {
+            return IsCurrentValueEqual(option);
         }
     }
 }

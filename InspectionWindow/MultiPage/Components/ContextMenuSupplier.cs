@@ -34,7 +34,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
             _notePages = notePages;
 
             _requestPropertyScreen = requestPropertyScreen;
-            _contentProperties = new PageContentProperties();
+            _contentProperties = new PageContentProperties(pageActions);
         }
 
         public ContextMenu? GetMenu(Point mousePosition)

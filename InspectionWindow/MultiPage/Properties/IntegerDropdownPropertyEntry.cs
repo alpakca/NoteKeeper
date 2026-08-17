@@ -38,6 +38,11 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Properties
             return _options.Contains(input) && int.TryParse(input, out _);
         }
 
+        public bool IsCurrentValueEqual(string input)
+        {
+            return input == _value.ToString();
+        }
+
         public IEnumerable<string> GetDropdownOptions()
         {
             return _options;
@@ -46,6 +51,11 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Properties
         public void SetDropdownOptionValue(string option)
         {
             SetValue(option);
+        }
+
+        public bool IsCurrentDropdownOptionEqual(string option)
+        {
+            return IsCurrentValueEqual(option);
         }
     }
 }

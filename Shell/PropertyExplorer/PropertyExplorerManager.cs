@@ -133,7 +133,8 @@ namespace NoteKeeper.Shell.PropertyExplorer
             }
             else if (_state == ScreenState.PickingDropdownOption)
             {
-                if (_optionDropdown.TrySelectOption(e.MousePosition, out string selectedOption))
+                if (_optionDropdown.TrySelectOption(e.MousePosition, out string selectedOption) && 
+                    !_focusedEntry.IsCurrentDropdownOptionEqual(selectedOption))
                 {
                     _focusedEntry.SetDropdownOptionValue(selectedOption);
                 }
@@ -175,7 +176,8 @@ namespace NoteKeeper.Shell.PropertyExplorer
 
         private void TrySetFocusedEntryValue()
         {
-            if (_focusedEntry.TryValidate(_valueTextBox.Text))
+            if (_focusedEntry.TryValidate(_valueTextBox.Text) &&
+                !_focusedEntry.IsCurrentValueEqual(_valueTextBox.Text))
             {
                 _focusedEntry.SetValue(_valueTextBox.Text);
             }
