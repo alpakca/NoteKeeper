@@ -42,7 +42,7 @@ namespace NoteKeeper.Shell.ToolBar
             IconRegistry.Register(new IconDefinition
             {
                 Id = CloseButton,
-                DefaultPath = @"shell\CloseButton.png"
+                FallbackIconId = IconRegistry.CloseButtonId
             });
         }
     }

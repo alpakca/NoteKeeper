@@ -24,7 +24,7 @@ namespace NoteKeeper.Shell.ChildWindow
                 }
             }
         }
-        public ITextProcesser Processer
+        public TextProcesser Processer
         {
             get;
             set

@@ -65,7 +65,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
                 Directory.CreateDirectory(directory);
                 renderer.SavePages(directory);
 
-                MessageWindow.Show($"Pages have saved to: {directory}");
+                MessageWindow.Show($"Pages have been saved to: {directory}");
             });
         }
 

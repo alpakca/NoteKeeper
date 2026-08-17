@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using NoteKeeper.InspectionWindow;
+using NoteKeeper.Shell.Styling;
 using PopUpUI.Input;
 using PopUpUI.Surface;
 using PopUpUI.Toolkit;
@@ -12,12 +13,15 @@ namespace NoteKeeper.Shell.ChildWindow
 {
     internal class CloseTabsWindow : PopWindow
     {
+        private const int HeaderTextSize = 24;
+        private const int TabNamesTextSize = 16;
+        private const int ButtonTextSize = 12;
+
         private IEnumerable<Tab> _tabs;
 
-        private readonly SpriteFont _topTextFont;
-        private readonly SpriteFont _tabNamesFont;
-
         private readonly List<WindowButton> _buttons;
+        private readonly WindowButton _closeButton;
+
         private WindowButton _hoveredButton;
         private bool _isButtonHeld;
 
@@ -26,9 +30,6 @@ namespace NoteKeeper.Shell.ChildWindow
 
         public CloseTabsWindow()
         {
-            _topTextFont = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans_24");
-            _tabNamesFont = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans_16");
-
             _buttons = [
             new WindowButton {
                 BackgroundColor = Color.Purple,
@@ -49,6 +50,13 @@ namespace NoteKeeper.Shell.ChildWindow
                 Text = "Cancel"
             }];
 
+            _closeButton = new WindowButton
+            {
+                BackgroundColor = Color.Transparent,
+                Bounds = new Rectangle(505, 0, 55, 38),
+                Result = CloseTabsResult.Canceled
+            };
+
             Point size = new Point(560, 400);
             Boundaries = new Rectangle((WindowOptions.Size - size) / 2, size);
         }
@@ -60,30 +68,38 @@ namespace NoteKeeper.Shell.ChildWindow
 
         protected override void RenderUpdate()
         {
+            ResolvedTheme theme = ThemeService.CurrentTheme;
             DrawHelper.SetBeginBatch(WindowTexture);
 
-            DrawHelper.DrawBackground(new Rectangle(new Point(), this.Boundaries.Size), Color.Black);
-            DrawHelper.Batch.DrawString(_topTextFont, "Save changes to following tabs?", new Vector2(10, 20), Color.White);
+            DrawHelper.DrawBorderedBackground(new Rectangle(default, Boundaries.Size),
+                                              theme.GetColor(ColorRegistry.BorderId), theme.GetColor(ColorRegistry.SurfaceId), 1);
+
+            DrawHelper.DrawTextureCenteralized(_closeButton.Bounds, theme.GetIcon(IconRegistry.CloseButtonId));
+
+            Color textColor = theme.GetColor(ColorRegistry.TextColorId);
+            FontProvider.DrawText(HeaderTextSize, isBold: false, "Save changes to following tabs?", new Vector2(10, 20), textColor);
 
             Vector2 currentOffset = new Vector2(40, 150);
             foreach (var tab in _tabs)
             {
-                DrawHelper.Batch.DrawString(_tabNamesFont, tab.Name + "*", currentOffset, Color.White);
-                currentOffset.Y += _tabNamesFont.LineSpacing;
+                FontProvider.DrawText(TabNamesTextSize, isBold: false, tab.Name + "*", currentOffset, textColor);
+                currentOffset.Y += FontProvider.GetLineSpacing(TabNamesTextSize, isBold: false);
             }
 
             foreach (var button in _buttons)
             {
                 DrawHelper.DrawBackground(button.Bounds, button.BackgroundColor);
 
-                Vector2 textSize = _tabNamesFont.MeasureString(button.Text);
+                Vector2 textSize = FontProvider.MeasureSize(ButtonTextSize, isBold: false, button.Text);
                 Vector2 textPosition = button.Bounds.Location.ToVector2() + (button.Bounds.Size.ToVector2() - textSize) / 2;
-                DrawHelper.Batch.DrawString(_tabNamesFont, button.Text, textPosition, Color.White);
+
+                FontProvider.DrawText(ButtonTextSize, isBold: false, button.Text, textPosition, textColor);
             }
 
             if (_hoveredButton != null)
             {
-                DrawHelper.DrawBackground(_hoveredButton.Bounds, _isButtonHeld ? Color.Gray * 0.5f : Color.LightGray * 0.7f);
+                DrawHelper.DrawBackground(_hoveredButton.Bounds, _isButtonHeld ? theme.GetColor(ColorRegistry.HeldOverlayId)
+                                                                               : theme.GetColor(ColorRegistry.HoverOverlayId));
             }
 
             DrawHelper.EndBatch();
@@ -111,6 +127,12 @@ namespace NoteKeeper.Shell.ChildWindow
                     _hoveredButton = button;
                     return;
                 }
+            }
+
+            if (_closeButton.Bounds.Contains(e.MousePosition))
+            {
+                _hoveredButton = _closeButton;
+                return;
             }
 
             _hoveredButton = null;

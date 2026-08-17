@@ -1,21 +1,26 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using NoteKeeper.Shell.Styling;
 using PopUpUI.Input;
 using PopUpUI.Surface;
 using PopUpUI.Text;
 using PopUpUI.Toolkit;
-using System;
 
 namespace NoteKeeper.Shell.ChildWindow
 {
     internal class MessageWindow : PopWindow
     {
+        private const int MessageTextSize = 12;
+        private const int ButtonTextSize = 12;
+
         private static readonly MessageWindow _window = new MessageWindow();
 
         private readonly TextPlaque _plaque;
         private readonly WindowButton _closeButton;
+        private readonly WindowButton _okButton;
 
+        private WindowButton _hoveredButton;
         private bool _buttonHeld;
 
         private MessageWindow()
@@ -23,22 +28,33 @@ namespace NoteKeeper.Shell.ChildWindow
             _plaque = new TextPlaque
             {
                 Location = new Point(20, 90),
-                Processer = new TextProcesser
-                {
-                    Font = ContentAssistant.FromLoaded<SpriteFont>("Font_ComicSans_16"),
-                    FirstRowOffset = 30
-                },
+                Processer = new TextProcesser { FirstRowOffset = 30 },
                 Width = 430
             };
 
+            FontUpdated();
+            FontProvider.FontChanged += FontUpdated;
+
             _closeButton = new WindowButton
             {
-                BackgroundColor = Color.Red,
-                Bounds = new Rectangle(450, 0, 50, 35)
+                BackgroundColor = Color.Transparent,
+                Bounds = new Rectangle(445, 0, 55, 38)
             };
 
-            Point size = new Point(500, 200);
+            _okButton = new WindowButton
+            {
+                BackgroundColor = Color.Gray,
+                Bounds = new Rectangle(320, 200, 160, 40),
+                Text = "Ok"
+            };
+
+            Point size = new Point(500, 250);
             this.Boundaries = new Rectangle((WindowOptions.Size - size) / 2, size);
+        }
+
+        private void FontUpdated()
+        {
+            FontProvider.UpdateProcesserFont(_plaque.Processer, MessageTextSize, isBold: false);
         }
 
         public static void Show(string message)
@@ -60,26 +76,67 @@ namespace NoteKeeper.Shell.ChildWindow
 
         protected override void RenderUpdate()
         {
+            ResolvedTheme theme = ThemeService.CurrentTheme;
             DrawHelper.SetBeginBatch(WindowTexture);
 
-            DrawHelper.DrawBackground(new Rectangle(default, this.Boundaries.Size), Color.SlateGray);
-            DrawHelper.DrawBackground(_closeButton.Bounds, _closeButton.BackgroundColor);
+            DrawHelper.DrawBorderedBackground(new Rectangle(default, Boundaries.Size), 
+                                              theme.GetColor(ColorRegistry.BorderId), theme.GetColor(ColorRegistry.SurfaceId), 1);
+
+            // close button
+            DrawHelper.DrawTextureCenteralized(_closeButton.Bounds, theme.GetIcon(IconRegistry.CloseButtonId));
+
+            // ok button
+            RenderButton(_okButton, theme);
+
+            if (_hoveredButton != null)
+            {
+                DrawHelper.DrawBackground(_hoveredButton.Bounds, _buttonHeld ? theme.GetColor(ColorRegistry.HeldOverlayId)
+                                                                             : theme.GetColor(ColorRegistry.HoverOverlayId));
+            }
 
             _plaque.Render();
 
             DrawHelper.EndBatch();
         }
 
+        private static void RenderButton(WindowButton button, ResolvedTheme theme)
+        {
+            DrawHelper.DrawBackground(button.Bounds, button.BackgroundColor);
+
+            Vector2 textSize = FontProvider.MeasureSize(ButtonTextSize, isBold: false, button.Text);
+            Vector2 textPosition = button.Bounds.Location.ToVector2() + (button.Bounds.Size.ToVector2() - textSize) / 2;
+
+            FontProvider.DrawText(ButtonTextSize, isBold: false, button.Text, textPosition, theme.GetColor(ColorRegistry.TextColorId));
+        }
+
         protected override void OnMouseButtonStateChange(PopWindowMouseEventArgs e)
         {
-            if (e.FirstTimeButtons.HasLeft && _closeButton.Bounds.Contains(e.MousePosition))
+            if (e.FirstTimeButtons.HasLeft && _hoveredButton.Bounds.Contains(e.MousePosition))
             {
                 _buttonHeld = true;
             }
-            else if (e.ReleasedButtons.HasLeft && _buttonHeld && _closeButton.Bounds.Contains(e.MousePosition))
+            else if (e.ReleasedButtons.HasLeft && _buttonHeld && _hoveredButton.Bounds.Contains(e.MousePosition))
             {
                 _buttonHeld = false;
+
+                // both buttons, close and ok, will close the window
                 CloseWindow();
+            }
+        }
+
+        protected override void OnMousePositionChange(PopWindowMouseEventArgs e)
+        {
+            if (_closeButton.Bounds.Contains(e.MousePosition))
+            {
+                _hoveredButton = _closeButton;
+            }
+            else if (_okButton.Bounds.Contains(e.MousePosition))
+            {
+                _hoveredButton = _okButton;
+            }
+            else
+            {
+                _hoveredButton = null;
             }
         }
 

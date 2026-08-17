@@ -65,7 +65,7 @@ namespace NoteKeeper.Shell.TabOrganizer
             IconRegistry.Register(new IconDefinition
             {
                 Id = CloseButton,
-                DefaultPath = @"shell\CloseButton.png"
+                FallbackIconId = IconRegistry.CloseButtonId
             });
 
             IconRegistry.Register(new IconDefinition

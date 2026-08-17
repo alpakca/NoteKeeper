@@ -36,6 +36,11 @@ namespace NoteKeeper.Shell.Styling
             return (isBold ? _loadedBoldFontSizes[size] : _loadedFontSizes[size]).MeasureString(text).X;
         }
 
+        public static Vector2 MeasureSize(int size, bool isBold, string text)
+        {
+            return (isBold ? _loadedBoldFontSizes[size] : _loadedFontSizes[size]).MeasureString(text);
+        }
+
         public static int GetLineSpacing(int size, bool isBold)
         {
             return isBold ? _loadedBoldFontSizes[size].LineSpacing : _loadedFontSizes[size].LineSpacing;
