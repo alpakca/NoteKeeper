@@ -4,6 +4,7 @@ using PopUpUI.Text;
 using PopUpUI.Toolkit;
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace NoteKeeper.Shell.Styling
 {
@@ -31,9 +32,20 @@ namespace NoteKeeper.Shell.Styling
                                         text, position, color);
         }
 
+        public static void DrawCenteredText(int size, bool isBold, string text, Rectangle boundaries, Color color)
+        {
+            Vector2 textSize = MeasureSize(size, isBold, text);
+            DrawText(size, isBold, text, new Vector2(boundaries.X + (boundaries.Width - textSize.X) / 2, boundaries.Y + (boundaries.Height - textSize.Y) / 2), color);
+        }
+
         public static float MeasureWidth(int size, bool isBold, string text)
         {
             return (isBold ? _loadedBoldFontSizes[size] : _loadedFontSizes[size]).MeasureString(text).X;
+        }
+
+        public static float MeasureWidth(int size, bool isBold, StringBuilder builder)
+        {
+            return (isBold ? _loadedBoldFontSizes[size] : _loadedFontSizes[size]).MeasureString(builder).X;
         }
 
         public static Vector2 MeasureSize(int size, bool isBold, string text)
@@ -49,6 +61,11 @@ namespace NoteKeeper.Shell.Styling
         public static void UpdateProcesserFont(TextProcesser processer, int size, bool isBold)
         {
             processer.Font = isBold ? _loadedBoldFontSizes[size] : _loadedFontSizes[size];
+        }
+
+        public static bool CanCharacterResolved(int size, bool isBold, char ch)
+        {
+            return (isBold ? _loadedBoldFontSizes[size] : _loadedFontSizes[size]).Characters.Contains(ch);
         }
     }
 }

@@ -73,6 +73,8 @@ namespace NoteKeeper
 
             panel.RearrangeUISizes(this.Window.ClientBounds);
             this.Window.ClientSizeChanged += (sender, _) => panel.RearrangeUISizes(((GameWindow)sender).ClientBounds);
+
+            NoteKeeper.Shell.ChildWindow.CreateTabFileWindow.Show();
         }
 
         protected override async void OnExiting(object sender, ExitingEventArgs args)
