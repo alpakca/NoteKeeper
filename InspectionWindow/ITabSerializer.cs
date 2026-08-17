@@ -6,7 +6,7 @@ namespace NoteKeeper.InspectionWindow
 {
     internal interface ITabSerializer
     {
-        public void Load();
-        public void Save();
+        public TabSerializationResult Load();
+        public TabSerializationResult Save();
     }
 }

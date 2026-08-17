@@ -111,11 +111,11 @@ namespace NoteKeeper.Shell.ChildWindow
 
         protected override void OnMouseButtonStateChange(PopWindowMouseEventArgs e)
         {
-            if (e.FirstTimeButtons.HasLeft && _hoveredButton.Bounds.Contains(e.MousePosition))
+            if (e.FirstTimeButtons.HasLeft && _hoveredButton != null && _hoveredButton.Bounds.Contains(e.MousePosition))
             {
                 _buttonHeld = true;
             }
-            else if (e.ReleasedButtons.HasLeft && _buttonHeld && _hoveredButton.Bounds.Contains(e.MousePosition))
+            else if (e.ReleasedButtons.HasLeft && _buttonHeld && _hoveredButton != null && _hoveredButton.Bounds.Contains(e.MousePosition))
             {
                 _buttonHeld = false;
 

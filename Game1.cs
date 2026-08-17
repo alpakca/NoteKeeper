@@ -138,7 +138,7 @@ namespace NoteKeeper
                 }
                 else
                 {
-                    Tab? created = TabRegistry.Create(result);
+                    Tab? created = TabService.Create(result);
                     if (created != null)
                     {
                         panel.ActiveTabs.Add(created);
@@ -150,10 +150,11 @@ namespace NoteKeeper
             if (toDisplay != null)
             {
                 panel.DisplayTab(toDisplay);
-
-                SDL_RestoreWindow(this.Window.Handle);
-                SDL_RaiseWindow(this.Window.Handle);
             }
+
+            // always show up the window even if file couldn't open, to show the message window
+            SDL_RestoreWindow(this.Window.Handle);
+            SDL_RaiseWindow(this.Window.Handle);
         }
     }
 

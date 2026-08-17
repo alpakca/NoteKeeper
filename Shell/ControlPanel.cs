@@ -7,6 +7,7 @@ using NoteKeeper.Shell.ContextMenus;
 using NoteKeeper.Shell.ChildWindow;
 using System;
 using NoteKeeper.Shell.Styling;
+using NoteKeeper.Project;
 
 #nullable enable
 
@@ -114,15 +115,14 @@ namespace NoteKeeper.Shell
                 return;
             }
 
+            IEnumerable<Tab> toRemoveTabs = closeTabsWindow.ClosingTabs;
             if (result == CloseTabsResult.Save)
             {
-                foreach (var tab in closeTabsWindow.ClosingTabs)
-                {
-                    tab.TabSerializer.Save();
-                }
+                // only remove tabs that are successfully saved
+                toRemoveTabs = TabService.SaveTabs(closeTabsWindow.ClosingTabs);
             }
 
-            ActiveTabs.RemoveTabs(closeTabsWindow.ClosingTabs);
+            ActiveTabs.RemoveTabs(toRemoveTabs);
             if (exitAppWasRequested)
             {
                 ExitApp?.Invoke();

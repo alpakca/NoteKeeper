@@ -1,9 +1,6 @@
 ﻿using NoteKeeper.InspectionWindow.MultiPage.Serialization;
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.Json;
 
 namespace NoteKeeper.InspectionWindow.MultiPage.Components
@@ -23,9 +20,31 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
             _tab = tab;
         }
 
-        public void Load()
+        public TabSerializationResult Load()
         {
-            TabInfo tabInfo = JsonSerializer.Deserialize<TabInfo>(File.ReadAllText(_tab.SourcePath), _options);
+            string json;
+            try
+            {
+                json = File.ReadAllText(_tab.SourcePath);
+            }
+            catch (FileNotFoundException)
+            {
+                return TabSerializationResult.FileNotFound;
+            }
+            catch (IOException)
+            {
+                return TabSerializationResult.IOError;
+            }
+
+            TabInfo tabInfo;
+            try
+            {
+                tabInfo = JsonSerializer.Deserialize<TabInfo>(json, _options);
+            }
+            catch (JsonException)
+            {
+                return TabSerializationResult.WrongFileFormat;
+            }
 
             _tab.NotePages.Clear();
             foreach (var pageInfo in tabInfo.NotePages) 
@@ -41,9 +60,11 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
             }
 
             _tab.TabHistory.MarkLoaded();
+
+            return TabSerializationResult.Success;
         }
 
-        public void Save()
+        public TabSerializationResult Save()
         {
             NotePageInfo[] pageInfos = new NotePageInfo[_tab.NotePages.Count];
             for (int i = 0; i < pageInfos.Length; i++)
@@ -60,9 +81,17 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
             };
 
             string json = JsonSerializer.Serialize(tabInfo, _options);
-            File.WriteAllText(_tab.SourcePath, json);
+            try
+            {
+                File.WriteAllText(_tab.SourcePath, json);
+            }
+            catch (IOException)
+            {
+                return TabSerializationResult.IOError;
+            }
 
             _tab.TabHistory.MarkSaved();
+            return TabSerializationResult.Success;
         }
     }
 }

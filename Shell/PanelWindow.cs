@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using NoteKeeper.InspectionWindow;
+using NoteKeeper.Project;
 using NoteKeeper.Shell.ContextMenus;
 using NoteKeeper.Shell.PropertyExplorer;
 using NoteKeeper.Shell.Styling;
@@ -62,12 +63,12 @@ namespace NoteKeeper.Shell
                 if (displayedTab != null)
                     historyActionsManager.Show(displayedTab.TabHistory.RedoableActions, screenLocation);
             };
-            uiService.SaveDisplayedTabRequested += () => displayedTab?.TabSerializer.Save();
-            uiService.SaveAllTabsRequested += () =>
-            {
-                foreach (var tab in panel.ActiveTabs)
-                    tab.TabSerializer.Save();
+            uiService.SaveDisplayedTabRequested += () => 
+            { 
+                if (displayedTab != null)
+                    TabService.SaveTabs([displayedTab]); 
             };
+            uiService.SaveAllTabsRequested += () => TabService.SaveTabs(panel.ActiveTabs);
             uiService.ToolMenuVisibilityChangeRequested += SetToolMenuVisibility;
 
             tabOrganizeManager.DisplayedTabChanged += panel.DisplayTab;

@@ -48,8 +48,6 @@ namespace NoteKeeper.InspectionWindow.MultiPage
             menuSupplier = new ContextMenuSupplier(pageActions, viewport, contentQuery, RequestPropertyScreenOpen, NotePages);
 
             NotePages.CollectionChanged += (sender, _) => viewport.PageCount = ((ObservableCollection<NotePage>)sender!).Count;
-
-            TabSerializer.Load();
         }
 
         public void AddContent(IPageContent content)
