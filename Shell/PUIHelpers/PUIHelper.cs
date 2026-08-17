@@ -23,6 +23,8 @@ namespace NoteKeeper.Shell.PUIHelpers
 
         public static ToolButtonAssigner ToolButtonAssigner { get; } = new ToolButtonAssigner();
 
+        public static ScrollerInstantiator ScrollerInstantiator { get; } = new ScrollerInstantiator();
+
         public static PUIInterpreter GetInterpreter(string puiFilePath)
         {
             PUIInterpreter interpreter = new PUIInterpreter(puiFilePath);

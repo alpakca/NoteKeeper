@@ -17,10 +17,15 @@ using System.Collections.Generic;
 
 namespace NoteKeeper.Shell
 {
-    internal class PanelWindow : PopWindow, ITabUpdateReceiver
+    internal class PanelWindow : PopWindow
     {
         private Tab? displayedTab;
+
         private Rectangle buttonsPanelBounds;
+        private Rectangle verticalScrollerBeltBounds;
+        private Rectangle horizontalScrollerBeltBounds;
+        private const int scrollersBeltWidth = 24;
+        private const int scrollerWidth = 10;
 
         private readonly ControlPanel panel;
         private readonly ContextMenuManager contextMenuManager;
@@ -71,6 +76,7 @@ namespace NoteKeeper.Shell
 
             Elements.Add(shortcutManager);
             Elements.AddRange(uiService.Buttons);
+            Elements.AddRange([uiService.VerticalScroller, uiService.HorizontalScroller]);
         }
 
         private void InitializeShortcuts()
@@ -109,24 +115,53 @@ namespace NoteKeeper.Shell
             SetToolMenuVisibility(toolMenuManager.IsShown);
         }
 
+        public void DisplayedTabScrollUpdated()
+        {
+            uiService.DisplayedTabScrollUpdated();
+        }
+
         public void ClientBoundsUpdated(Rectangle newBounds)
         {
             // button positions
-            const int UIMargin = 10; // from first button's X: assets/shell/Buttons.pui
+            const int UIMargin = 10;
             const int FrameThickness = 4;
+            const int BottomMargin = 40;
 
-            const int ButtonLength = 32;
-            for (int i = 0; i < uiService.Buttons.Length; i++)
+            const int ButtonHeight = 32;
+            int offset = 0;
+            foreach (var button in uiService.Buttons)
             {
-                uiService.Buttons[i].Boundaries = new Rectangle(UIMargin + ButtonLength * i, UIMargin, ButtonLength, ButtonLength);
+                button.Boundaries = new Rectangle(UIMargin + offset, UIMargin, button.Boundaries.Width, ButtonHeight);
+                offset += button.Boundaries.Width;
             }
 
             buttonsPanelBounds = new Rectangle(UIMargin - FrameThickness, UIMargin - FrameThickness, 
-                                               ButtonLength + 2 * FrameThickness, ButtonLength + 2 * FrameThickness);
+                                               offset + 2 * FrameThickness, ButtonHeight + 2 * FrameThickness);
 
             // tabs header position
-            tabOrganizeManager.ScreenBounds = new Rectangle(buttonsPanelBounds.X, buttonsPanelBounds.Bottom + UIMargin,
-                                                            WindowOptions.Width - UIMargin * 2, ButtonLength);
+            Rectangle tabOrganizerBounds = new Rectangle(buttonsPanelBounds.X, buttonsPanelBounds.Bottom + UIMargin,
+                                                         newBounds.Width - UIMargin * 2, ButtonHeight);
+            tabOrganizeManager.ScreenBounds = tabOrganizerBounds;
+
+            // displayed tab
+            Rectangle displayedTabBounds = new Rectangle(buttonsPanelBounds.X, tabOrganizerBounds.Bottom,
+                                                         tabOrganizerBounds.Width - scrollersBeltWidth, newBounds.Height - tabOrganizerBounds.Bottom - BottomMargin);
+            if (displayedTab != null)
+            {
+                displayedTab.TabViewport.UISize = displayedTabBounds.Size;
+                displayedTab.Window.Boundaries = displayedTabBounds;
+            }
+
+            // scrollers
+            const int MarginInBelt = (scrollersBeltWidth - scrollerWidth) / 2;
+
+            verticalScrollerBeltBounds = new Rectangle(displayedTabBounds.Right, displayedTabBounds.Y, scrollersBeltWidth, displayedTabBounds.Height);
+            uiService.VerticalScroller.Boundaries = new Rectangle(verticalScrollerBeltBounds.X + MarginInBelt, verticalScrollerBeltBounds.Y, scrollerWidth, 1);
+            uiService.VerticalScroller.Range = displayedTabBounds.Height;
+
+            horizontalScrollerBeltBounds = new Rectangle(displayedTabBounds.Left, displayedTabBounds.Bottom, displayedTabBounds.Width, scrollersBeltWidth);
+            uiService.HorizontalScroller.Boundaries = new Rectangle(horizontalScrollerBeltBounds.X, horizontalScrollerBeltBounds.Y + MarginInBelt, 1, scrollerWidth);
+            uiService.HorizontalScroller.Range = displayedTabBounds.Width;
         }
 
         private void ShowPropertyExplorer(IPropertyCollection collection)
@@ -163,10 +198,6 @@ namespace NoteKeeper.Shell
                 for (int i = 0; i < count; i++)
                     displayedTab.TabHistory.Redo();
             }
-        }
-
-        public void ScrollChanged()
-        {
         }
 
         protected override void Update()
@@ -209,6 +240,14 @@ namespace NoteKeeper.Shell
                     DrawHelper.Batch.Draw(drawInfo.GetTexture(), drawInfo.DestinationArea, drawInfo.Opacity * Color.White);
                 }
             }
+
+            if (uiService.VerticalScroller.ShouldDrawn)
+                DrawHelper.DrawBackground(new Rectangle(uiService.VerticalScroller.DrawPosition, uiService.VerticalScroller.Boundaries.Size),
+                                          theme.GetColor(ColorRegistry.ScrollerColorId));
+
+            if (uiService.HorizontalScroller.ShouldDrawn)
+                DrawHelper.DrawBackground(new Rectangle(uiService.HorizontalScroller.DrawPosition, uiService.HorizontalScroller.Boundaries.Size),
+                                          theme.GetColor(ColorRegistry.ScrollerColorId));
         }
 
         protected override void OnMouseButtonStateChange(PopWindowMouseEventArgs e)

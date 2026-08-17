@@ -19,6 +19,8 @@ namespace NoteKeeper.Shell.Styling
 
         public const string TextColorId = "base.textcolor";
 
+        public const string ScrollerColorId = "base.scrollercolor";
+
         private static readonly Dictionary<string, ColorDefinition> _definitions = new Dictionary<string, ColorDefinition>();
 
         public static IEnumerable<string> RegisteredIds => _definitions.Keys;
@@ -33,6 +35,7 @@ namespace NoteKeeper.Shell.Styling
             Register(new ColorDefinition { Id = HoverOverlayId });
             Register(new ColorDefinition { Id = HeldOverlayId });
             Register(new ColorDefinition { Id = TextColorId });
+            Register(new ColorDefinition { Id = ScrollerColorId });
         }
 
         public static void Register(ColorDefinition definition)

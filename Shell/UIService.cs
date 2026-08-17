@@ -18,7 +18,12 @@ namespace NoteKeeper.Shell
         private readonly VisualClickable _saveAllTabs;
         private readonly VisualToggleButton _toolMenu;
 
+        private readonly VerticalScroller _verticalScroller;
+        private readonly HorizontalScroller _horizontalScroller;
+
         public Clickable[] Buttons { get; }
+        public VerticalScroller VerticalScroller => _verticalScroller;
+        public HorizontalScroller HorizontalScroller => _horizontalScroller;
 
         public event Action UndoRequested;
         public event Action RedoRequested;
@@ -57,11 +62,14 @@ namespace NoteKeeper.Shell
             _toolMenu = interpreter.CreateFromProperties(PUIHelper.VisualToggleButtonInstantiator, "Tool_Menu");
             _toolMenu.ToggleCommand = new ActionCommander<ToggleButton>(button => ToolMenuVisibilityChangeRequested?.Invoke(button.IsChecked));
 
-            Buttons = [_undo, _redo, _historyUndo, _historyRedo, _saveCurrentTab, _saveAllTabs, _toolMenu];
+            Buttons = [_undo, _historyUndo, _redo, _historyRedo, _saveCurrentTab, _saveAllTabs, _toolMenu];
             foreach (var button in Buttons)
             {
                 button.Enabled = false;
             }
+
+            _verticalScroller = interpreter.CreateFromProperties<VerticalScroller>(PUIHelper.ScrollerInstantiator, "Vertical_Scroller");
+            _horizontalScroller = interpreter.CreateFromProperties<HorizontalScroller>(PUIHelper.ScrollerInstantiator, "Horizontal_Scroller");
         }
 
         public void DisplayedTabChanged(Tab newTab)
@@ -69,6 +77,15 @@ namespace NoteKeeper.Shell
             _saveCurrentTab.Enabled = newTab != null;
             _saveAllTabs.Enabled = newTab != null;
             _toolMenu.Enabled = newTab?.ToolMenu != null;
+
+            _verticalScroller.DisplayedTabChanged(newTab);
+            _horizontalScroller.DisplayedTabChanged(newTab);
+        }
+
+        public void DisplayedTabScrollUpdated()
+        {
+            _verticalScroller.ScrollChanged();
+            _horizontalScroller.ScrollChanged();
         }
 
         public void DisplayedTabHistoryUpdated(TabHistory history)

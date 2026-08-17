@@ -46,8 +46,6 @@ namespace NoteKeeper
         {
             PopUpUIManager.Initialize(this, _graphics);
 
-            WindowOptions.Size = new Point(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width,
-                                           GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height);
             WindowOptions.AllowUserResizing = true;
 
             base.Initialize();

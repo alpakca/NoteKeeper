@@ -1,17 +1,18 @@
 ﻿using Microsoft.Xna.Framework;
 using NoteKeeper.InspectionWindow;
-using PopUpUI.Elements.Visual;
-using PopUpUI.Surface;
-using System.Collections.Generic;
+using PopUpUI.Elements;
 
 #nullable enable
 
 namespace NoteKeeper.Shell
 {
-    internal class VerticalScroller : VisualVerticalSlider, ITabUpdateReceiver
+    internal class VerticalScroller : VerticalSlider
     {
         private bool slidedFromNonUI = false;
         private ITabViewport? displayedTabViewport;
+
+        public bool ShouldDrawn => displayedTabViewport != null && displayedTabViewport.TotalContentHeight - displayedTabViewport.ViewedHeight > 0;
+        public Point DrawPosition => new Point(Boundaries.X, Boundaries.Y + ScrollOffset);
 
         public void DisplayedTabChanged(Tab? setTab)
         {
@@ -35,16 +36,6 @@ namespace NoteKeeper.Shell
         {
             UpdateSliderBounds();
             base.Update();
-        }
-
-        public override IEnumerable<UIDrawInfo> GetDrawInfos()
-        {
-            if (displayedTabViewport == null || displayedTabViewport.TotalContentHeight - displayedTabViewport.ViewedHeight <= 0)
-            {
-                return [];
-            }
-
-            return base.GetDrawInfos();
         }
 
         protected override void OnSliding()
