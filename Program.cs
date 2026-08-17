@@ -5,9 +5,11 @@ namespace NoteKeeper
 {
     public class Program
     {
-        private const string RootPathFileRelativePath = "RootPath.txt";
+        private const string RootPathFileRelativePath = "RootPath";
+        private const string PreferencesFileRelativePath = "Preferences";
 
         public static string RootPath { get; private set; }
+        public static string PreferencesPath { get; private set; }
 
         public static void Main(string[] args)
         {
@@ -32,8 +34,10 @@ namespace NoteKeeper
 
 #if DEBUG
             RootPath = File.ReadAllText(@"C:\Users\user\Desktop\C#\NoteKeeper\NoteKeeper\bin\Release\net10.0\" + RootPathFileRelativePath);
+            PreferencesPath = @"C:\Users\user\Desktop\C#\NoteKeeper\NoteKeeper\bin\Release\net10.0\" + PreferencesFileRelativePath;
 #else
             RootPath = File.ReadAllText(AppContext.BaseDirectory + RootPathFileRelativePath);
+            PreferencesPath = AppContext.BaseDirectory + PreferencesFileRelativePath;
 #endif
             game.Run();
         }

@@ -1,9 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using NoteKeeper.Shell.Styling;
 using PopUpUI.PUI;
 using PopUpUI.Surface;
 using PopUpUI.Toolkit;
-using System;
+using System.IO;
 
 namespace NoteKeeper.Shell.PUIHelpers
 {
@@ -18,7 +19,7 @@ namespace NoteKeeper.Shell.PUIHelpers
                 throw new TupleParseException("Animation tuple parser takes single string argument");
             }
 
-            return Animation2D.FromTexture(ContentAssistant.FromLoaded<Texture2D>(path));
+            return Animation2D.FromTexture(ContentAssistant.FromLoaded<Texture2D>(Path.Combine(ThemeService.AssetsFolderRelativePath, path)));
         }
     }
 
@@ -33,7 +34,7 @@ namespace NoteKeeper.Shell.PUIHelpers
                 throw new TupleParseException("Texture tuple parser takes single string argument");
             }
 
-            return ContentAssistant.FromLoaded<Texture2D>(path);
+            return ContentAssistant.FromLoaded<Texture2D>(Path.Combine(ThemeService.AssetsFolderRelativePath, path));
         }
     }
 

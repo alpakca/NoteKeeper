@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using NoteKeeper.InspectionWindow;
 using NoteKeeper.Project;
 using NoteKeeper.Shell;
@@ -8,7 +7,6 @@ using NoteKeeper.Shell.Styling;
 using PopUpUI.Toolkit;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -48,6 +46,8 @@ namespace NoteKeeper
 
             WindowOptions.AllowUserResizing = true;
 
+            PreferenceLoader.Load();
+
             base.Initialize();
         }
 
@@ -61,9 +61,8 @@ namespace NoteKeeper
             ContentAssistant.LoadWithContentManager<SpriteFont>(("ComicSans_Bold_16", "Font_ComicSans_Bold_16"));
             ContentAssistant.LoadWithContentManager<SpriteFont>(("ComicSans_Bold_24", "Font_ComicSans_Bold_24"));
 
-            string shellAssetsPath = @"C:\Users\user\Desktop\C#\NoteKeeper\NoteKeeper\assets";
             ContentAssistant.LoadTexture2Ds(
-                Directory.EnumerateFiles(shellAssetsPath, "*.png", SearchOption.AllDirectories)
+                Directory.EnumerateFiles(ThemeService.AssetsFolderRelativePath, "*.png", SearchOption.AllDirectories)
                 .Where(path => Path.GetExtension(path) != ".pui")
                 .Select(path => (path, path))
                 .ToArray()
@@ -76,7 +75,7 @@ namespace NoteKeeper
             this.Window.ClientSizeChanged += (sender, _) => panel.RearrangeUISizes(((GameWindow)sender).ClientBounds);
         }
 
-        protected override void OnExiting(object sender, ExitingEventArgs args)
+        protected override async void OnExiting(object sender, ExitingEventArgs args)
         {
             if (!panel.TryExitApp())
             {
@@ -84,6 +83,7 @@ namespace NoteKeeper
                 return;
             }
 
+            PreferenceLoader.Save(GraphicsDevice.Viewport);
             base.OnExiting(sender, args);
         }
 

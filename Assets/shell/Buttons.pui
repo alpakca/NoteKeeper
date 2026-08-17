@@ -1,4 +1,4 @@
-#define Path ShellFolderPath = "C:\Users\user\Desktop\C#\NoteKeeper\NoteKeeper\assets\shell\";
+#define Path ShellFolderPath = "shell\";
 
 #define SelectablePacket selectablePacket { }
 #define HoldablePacket holdablePacket { }
