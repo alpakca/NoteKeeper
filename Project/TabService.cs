@@ -11,7 +11,9 @@ namespace NoteKeeper.Project
 {
     internal static class TabService
     {
-        private static readonly Dictionary<string, Func<string, Tab>> _creators = new Dictionary<string, Func<string, Tab>>();
+        private static readonly Dictionary<string, TabFileInfo> _tabInfos = new Dictionary<string, TabFileInfo>();
+
+        public static IEnumerable<TabFileInfo> TabTypes => _tabInfos.Values;
 
         [ModuleInitializer]
         public static void InitializeRegistry()
@@ -21,18 +23,33 @@ namespace NoteKeeper.Project
 
         public static void Register<T>(Func<string, Tab> creator) where T : Tab
         {
-            string extension = typeof(T).GetCustomAttribute<TabFileExtensionAttribute>()?.Extension
+            TabFileAttribute attr = typeof(T).GetCustomAttribute<TabFileAttribute>() 
                 ?? throw new Exception();
 
-            _creators.Add(extension, creator);
+            _tabInfos.Add(attr.Extension, new TabFileInfo
+            {
+                Extension = attr.Extension,
+                FileTypeName = attr.FileTypeName,
+                Creator = creator
+            });
         }
 
-        public static Tab? Create(string path)
+        public static Tab? CreateNew(string path)
+        {
+            if (_tabInfos.TryGetValue(Path.GetExtension(path), out TabFileInfo info))
+            {
+                return info.Creator(path);
+            }
+
+            return null;
+        }
+
+        public static Tab? Load(string path)
         {
             TabSerializationResult result = TabSerializationResult.WrongFileFormat;
-            if (_creators.TryGetValue(Path.GetExtension(path), out Func<string, Tab> creator))
+            if (_tabInfos.TryGetValue(Path.GetExtension(path), out TabFileInfo info))
             {
-                Tab created = creator(path);
+                Tab created = info.Creator(path);
                 result = created.TabSerializer.Load();
 
                 if (result == TabSerializationResult.Success)

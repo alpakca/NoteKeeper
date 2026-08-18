@@ -1,14 +1,18 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using NoteKeeper.Project;
 using NoteKeeper.Shell.Styling;
 using PopUpUI.Elements;
 using PopUpUI.Input;
 using PopUpUI.Surface;
 using PopUpUI.Toolkit;
 using System;
+using System.Collections.Generic;
 
 namespace NoteKeeper.Shell.ChildWindow
 {
+    internal delegate void CreateTabFileWindowClosed(string? filePath, string tabExtension);
+
     internal class CreateTabFileWindow : PopWindow
     {
         private const int ButtonTextSize = 12;
@@ -20,25 +24,72 @@ namespace NoteKeeper.Shell.ChildWindow
         private readonly Clickable _closeButton;
         private readonly LinearTextBox _textBox;
 
-        private readonly ToggleButton[] _optionToggles;
+        private readonly List<TabToggleButton> _optionToggles;
         private readonly Clickable[] _textedButtons;
         private readonly Clickable[] _allButtons;
 
-        private ToggleButton _selectedToggle;
+        private TabToggleButton _selectedToggle;
 
-        public event Action<string?> WindowClosed;
+        public static event CreateTabFileWindowClosed WindowClosed;
 
         private CreateTabFileWindow() : base(new BatchDrawOptions { BlendState = Microsoft.Xna.Framework.Graphics.BlendState.AlphaBlend })
         {
-            Point size = new Point(550, 320);
-            Boundaries = new Rectangle((WindowOptions.Size - size) / 2, size);
-
             SelectablePacket selectablePacket = new SelectablePacket();
             HoldablePacket holdablePacket = new HoldablePacket();
 
+            const int ToggleButtonHeight = 40;
+            const int WindowWidth = 550;
+
+            int yOffset = 70;
+            ActionCommander<ToggleButton> toggleAction = new ActionCommander<ToggleButton>(OptionToggled);
+            _optionToggles = new List<TabToggleButton>();
+
+            foreach (var tabInfo in TabService.TabTypes)
+            {
+                TabToggleButton tabToggle = new TabToggleButton
+                {
+                    Name = tabInfo.FileTypeName,
+                    FileExtension = tabInfo.Extension,
+
+                    Boundaries = new Rectangle(HorizontalMargin, yOffset, WindowWidth - HorizontalMargin * 2, ToggleButtonHeight),
+                    ToggleCommand = toggleAction,
+
+                    SelectablePacket = selectablePacket,
+                    HoldPacket = holdablePacket
+                };
+
+                yOffset += ToggleButtonHeight;
+                _optionToggles.Add(tabToggle);
+            }
+
+            _selectedToggle = _optionToggles[0]; // selected by default, first one
+            _selectedToggle.SetStatusWithoutCommander(true);
+
+            int textBoxHeight = FontProvider.GetLineSpacing(ButtonTextSize, isBold: false);
+            Rectangle lastTabToggleBounds = _optionToggles[^1].Boundaries;
+            Rectangle textBoxBounds = new Rectangle(lastTabToggleBounds.X, yOffset, lastTabToggleBounds.Width, textBoxHeight);
+            _textBox = new LinearTextBox
+            {
+                TextSize = ButtonTextSize,
+                IsTextBold = false,
+                ReceivesInput = true,
+                Boundaries = textBoxBounds,
+                SelectableArea = new Rectangle(textBoxBounds.X - FrameThickness, textBoxBounds.Y - FrameThickness,
+                                               textBoxBounds.Width + 2 * FrameThickness, textBoxHeight + 2 * FrameThickness),
+
+                SelectablePacket = selectablePacket
+            };
+
+            yOffset += textBoxHeight + ToggleButtonHeight;
+            const int BottomButtonHeight = 40;
+            const int BottomMargin = 10;
+
+            Point size = new Point(WindowWidth, yOffset + BottomButtonHeight + BottomMargin);
+            Boundaries = new Rectangle((WindowOptions.Size - size) / 2, size);
+
             _closeButton = new Clickable
             {
-                Boundaries = new Rectangle(Boundaries.Width - 55, 0, 55, 38),
+                Boundaries = new Rectangle(WindowWidth - 55, 0, 55, 38),
                 ClickCommand = new ActionCommander<Clickable>(_ => CloseWindow(additionCancelled: true)),
 
                 SelectablePacket = selectablePacket,
@@ -47,7 +98,7 @@ namespace NoteKeeper.Shell.ChildWindow
             Clickable cancelButton = new Clickable
             {
                 Name = "Cancel",
-                Boundaries = new Rectangle(Boundaries.Width - HorizontalMargin - 160, Boundaries.Height - 50, 160, 40),
+                Boundaries = new Rectangle(WindowWidth - HorizontalMargin - 160, Boundaries.Height - 50, 160, 40),
                 ClickCommand = _closeButton.ClickCommand,
 
                 SelectablePacket = selectablePacket,
@@ -66,47 +117,20 @@ namespace NoteKeeper.Shell.ChildWindow
             _textedButtons = [addButton, cancelButton];
             _allButtons = [addButton, cancelButton, _closeButton];
 
-            ToggleButton multiPageTabToggle = new ToggleButton
-            {
-                Name = "Multi-Paged Note",
-                Boundaries = new Rectangle(HorizontalMargin, 70, Boundaries.Width - HorizontalMargin * 2, 40),
-                ToggleCommand = new ActionCommander<ToggleButton>(OptionToggled),
-
-                SelectablePacket = selectablePacket,
-                HoldPacket = holdablePacket
-            };
-            multiPageTabToggle.SetStatusWithoutCommander(true);
-
-            _selectedToggle = multiPageTabToggle; // selected by default, first one
-            _optionToggles = [multiPageTabToggle];
-
-            int textBoxHeight = FontProvider.GetLineSpacing(ButtonTextSize, isBold: false);
-            Rectangle textBoxBounds = new Rectangle(multiPageTabToggle.Boundaries.X, addButton.Boundaries.Y - 20 - textBoxHeight,
-                                                    multiPageTabToggle.Boundaries.Width, textBoxHeight);
-            _textBox = new LinearTextBox
-            {
-                TextSize = ButtonTextSize,
-                IsTextBold = false,
-                ReceivesInput = true,
-                Boundaries = textBoxBounds,
-                SelectableArea = new Rectangle(textBoxBounds.X - FrameThickness, textBoxBounds.Y - FrameThickness,
-                                               textBoxBounds.Width + 2 * FrameThickness, textBoxHeight + 2 * FrameThickness),
-
-                SelectablePacket = selectablePacket
-            };
-
-            Elements.AddRange([_closeButton, addButton, cancelButton, multiPageTabToggle, _textBox]);
+            Elements.AddRange([_closeButton, addButton, cancelButton, .._optionToggles, _textBox]);
         }
 
-        public static void Show()
+        public static void Show(string examplePath)
         {
             foreach (var window in PopWindowManager.ActiveWindows) window.Frozen = true;
             PopWindowManager.ActiveWindows.Add(_instance);
+
+            _instance._textBox.Text = examplePath;
         }
 
         private void OptionToggled(ToggleButton button)
         {
-            _selectedToggle = button;
+            _selectedToggle = (TabToggleButton)button;
             foreach (var toggle in _optionToggles)
             {
                 toggle.SetStatusWithoutCommander(false);
@@ -120,7 +144,7 @@ namespace NoteKeeper.Shell.ChildWindow
             foreach (var window in PopWindowManager.ActiveWindows) window.Frozen = false;
             PopWindowManager.ActiveWindows.Remove(_instance);
 
-            WindowClosed?.Invoke(additionCancelled ? null : _textBox.Text);
+            WindowClosed?.Invoke(additionCancelled ? null : _textBox.Text, _selectedToggle.FileExtension);
         }
 
         protected override void RenderUpdate()
@@ -182,6 +206,11 @@ namespace NoteKeeper.Shell.ChildWindow
             }
 
             base.OnKeyDown(e, key);
+        }
+
+        private class TabToggleButton : ToggleButton
+        {
+            public string FileExtension { get; init; }
         }
     }
 }

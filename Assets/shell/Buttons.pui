@@ -108,3 +108,16 @@ HorizontalScroller Horizontal_Scroller
 	SelectablePacket = selectablePacket,
 	HoldablePacket = holdablePacket
 }
+
+VisualClickable Create_Tab_File
+{
+	Name = "Create Tab File",
+	Boundaries = Rectangle(0, 0, 32, 0),
+	DefaultAnimation = Animation(ShellFolderPath + "CreateTabFile.png"),
+	HoverAnimation = Animation(ShellFolderPath + "CreateTabFileHovered.png"),
+	HoldAnimation = Animation(ShellFolderPath + "CreateTabFileHeld.png"),
+	UnenabledAnimation = Animation(ShellFolderPath + "CreateTabFileUnenabled.png"),
+
+	SelectablePacket = selectablePacket,
+	HoldablePacket = holdablePacket
+}

@@ -17,6 +17,7 @@ namespace NoteKeeper.Shell
         private readonly VisualClickable _saveCurrentTab;
         private readonly VisualClickable _saveAllTabs;
         private readonly VisualToggleButton _toolMenu;
+        private readonly VisualClickable _createTabFile;
 
         private readonly VerticalScroller _verticalScroller;
         private readonly HorizontalScroller _horizontalScroller;
@@ -35,6 +36,8 @@ namespace NoteKeeper.Shell
         public event Action SaveAllTabsRequested;
 
         public event Action<bool> ToolMenuVisibilityChangeRequested;
+
+        public event Action CreateTabFileWindowRequested;
 
         public UIService()
         {
@@ -62,11 +65,16 @@ namespace NoteKeeper.Shell
             _toolMenu = interpreter.CreateFromProperties(PUIHelper.VisualToggleButtonInstantiator, "Tool_Menu");
             _toolMenu.ToggleCommand = new ActionCommander<ToggleButton>(button => ToolMenuVisibilityChangeRequested?.Invoke(button.IsChecked));
 
-            Buttons = [_undo, _historyUndo, _redo, _historyRedo, _saveCurrentTab, _saveAllTabs, _toolMenu];
+            _createTabFile = interpreter.CreateFromProperties(PUIHelper.VisualClickableInstantiator, "Create_Tab_File");
+            _createTabFile.ClickCommand = new ActionCommander<Clickable>(_ => CreateTabFileWindowRequested?.Invoke());
+
+            Buttons = [_undo, _historyUndo, _redo, _historyRedo, _saveCurrentTab, _saveAllTabs, _toolMenu, _createTabFile];
+
             foreach (var button in Buttons)
             {
                 button.Enabled = false;
             }
+            _createTabFile.Enabled = true;
 
             _verticalScroller = interpreter.CreateFromProperties<VerticalScroller>(PUIHelper.ScrollerInstantiator, "Vertical_Scroller");
             _horizontalScroller = interpreter.CreateFromProperties<HorizontalScroller>(PUIHelper.ScrollerInstantiator, "Horizontal_Scroller");

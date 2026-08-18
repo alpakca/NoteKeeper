@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using NoteKeeper.InspectionWindow;
 using NoteKeeper.Project;
+using NoteKeeper.Shell.ChildWindow;
 using NoteKeeper.Shell.ContextMenus;
 using NoteKeeper.Shell.PropertyExplorer;
 using NoteKeeper.Shell.Styling;
@@ -13,6 +14,7 @@ using PopUpUI.Input;
 using PopUpUI.Surface;
 using PopUpUI.Toolkit;
 using System.Collections.Generic;
+using System.IO;
 
 #nullable enable
 
@@ -70,6 +72,7 @@ namespace NoteKeeper.Shell
             };
             uiService.SaveAllTabsRequested += () => TabService.SaveTabs(panel.ActiveTabs);
             uiService.ToolMenuVisibilityChangeRequested += SetToolMenuVisibility;
+            uiService.CreateTabFileWindowRequested += UiService_CreateTabFileWindowRequested;
 
             tabOrganizeManager.DisplayedTabChanged += panel.DisplayTab;
             historyActionsManager.ActionsReversed += HistoryActionsManager_ActionsReversed;
@@ -179,6 +182,33 @@ namespace NoteKeeper.Shell
             else
             {
                 toolMenuManager.Hide();
+            }
+        }
+
+        private void UiService_CreateTabFileWindowRequested()
+        {
+            CreateTabFileWindow.WindowClosed += CreateTabFileWindow_WindowClosed;
+            CreateTabFileWindow.Show(@"C:\Users\user\Desktop\");
+        }
+
+        private void CreateTabFileWindow_WindowClosed(string? filePath, string tabExtension)
+        {
+            CreateTabFileWindow.WindowClosed -= CreateTabFileWindow_WindowClosed;
+
+            if (filePath != null)
+            {
+                string newPath = Path.ChangeExtension(filePath, tabExtension);
+                if (File.Exists(newPath))
+                {
+                    MessageWindow.Show($"Given path already contains a file with path {newPath}. Try again with another path.");
+                    return;
+                }
+
+                Tab created = TabService.CreateNew(newPath)!;
+                var result = created.TabSerializer.Save();
+
+                panel.ActiveTabs.Add(created);
+                panel.DisplayTab(created);
             }
         }
 

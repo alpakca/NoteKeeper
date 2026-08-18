@@ -12,7 +12,7 @@ using System.Collections.ObjectModel;
 
 namespace NoteKeeper.InspectionWindow.MultiPage
 {
-    [TabFileExtension(".mlpage")]
+    [TabFile("Multi-Paged Note", ".mlpage")]
     internal class MultiPageTab : Tab
     {
         private readonly TabViewport viewport;

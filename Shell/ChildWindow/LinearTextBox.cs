@@ -13,7 +13,15 @@ namespace NoteKeeper.Shell.ChildWindow
         private string _text = "";
         private int _caretPosition = 0;
 
-        public string Text => _text;
+        public string Text
+        {
+            get => _text;
+            set
+            {
+                _text = value;
+                _caretPosition = Math.Clamp(_caretPosition, 0, _text.Length);
+            }
+        }
         public int CaretOffset => (int)FontProvider.MeasureWidth(TextSize, IsTextBold, _text[.._caretPosition]);
 
         public int TextSize { get; set; }
