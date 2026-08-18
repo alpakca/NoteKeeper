@@ -16,23 +16,11 @@ namespace NoteKeeper.InspectionWindow.MultiPage
         public Point Location => location;
         public Point Size => size;
 
-#if DEBUG
-        public PageImageContent(Texture2D image, Point size)
-        {
-            this.image = image;
-            this.size = size;
-        }
-#endif
-
         public PageImageContent(string imagePath)
         {
             _imagePath = imagePath;
             image = DrawHelper.FromFile(imagePath);
-        }
-
-        public PageImageContent(string imagePath, Point size) : this(imagePath)
-        {
-            this.size = size;
+            this.size = new Point(image.Width, image.Height);
         }
 
         public void RenderUpdate()

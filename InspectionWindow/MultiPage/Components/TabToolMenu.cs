@@ -73,7 +73,7 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
         private void AddTextBlock()
         {
             PageTextContent content = new PageTextContent();
-            content.SetFont("Font_ComicSans", 16);
+            content.SetFont("ComicSans", 16);
 
             _tab.AddContent(content);
             WindowInputStateChanged?.Invoke(WindowInputState.Writing);
