@@ -5,12 +5,10 @@ using NoteKeeper.Shell;
 using NoteKeeper.Shell.ChildWindow;
 using PopUpUI.Input;
 using PopUpUI.Surface;
-using PopUpUI.Toolkit;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Text;
 
 #nullable enable
 
@@ -115,16 +113,6 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
         protected override void OnKeyDown(PopWindowMouseEventArgs e, Keys key)
         {
             inputHandler.KeyInput(e, key);
-        }
-
-        protected override void OnMouseVerticalScrollChange(PopWindowMouseEventArgs e, int change)
-        {
-            viewport.ScrollVertical(-change / 6);
-        }
-
-        protected override void OnMouseHorizontalScrollChange(PopWindowMouseEventArgs e, int change)
-        {
-            viewport.ScrollHorizontal(-change / 6);
         }
 
         protected override void OnFileDrop(PopWindowMouseEventArgs e, FileDropEventArgs fileArgs)

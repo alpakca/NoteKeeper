@@ -22,6 +22,8 @@ namespace NoteKeeper.Shell
 {
     internal class PanelWindow : PopWindow
     {
+        private const int ScrollSpeed = 6;
+
         private Tab? displayedTab;
 
         private Rectangle buttonsPanelBounds;
@@ -322,6 +324,18 @@ namespace NoteKeeper.Shell
         {
             propertiesScreen.OnKeyDown(e, key);
             base.OnKeyDown(e, key);
+        }
+
+        protected override void OnMouseVerticalScrollChange(PopWindowMouseEventArgs e, int change)
+        {
+            displayedTab?.TabViewport.ScrollVertical(-change / ScrollSpeed); 
+            base.OnMouseVerticalScrollChange(e, change);
+        }
+
+        protected override void OnMouseHorizontalScrollChange(PopWindowMouseEventArgs e, int change)
+        {
+            displayedTab?.TabViewport.ScrollHorizontal(change / ScrollSpeed);
+            base.OnMouseHorizontalScrollChange(e, change);
         }
     }
 }
