@@ -17,7 +17,12 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
         public float Zoom
         {
             get;
-            set => field = Math.Clamp(value, MinimumZoomValue, MaximumZoomValue);
+            set
+            {
+                field = Math.Clamp(value, MinimumZoomValue, MaximumZoomValue);
+                SetVerticalScroll(scrolledDistance.Y);
+                SetHorizontalScroll(scrolledDistance.X);
+            }
         } = 1f;
         public Point UISize
         {
@@ -121,6 +126,25 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
             else
             {
                 return new Point(pos.X + amount, pos.Y);
+            }
+        }
+
+        public void ToggleOrientation()
+        {
+            float scrolledVerticalPercentage = ExceedsUIHeight ? scrolledDistance.Y / ScrollableHeight : 0;
+            float scrolledHorizontalPercentage = ExceedsUIWidth ? scrolledDistance.X / ScrollableWidth : 0;
+
+            inVerticalMode = !inVerticalMode;
+
+            if (inVerticalMode) // old mode was horizontal
+            {
+                SetVerticalScroll(ExceedsUIHeight ? (int)(scrolledHorizontalPercentage * ScrollableHeight) : 0);
+                SetHorizontalScroll(ExceedsUIWidth ? (int)(scrolledVerticalPercentage * ScrollableWidth) : 0);
+            }
+            else // old mode was vertical
+            {
+                SetHorizontalScroll(ExceedsUIWidth ? (int)(scrolledVerticalPercentage * ScrollableWidth) : 0);
+                SetVerticalScroll(ExceedsUIHeight ? (int)(scrolledHorizontalPercentage * ScrollableHeight) : 0);
             }
         }
 

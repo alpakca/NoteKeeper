@@ -34,3 +34,8 @@ ActionToolButton Save_Pages
 {
 	DefaultTexture = Texture(FolderPath + "SavePages.png")
 }
+
+ActionToolButton Change_Orientation
+{
+	DefaultTexture = Texture(FolderPath + "ChangeOrientation.png")
+}

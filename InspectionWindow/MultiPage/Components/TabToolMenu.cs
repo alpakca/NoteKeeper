@@ -51,8 +51,11 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
             ActionToolButton savePages = new ActionToolButton(SavePages);
             interpreter.AssignProperties(PUIHelper.ToolButtonAssigner, "Save_Pages", savePages);
 
+            ActionToolButton changeOrientation = new ActionToolButton(ChangeOrientation);
+            interpreter.AssignProperties(PUIHelper.ToolButtonAssigner, "Change_Orientation", changeOrientation);
+
             _combinedToggles = [transformContents, writingContent, swapPages];
-            Buttons = [transformContents, writingContent, swapPages, addTextBlock, appendPage, lockTransformerCorner, savePages];
+            Buttons = [transformContents, writingContent, swapPages, addTextBlock, appendPage, lockTransformerCorner, savePages, changeOrientation];
         }
 
         private void ButtonToggled(ToggleToolButton button, WindowInputState state)
@@ -110,6 +113,11 @@ namespace NoteKeeper.InspectionWindow.MultiPage.Components
         {
             string directoryPath = Path.ChangeExtension(_tab.SourcePath, null) + "Pages";
             SavingPagesRequested?.Invoke(directoryPath);
+        }
+
+        private void ChangeOrientation()
+        {
+            ((TabViewport)_tab.TabViewport).ToggleOrientation();
         }
     }
 }
