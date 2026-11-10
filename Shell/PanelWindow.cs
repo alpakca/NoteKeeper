@@ -13,6 +13,7 @@ using NoteKeeper.Shell.UndoRedo;
 using PopUpUI.Input;
 using PopUpUI.Surface;
 using PopUpUI.Toolkit;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -190,7 +191,7 @@ namespace NoteKeeper.Shell
         private void UiService_CreateTabFileWindowRequested()
         {
             CreateTabFileWindow.WindowClosed += CreateTabFileWindow_WindowClosed;
-            CreateTabFileWindow.Show(@"C:\Users\user\Desktop\");
+            CreateTabFileWindow.Show(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory));
         }
 
         private void CreateTabFileWindow_WindowClosed(string? filePath, string tabExtension)
