@@ -5,7 +5,6 @@ namespace NoteKeeper
 {
     public class Program
     {
-        private const string RootPathFileRelativePath = "RootPath";
         private const string PreferencesFileRelativePath = "Preferences";
 
         public static string RootPath { get; private set; }
@@ -20,7 +19,7 @@ namespace NoteKeeper
                 return;
             }
 
-            RootPath = File.ReadAllText(AppContext.BaseDirectory + RootPathFileRelativePath);
+            RootPath = AppContext.BaseDirectory;
             PreferencesPath = AppContext.BaseDirectory + PreferencesFileRelativePath;
 
             game.Run();
